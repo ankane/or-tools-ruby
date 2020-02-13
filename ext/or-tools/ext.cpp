@@ -34,6 +34,7 @@ using operations_research::sat::IntVar;
 using operations_research::sat::SolutionIntegerValue;
 
 using Rice::Array;
+using Rice::Class;
 using Rice::Constructor;
 using Rice::Hash;
 using Rice::Module;
@@ -68,19 +69,44 @@ MPSolver::OptimizationProblemType from_ruby<MPSolver::OptimizationProblemType>(O
   }
 }
 
+Class rb_cMPVariable;
+Class rb_cMPConstraint;
+Class rb_cMPObjective;
+
+template<>
+inline
+Object to_ruby<MPVariable*>(MPVariable* const &x)
+{
+  return Rice::Data_Object<MPVariable>(x, rb_cMPVariable, nullptr, nullptr);
+}
+
+template<>
+inline
+Object to_ruby<MPConstraint*>(MPConstraint* const &x)
+{
+  return Rice::Data_Object<MPConstraint>(x, rb_cMPConstraint, nullptr, nullptr);
+}
+
+template<>
+inline
+Object to_ruby<MPObjective*>(MPObjective* const &x)
+{
+  return Rice::Data_Object<MPObjective>(x, rb_cMPObjective, nullptr, nullptr);
+}
+
 extern "C"
 void Init_ext()
 {
   Module rb_mORTools = define_module("ORTools");
 
-  define_class_under<MPVariable>(rb_mORTools, "MPVariable")
+  rb_cMPVariable = define_class_under<MPVariable>(rb_mORTools, "MPVariable")
     .define_method("name", &MPVariable::name)
     .define_method("solution_value", &MPVariable::solution_value);
 
-  define_class_under<MPConstraint>(rb_mORTools, "MPConstraint")
+  rb_cMPConstraint = define_class_under<MPConstraint>(rb_mORTools, "MPConstraint")
     .define_method("set_coefficient", &MPConstraint::SetCoefficient);
 
-  define_class_under<MPObjective>(rb_mORTools, "MPObjective")
+  rb_cMPObjective = define_class_under<MPObjective>(rb_mORTools, "MPObjective")
     .define_method("value", &MPObjective::Value)
     .define_method("set_coefficient", &MPObjective::SetCoefficient)
     .define_method("set_maximization", &MPObjective::SetMaximization);

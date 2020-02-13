@@ -5,8 +5,6 @@ class IntegerTest < Minitest::Test
   def test_solver
     solver = ORTools::Solver.new("simple_mip_program", :cbc)
 
-    skip
-
     infinity = solver.infinity
     x = solver.int_var(0.0, infinity, "x")
     y = solver.int_var(0.0, infinity, "y")

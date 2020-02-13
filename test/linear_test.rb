@@ -5,8 +5,6 @@ class LinearTest < Minitest::Test
   def test_solver
     solver = ORTools::Solver.new("LinearProgrammingExample", :glop)
 
-    skip # pointer being freed was not allocated error
-
     x = solver.num_var(0, solver.infinity, "x")
     y = solver.num_var(0, solver.infinity, "y")
 
