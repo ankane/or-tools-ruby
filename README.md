@@ -36,6 +36,7 @@ Network Flows
 Assignment
 
 - [Assignment](#assignment)
+- [Assignment as a Min Cost Problem](#assignment-as-a-min-cost-problem)
 
 ### CP-SAT Solver
 
@@ -274,6 +275,63 @@ elsif solve_status == :infeasible
   puts "No assignment is possible."
 elsif solve_status == :possible_overflow
   puts "Some input costs are too large and may cause an integer overflow."
+end
+```
+
+## Assignment as a Min Cost Problem
+
+Create the solver
+
+```ruby
+min_cost_flow = ORTools::SimpleMinCostFlow.new
+```
+
+Create the data
+
+```ruby
+start_nodes = [0, 0, 0, 0] + [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4] + [5, 6, 7, 8]
+end_nodes =   [1, 2, 3, 4] + [5, 6, 7, 8, 5, 6, 7, 8, 5, 6, 7, 8, 5, 6, 7, 8] + [9, 9, 9, 9]
+capacities =  [1, 1, 1, 1] + [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] + [1, 1, 1, 1]
+costs  = [0, 0, 0, 0] + [90, 76, 75, 70, 35, 85, 55, 65, 125, 95, 90, 105, 45, 110, 95, 115] + [0, 0, 0, 0]
+supplies = [4, 0, 0, 0, 0, 0, 0, 0, 0, -4]
+source = 0
+sink = 9
+tasks = 4
+```
+
+Create the graph and constraints
+
+```ruby
+start_nodes.length.times do |i|
+  min_cost_flow.add_arc_with_capacity_and_unit_cost(
+    start_nodes[i], end_nodes[i], capacities[i], costs[i]
+  )
+end
+
+supplies.length.times do |i|
+  min_cost_flow.set_node_supply(i, supplies[i])
+end
+```
+
+Invoke the solver
+
+```ruby
+if min_cost_flow.solve == :optimal
+  puts "Total cost = #{min_cost_flow.optimal_cost}"
+  puts
+  min_cost_flow.num_arcs.times do |arc|
+    if min_cost_flow.tail(arc) != source && min_cost_flow.head(arc) != sink
+      if min_cost_flow.flow(arc) > 0
+        puts "Worker %d assigned to task %d.  Cost = %d" % [
+          min_cost_flow.tail(arc),
+          min_cost_flow.head(arc),
+          min_cost_flow.unit_cost(arc)
+        ]
+      end
+    end
+  end
+else
+  puts "There was an issue with the min cost flow input."
 end
 ```
 
