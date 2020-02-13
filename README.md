@@ -1,6 +1,6 @@
 # OR-Tools
 
-[OR-Tools](https://developers.google.com/optimization/) - operations research tools - for Ruby
+[OR-Tools](https://github.com/google/or-tools) - operations research tools - for Ruby
 
 [![Build Status](https://travis-ci.org/ankane/or-tools.svg?branch=master)](https://travis-ci.org/ankane/or-tools)
 
