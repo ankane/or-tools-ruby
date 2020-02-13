@@ -20,9 +20,17 @@ gem 'or-tools'
 
 ## Getting Started
 
+Linear Optimization
+
+- [The Glop Linear Solver](#the-glop-linear-solver)
+
 Constraint Optimization
 
 - [CP-SAT Solver](#cp-sat-solver)
+
+Integer Optimization
+
+- [Mixed-Integer Programming](mixed-integer-programming)
 
 Bin Packing
 
@@ -37,6 +45,66 @@ Assignment
 
 - [Assignment](#assignment)
 - [Assignment as a Min Cost Problem](#assignment-as-a-min-cost-problem)
+
+### The Glop Linear Solver
+
+[Guide](https://developers.google.com/optimization/lp/glop)
+
+Declare the solver
+
+```ruby
+solver = ORTools::Solver.new("LinearProgrammingExample", :glop)
+```
+
+Create the variables
+
+```ruby
+x = solver.num_var(0, solver.infinity, "x")
+y = solver.num_var(0, solver.infinity, "y")
+```
+
+Define the constraints
+
+```ruby
+constraint0 = solver.constraint(-solver.infinity, 14)
+constraint0.set_coefficient(x, 1)
+constraint0.set_coefficient(y, 2)
+
+constraint1 = solver.constraint(0, solver.infinity)
+constraint1.set_coefficient(x, 3)
+constraint1.set_coefficient(y, -1)
+
+constraint2 = solver.constraint(-solver.infinity, 2)
+constraint2.set_coefficient(x, 1)
+constraint2.set_coefficient(y, -1)
+```
+
+Define the objective function
+
+```ruby
+objective = solver.objective
+objective.set_coefficient(x, 3)
+objective.set_coefficient(y, 4)
+objective.set_maximization
+```
+
+Invoke the solver
+
+```ruby
+solver.solve
+```
+
+Display the solution
+
+```ruby
+opt_solution = 3 * x.solution_value + 4 * y.solution_value
+puts "Number of variables = #{solver.num_variables}"
+puts "Number of constraints = #{solver.num_constraints}"
+puts "Solution:"
+puts "x = #{x.solution_value}"
+puts "y = #{y.solution_value}"
+puts "Optimal objective value = #{opt_solution}"
+```
 
 ### CP-SAT Solver
 
@@ -77,6 +145,68 @@ if status == :feasible
   puts "x = #{solver.value(x)}"
   puts "y = #{solver.value(y)}"
   puts "z = #{solver.value(z)}"
+end
+```
+
+### Mixed-Integer Programming
+
+[Guide](https://developers.google.com/optimization/mip/integer_opt)
+
+Declare the MIP solver
+
+```ruby
+solver = ORTools::Solver.new("simple_mip_program", :cbc)
+```
+
+Define the variables
+
+```ruby
+infinity = solver.infinity
+x = solver.int_var(0.0, infinity, "x")
+y = solver.int_var(0.0, infinity, "y")
+
+puts "Number of variables = #{solver.num_variables}"
+```
+
+Define the constraints
+
+```ruby
+c0 = solver.constraint(-infinity, 17.5)
+c0.set_coefficient(x, 1)
+c0.set_coefficient(y, 7)
+
+c1 = solver.constraint(-infinity, 3.5)
+c1.set_coefficient(x, 1);
+c1.set_coefficient(y, 0);
+
+puts "Number of constraints = #{solver.num_constraints}"
+```
+
+Define the objective
+
+```ruby
+objective = solver.objective
+objective.set_coefficient(x, 1)
+objective.set_coefficient(y, 10)
+objective.set_maximization
+```
+
+Call the solver
+
+```ruby
+status = solver.solve
+```
+
+Display the solution
+
+```ruby
+if status == :optimal
+  puts "Solution:"
+  puts "Objective value = #{solver.objective.value}"
+  puts "x = #{x.solution_value}"
+  puts "y = #{y.solution_value}"
+else
+  puts "The problem does not have an optimal solution."
 end
 ```
 
