@@ -95,13 +95,11 @@ void Init_ext()
     .define_method("wall_time", &MPSolver::wall_time)
     .define_method("iterations", &MPSolver::iterations)
     .define_method("nodes", &MPSolver::nodes)
-    .define_method("constraint",
+    .define_method("objective", &MPSolver::MutableObjective)
+    .define_method(
+      "constraint",
       *[](MPSolver& self, double lb, double ub) {
         return self.MakeRowConstraint(lb, ub);
-      })
-    .define_method("objective",
-      *[](MPSolver& self) {
-        return self.MutableObjective();
       })
     .define_method(
       "solve",
