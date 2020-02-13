@@ -227,6 +227,8 @@ end
 
 ## Assignment
 
+[Guide](https://developers.google.com/optimization/assignment/simple_assignment)
+
 Create the data
 
 ```ruby
@@ -279,6 +281,8 @@ end
 ```
 
 ## Assignment as a Min Cost Problem
+
+[Guide](https://developers.google.com/optimization/assignment/assignment_min_cost_flow)
 
 Create the solver
 
