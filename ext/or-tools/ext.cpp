@@ -3,6 +3,7 @@
 #include <ortools/graph/assignment.h>
 #include <ortools/graph/max_flow.h>
 #include <ortools/graph/min_cost_flow.h>
+#include <ortools/linear_solver/linear_solver.h>
 #include <ortools/sat/cp_model.h>
 
 // rice
@@ -17,6 +18,10 @@ using operations_research::ArcIndex;
 using operations_research::Domain;
 using operations_research::FlowQuantity;
 using operations_research::KnapsackSolver;
+using operations_research::MPConstraint;
+using operations_research::MPObjective;
+using operations_research::MPSolver;
+using operations_research::MPVariable;
 using operations_research::NodeIndex;
 using operations_research::SimpleLinearSumAssignment;
 using operations_research::SimpleMaxFlow;
@@ -49,10 +54,78 @@ KnapsackSolver::SolverType from_ruby<KnapsackSolver::SolverType>(Object x)
   }
 }
 
+template<>
+inline
+MPSolver::OptimizationProblemType from_ruby<MPSolver::OptimizationProblemType>(Object x)
+{
+  std::string s = Symbol(x).str();
+  if (s == "glop") {
+    return MPSolver::OptimizationProblemType::GLOP_LINEAR_PROGRAMMING;
+  } else if (s == "cbc") {
+    return MPSolver::OptimizationProblemType::CBC_MIXED_INTEGER_PROGRAMMING;
+  } else {
+    throw std::runtime_error("Unknown optimization problem type: " + s);
+  }
+}
+
 extern "C"
 void Init_ext()
 {
   Module rb_mORTools = define_module("ORTools");
+
+  define_class_under<MPVariable>(rb_mORTools, "MPVariable")
+    .define_method("name", &MPVariable::name)
+    .define_method("solution_value", &MPVariable::solution_value);
+
+  define_class_under<MPConstraint>(rb_mORTools, "MPConstraint")
+    .define_method("set_coefficient", &MPConstraint::SetCoefficient);
+
+  define_class_under<MPObjective>(rb_mORTools, "MPObjective")
+    .define_method("value", &MPObjective::Value)
+    .define_method("set_coefficient", &MPObjective::SetCoefficient)
+    .define_method("set_maximization", &MPObjective::SetMaximization);
+
+  define_class_under<MPSolver>(rb_mORTools, "Solver")
+    .define_constructor(Constructor<MPSolver, std::string, MPSolver::OptimizationProblemType>())
+    .define_method("infinity", &MPSolver::infinity)
+    .define_method("int_var", &MPSolver::MakeIntVar)
+    .define_method("num_var", &MPSolver::MakeNumVar)
+    .define_method("num_variables", &MPSolver::NumVariables)
+    .define_method("num_constraints", &MPSolver::NumConstraints)
+    .define_method("wall_time", &MPSolver::wall_time)
+    .define_method("iterations", &MPSolver::iterations)
+    .define_method("nodes", &MPSolver::nodes)
+    .define_method("constraint",
+      *[](MPSolver& self, double lb, double ub) {
+        return self.MakeRowConstraint(lb, ub);
+      })
+    .define_method("objective",
+      *[](MPSolver& self) {
+        return self.MutableObjective();
+      })
+    .define_method(
+      "solve",
+      *[](MPSolver& self) {
+        auto status = self.Solve();
+
+        if (status == MPSolver::ResultStatus::OPTIMAL) {
+          return Symbol("optimal");
+        } else if (status == MPSolver::ResultStatus::FEASIBLE) {
+          return Symbol("feasible");
+        } else if (status == MPSolver::ResultStatus::INFEASIBLE) {
+          return Symbol("infeasible");
+        } else if (status == MPSolver::ResultStatus::UNBOUNDED) {
+          return Symbol("unbounded");
+        } else if (status == MPSolver::ResultStatus::ABNORMAL) {
+          return Symbol("abnormal");
+        } else if (status == MPSolver::ResultStatus::MODEL_INVALID) {
+          return Symbol("model_invalid");
+        } else if (status == MPSolver::ResultStatus::NOT_SOLVED) {
+          return Symbol("not_solved");
+        } else {
+          throw std::runtime_error("Unknown status");
+        }
+      });
 
   define_class_under<IntVar>(rb_mORTools, "IntVar");
 

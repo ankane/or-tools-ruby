@@ -1,6 +1,6 @@
 require_relative "test_helper"
 
-class ConstraintOptimizationTest < Minitest::Test
+class ConstraintTest < Minitest::Test
   # https://developers.google.com/optimization/cp/cp_solver
   def test_cp_sat_solver
     model = ORTools::CpModel.new
