@@ -2,6 +2,8 @@
 
 [OR-Tools](https://developers.google.com/optimization/) - operations research tools - for Ruby
 
+[![Build Status](https://travis-ci.org/ankane/or-tools.svg?branch=master)](https://travis-ci.org/ankane/or-tools)
+
 ## Installation
 
 Download the [OR-Tools C++ library](https://developers.google.com/optimization/install/cpp). Then run:

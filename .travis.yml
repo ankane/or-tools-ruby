@@ -1,0 +1,16 @@
+dist: bionic
+language: ruby
+rvm: 2.7
+before_install:
+  - export OR_TOOLS_VERSION=7.5.7466
+  - ./test/ci/install_or_tools.sh
+cache:
+  bundler: true
+  directories:
+    - $HOME/or-tools
+before_script: bundle exec rake compile -- --with-or-tools-dir=$HOME/or-tools/$OR_TOOLS_VERSION
+script: bundle exec rake test
+notifications:
+  email:
+    on_success: never
+    on_failure: change
