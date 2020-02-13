@@ -33,6 +33,10 @@ Network Flows
 - [Maximum Flows](#maximum-flows)
 - [Minimum Cost Flows](#minimum-cost-flows)
 
+Assignment
+
+- [Assignment](#assignment)
+
 ### CP-SAT Solver
 
 [Guide](https://developers.google.com/optimization/cp/cp_solver)
@@ -217,6 +221,59 @@ if min_cost_flow.solve == :optimal
   end
 else
   puts "There was an issue with the min cost flow input."
+end
+```
+
+## Assignment
+
+Create the data
+
+```ruby
+cost = [[ 90,  76, 75,  70],
+        [ 35,  85, 55,  65],
+        [125,  95, 90, 105],
+        [ 45, 110, 95, 115]]
+
+rows = cost.length
+cols = cost[0].length
+```
+
+Create the solver
+
+```ruby
+assignment = ORTools::LinearSumAssignment.new
+```
+
+Add the costs to the solver
+
+```ruby
+rows.times do |worker|
+  cols.times do |task|
+    if cost[worker][task]
+      assignment.add_arc_with_cost(worker, task, cost[worker][task])
+    end
+  end
+end
+```
+
+Invoke the solver
+
+```ruby
+solve_status = assignment.solve
+if solve_status == :optimal
+  puts "Total cost = #{assignment.optimal_cost}"
+  puts
+  assignment.num_nodes.times do |i|
+    puts "Worker %d assigned to task %d.  Cost = %d" % [
+      i,
+      assignment.right_mate(i),
+      assignment.assignment_cost(i)
+    ]
+  end
+elsif solve_status == :infeasible
+  puts "No assignment is possible."
+elsif solve_status == :possible_overflow
+  puts "Some input costs are too large and may cause an integer overflow."
 end
 ```
 
