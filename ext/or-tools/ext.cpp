@@ -96,6 +96,19 @@ Object to_ruby<RoutingNodeIndex>(RoutingNodeIndex const &x)
   return to_ruby<int>(x.value());
 }
 
+template<>
+inline
+operations_research::sat::LinearExpr from_ruby<operations_research::sat::LinearExpr>(Object x)
+{
+  operations_research::sat::LinearExpr expr;
+  Array vars = x.call("vars");
+  for(auto const& var: vars) {
+    auto cvar = (Array) var;
+    expr.AddTerm(from_ruby<operations_research::sat::IntVar>(cvar[0]), from_ruby<int64>(cvar[1]));
+  }
+  return expr;
+}
+
 // need a wrapper class due to const
 class Assignment {
   const operations_research::Assignment* self;
@@ -385,6 +398,21 @@ void Init_ext()
       *[](CpModelBuilder& self, operations_research::sat::IntVar x, operations_research::sat::IntVar y) {
         // TODO return value
         self.AddNotEqual(x, y);
+      })
+    .define_method(
+      "add_less_or_equal",
+      *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, int64 y) {
+        self.AddLessOrEqual(x, y);
+      })
+    .define_method(
+      "maximize",
+      *[](CpModelBuilder& self, operations_research::sat::LinearExpr expr) {
+        self.Maximize(expr);
+      })
+    .define_method(
+      "minimize",
+      *[](CpModelBuilder& self, operations_research::sat::LinearExpr expr) {
+        self.Minimize(expr);
       });
 
   define_class_under(rb_mORTools, "CpSolver")
