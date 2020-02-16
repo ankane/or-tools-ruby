@@ -34,8 +34,8 @@ Integer Optimization
 
 Routing
 
-- [Traveling Salesperson Problem (TSP)](#traveling-salesperson-problem)
-- [Vehicle Routing Problem (VRP)](#vehicle-routing-problem)
+- [Traveling Salesperson Problem (TSP)](#traveling-salesperson-problem-tsp)
+- [Vehicle Routing Problem (VRP)](#vehicle-routing-problem-vrp)
 
 Bin Packing
 
