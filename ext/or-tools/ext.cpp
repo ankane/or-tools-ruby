@@ -163,6 +163,32 @@ void Init_ext()
 
         if (s == "path_cheapest_arc") {
           return self.set_first_solution_strategy(FirstSolutionStrategy::PATH_CHEAPEST_ARC);
+        } else if (s == "path_most_constrained_arc") {
+          return self.set_first_solution_strategy(FirstSolutionStrategy::PATH_MOST_CONSTRAINED_ARC);
+        } else if (s == "evaluator_strategy") {
+          return self.set_first_solution_strategy(FirstSolutionStrategy::EVALUATOR_STRATEGY);
+        } else if (s == "savings") {
+          return self.set_first_solution_strategy(FirstSolutionStrategy::SAVINGS);
+        } else if (s == "sweep") {
+          return self.set_first_solution_strategy(FirstSolutionStrategy::SWEEP);
+        } else if (s == "christofides") {
+          return self.set_first_solution_strategy(FirstSolutionStrategy::CHRISTOFIDES);
+        } else if (s == "all_unperformed") {
+          return self.set_first_solution_strategy(FirstSolutionStrategy::ALL_UNPERFORMED);
+        } else if (s == "best_insertion") {
+          return self.set_first_solution_strategy(FirstSolutionStrategy::BEST_INSERTION);
+        } else if (s == "parallel_cheapest_insertion") {
+          return self.set_first_solution_strategy(FirstSolutionStrategy::PARALLEL_CHEAPEST_INSERTION);
+        } else if (s == "sequential_cheapest_insertion") {
+          return self.set_first_solution_strategy(FirstSolutionStrategy::SEQUENTIAL_CHEAPEST_INSERTION);
+        } else if (s == "local_cheapest_insertion") {
+          return self.set_first_solution_strategy(FirstSolutionStrategy::LOCAL_CHEAPEST_INSERTION);
+        } else if (s == "global_cheapest_arc") {
+          return self.set_first_solution_strategy(FirstSolutionStrategy::GLOBAL_CHEAPEST_ARC);
+        } else if (s == "local_cheapest_arc") {
+          return self.set_first_solution_strategy(FirstSolutionStrategy::LOCAL_CHEAPEST_ARC);
+        } else if (s == "first_unbound_min_value") {
+          return self.set_first_solution_strategy(FirstSolutionStrategy::FIRST_UNBOUND_MIN_VALUE);
         } else {
           throw std::runtime_error("Unknown first solution strategy: " + s);
         }
@@ -174,6 +200,12 @@ void Init_ext()
 
         if (s == "guided_local_search") {
           return self.set_local_search_metaheuristic(LocalSearchMetaheuristic::GUIDED_LOCAL_SEARCH);
+        } else if (s == "tabu_search") {
+          return self.set_local_search_metaheuristic(LocalSearchMetaheuristic::TABU_SEARCH);
+        } else if (s == "generic_tabu_search") {
+          return self.set_local_search_metaheuristic(LocalSearchMetaheuristic::GENERIC_TABU_SEARCH);
+        } else if (s == "simulated_annealing") {
+          return self.set_local_search_metaheuristic(LocalSearchMetaheuristic::SIMULATED_ANNEALING);
         } else {
           throw std::runtime_error("Unknown local search metaheuristic: " + s);
         }
