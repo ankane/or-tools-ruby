@@ -9,19 +9,27 @@ module ORTools
     end
 
     def +(other)
-      case other
-      when SatLinearExpr
-        self.class.new(vars + other.vars)
-      when BoolVar
-        self.class.new(vars + [[other, 1]])
-      else
-        raise ArgumentError, "Unsupported type"
-      end
+      add(other, 1)
     end
 
     def -(other)
-      # negate constant terms
-      self.class.new(vars + other.vars.map { |a, b| [a, -b] })
+      add(other, -1)
+    end
+
+    private
+
+    def add(other, sign)
+      other_vars =
+        case other
+        when SatLinearExpr
+          other.vars
+        when BoolVar
+          [[other, 1]]
+        else
+          raise ArgumentError, "Unsupported type"
+        end
+
+      self.class.new(vars + other_vars.map { |a, b| [a, sign * b] })
     end
   end
 end
