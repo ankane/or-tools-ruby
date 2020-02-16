@@ -63,4 +63,149 @@ class BinPackingTest < Minitest::Test
     expected_weights = [7, 0, 22, 80, 11, 59, 18, 0, 3, 8, 15, 42, 9, 0, 47, 52, 26, 6, 29, 84, 2, 4, 18, 7, 71, 3, 66, 31, 0, 65, 52, 13]
     assert_equal expected_weights, packed_weights
   end
+
+  # https://developers.google.com/optimization/bin/multiple_knapsack
+  def test_multiple_knapsack
+    data = {}
+    weights = [48, 30, 42, 36, 36, 48, 42, 42, 36, 24, 30, 30, 42, 36, 36]
+    values = [10, 30, 25, 50, 35, 30, 15, 40, 30, 35, 45, 10, 20, 30, 25]
+    data[:weights] = weights
+    data[:values] = values
+    data[:items] = (0...weights.length).to_a
+    data[:num_items] = weights.length
+    num_bins = 5
+    data[:bins] = (0...num_bins).to_a
+    data[:bin_capacities] = [100, 100, 100, 100, 100]
+
+    solver = ORTools::Solver.new("simple_mip_program", :cbc)
+
+    x = {}
+    data[:items].each do |i|
+      data[:bins].each do |j|
+        x[[i, j]] = solver.int_var(0, 1, "x_%i_%i" % [i, j])
+      end
+    end
+
+    data[:items].each do |i|
+      sum = ORTools::LinearExpr.new
+      data[:bins].each do |j|
+        sum += x[[i, j]]
+      end
+      solver.add(sum <= 1.0)
+    end
+
+    data[:bins].each do |j|
+      weight = ORTools::LinearExpr.new
+      data[:items].each do |i|
+        weight += x[[i, j]] * data[:weights][i]
+      end
+      solver.add(weight <= data[:bin_capacities][j])
+    end
+
+    objective = solver.objective
+
+    data[:items].each do |i|
+      data[:bins].each do |j|
+        objective.set_coefficient(x[[i, j]], data[:values][i])
+      end
+    end
+    objective.set_maximization
+
+    status = solver.solve
+
+    assert_equal :optimal, status
+    assert_equal 395, objective.value
+
+    bins = []
+    bin_weights = []
+    bin_values = []
+
+    total_weight = 0
+    data[:bins].each do |j|
+      bin_weight = 0
+      bin_value = 0
+      bin = []
+      data[:items].each do |i|
+        if x[[i, j]].solution_value > 0
+          bin << i
+          bin_weight += data[:weights][i]
+          bin_value += data[:values][i]
+        end
+      end
+      bins << bin
+      bin_weights << bin_weight
+      bin_values << bin_value
+      total_weight += bin_weight
+    end
+
+    assert_equal [[5, 7], [1, 4, 10], [3, 8, 9], [2, 12], [13, 14]], bins
+    assert_equal [90, 96, 96, 84, 72], bin_weights
+    assert_equal [70, 110, 115, 45, 55], bin_values
+    assert_equal 438, total_weight
+  end
+
+  # https://developers.google.com/optimization/bin/bin_packing
+  def test_bin_packing
+    data = {}
+    weights = [48, 30, 19, 36, 36, 27, 42, 42, 36, 24, 30]
+    data[:weights] = weights
+    data[:items] = (0...weights.length).to_a
+    data[:bins] = data[:items]
+    data[:bin_capacity] = 100
+
+    solver = ORTools::Solver.new("simple_mip_program", :cbc)
+
+    x = {}
+    data[:items].each do |i|
+      data[:bins].each do |j|
+        x[[i, j]] = solver.int_var(0, 1, "x_%i_%i" % [i, j])
+      end
+    end
+
+    y = {}
+    data[:bins].each do |j|
+      y[j] = solver.int_var(0, 1, "y[%i]" % j)
+    end
+
+    data[:items].each do |i|
+      solver.add(solver.sum(data[:bins].map { |j| x[[i, j]] }) == 1)
+    end
+
+    data[:bins].each do |j|
+      sum = solver.sum(data[:items].map { |i| x[[i, j]] * data[:weights][i] })
+      solver.add(sum <= y[j] * data[:bin_capacity])
+    end
+
+    solver.minimize(solver.sum(data[:bins].map { |j| y[j] }))
+
+    status = solver.solve
+
+    assert_equal :optimal, status
+
+    bins = []
+    bin_weights = []
+
+    num_bins = 0
+    data[:bins].each do |j|
+      if y[j].solution_value == 1
+        bin_items = []
+        bin_weight = 0
+        data[:items].each do |i|
+          if x[[i, j]].solution_value > 0
+            bin_items << i
+            bin_weight += data[:weights][i]
+          end
+        end
+        if bin_weight > 0
+          num_bins += 1
+          bins << bin_items
+          bin_weights << bin_weight
+        end
+      end
+    end
+
+    assert_equal [[1, 5, 10], [0, 6], [2, 4, 7], [3, 8, 9]], bins
+    assert_equal [87, 90, 97, 96], bin_weights
+    assert_equal 4, num_bins
+  end
 end

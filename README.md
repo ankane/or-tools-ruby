@@ -41,6 +41,8 @@ Routing
 Bin Packing
 
 - [The Knapsack Problem](#the-knapsack-problem)
+- [Multiple Knapsacks](#multiple-knapsacks)
+- [Bin Packing Problem](#bin-packing-problem)
 
 Network Flows
 
@@ -428,6 +430,193 @@ end
 puts "Total weight: #{total_weight}"
 puts "Packed items: #{packed_items}"
 puts "Packed weights: #{packed_weights}"
+```
+
+### Multiple Knapsacks
+
+[Guide](https://developers.google.com/optimization/bin/multiple_knapsack)
+
+Create the data
+
+```ruby
+data = {}
+weights = [48, 30, 42, 36, 36, 48, 42, 42, 36, 24, 30, 30, 42, 36, 36]
+values = [10, 30, 25, 50, 35, 30, 15, 40, 30, 35, 45, 10, 20, 30, 25]
+data[:weights] = weights
+data[:values] = values
+data[:items] = (0...weights.length).to_a
+data[:num_items] = weights.length
+num_bins = 5
+data[:bins] = (0...num_bins).to_a
+data[:bin_capacities] = [100, 100, 100, 100, 100]
+```
+
+Declare the solver
+
+```ruby
+solver = ORTools::Solver.new("simple_mip_program", :cbc)
+```
+
+Create the variables
+
+```ruby
+x = {}
+data[:items].each do |i|
+  data[:bins].each do |j|
+    x[[i, j]] = solver.int_var(0, 1, "x_%i_%i" % [i, j])
+  end
+end
+```
+
+Define the constraints
+
+```ruby
+data[:items].each do |i|
+  sum = ORTools::LinearExpr.new
+  data[:bins].each do |j|
+    sum += x[[i, j]]
+  end
+  solver.add(sum <= 1.0)
+end
+
+data[:bins].each do |j|
+  weight = ORTools::LinearExpr.new
+  data[:items].each do |i|
+    weight += x[[i, j]] * data[:weights][i]
+  end
+  solver.add(weight <= data[:bin_capacities][j])
+end
+```
+
+Define the objective
+
+```ruby
+objective = solver.objective
+
+data[:items].each do |i|
+  data[:bins].each do |j|
+    objective.set_coefficient(x[[i, j]], data[:values][i])
+  end
+end
+objective.set_maximization
+```
+
+Call the solver and print the solution
+
+```ruby
+status = solver.solve
+
+if status == :optimal
+  puts "Total packed value: #{objective.value}"
+  total_weight = 0
+  data[:bins].each do |j|
+    bin_weight = 0
+    bin_value = 0
+    puts "Bin  #{j}\n\n"
+    data[:items].each do |i|
+      if x[[i, j]].solution_value > 0
+        puts "Item #{i} - weight: #{data[:weights][i]}  value: #{data[:values][i]}"
+        bin_weight += data[:weights][i]
+        bin_value += data[:values][i]
+      end
+    end
+    puts "Packed bin weight: #{bin_weight}"
+    puts "Packed bin value: #{bin_value}"
+    puts
+    total_weight += bin_weight
+  end
+  puts "Total packed weight: #{total_weight}"
+else
+  puts "The problem does not have an optimal solution."
+end
+```
+
+### Bin Packing Problem
+
+[Guide](https://developers.google.com/optimization/bin/bin_packing)
+
+Create the data
+
+```ruby
+data = {}
+weights = [48, 30, 19, 36, 36, 27, 42, 42, 36, 24, 30]
+data[:weights] = weights
+data[:items] = (0...weights.length).to_a
+data[:bins] = data[:items]
+data[:bin_capacity] = 100
+```
+
+Declare the solver
+
+```ruby
+solver = ORTools::Solver.new("simple_mip_program", :cbc)
+```
+
+Create the variables
+
+```ruby
+x = {}
+data[:items].each do |i|
+  data[:bins].each do |j|
+    x[[i, j]] = solver.int_var(0, 1, "x_%i_%i" % [i, j])
+  end
+end
+
+y = {}
+data[:bins].each do |j|
+  y[j] = solver.int_var(0, 1, "y[%i]" % j)
+end
+```
+
+Define the constraints
+
+```ruby
+data[:items].each do |i|
+  solver.add(solver.sum(data[:bins].map { |j| x[[i, j]] }) == 1)
+end
+
+data[:bins].each do |j|
+  sum = solver.sum(data[:items].map { |i| x[[i, j]] * data[:weights][i] })
+  solver.add(sum <= y[j] * data[:bin_capacity])
+end
+```
+
+Define the objective
+
+```ruby
+solver.minimize(solver.sum(data[:bins].map { |j| y[j] }))
+```
+
+Call the solver and print the solution
+
+```ruby
+if status == :optimal
+  num_bins = 0
+  data[:bins].each do |j|
+    if y[j].solution_value == 1
+      bin_items = []
+      bin_weight = 0
+      data[:items].each do |i|
+        if x[[i, j]].solution_value > 0
+          bin_items << i
+          bin_weight += data[:weights][i]
+        end
+      end
+      if bin_weight > 0
+        num_bins += 1
+        puts "Bin number #{j}"
+        puts "  Items packed: #{bin_items}"
+        puts "  Total weight: #{bin_weight}"
+        puts
+      end
+    end
+  end
+  puts
+  puts "Number of bins used: #{num_bins}"
+  puts "Time = #{solver.wall_time} milliseconds"
+else
+  puts "The problem does not have an optimal solution."
+end
 ```
 
 ### Maximum Flows

@@ -22,6 +22,8 @@ using operations_research::Domain;
 using operations_research::FirstSolutionStrategy;
 using operations_research::FlowQuantity;
 using operations_research::KnapsackSolver;
+using operations_research::LinearExpr;
+using operations_research::LinearRange;
 using operations_research::LocalSearchMetaheuristic;
 using operations_research::MPConstraint;
 using operations_research::MPObjective;
@@ -37,6 +39,7 @@ using operations_research::SimpleLinearSumAssignment;
 using operations_research::SimpleMaxFlow;
 using operations_research::SimpleMinCostFlow;
 
+using operations_research::sat::BoolVar;
 using operations_research::sat::CpModelBuilder;
 using operations_research::sat::CpSolverResponse;
 using operations_research::sat::CpSolverStatus;
@@ -239,7 +242,63 @@ void Init_ext()
 
   rb_cMPVariable = define_class_under<MPVariable>(rb_mORTools, "MPVariable")
     .define_method("name", &MPVariable::name)
-    .define_method("solution_value", &MPVariable::solution_value);
+    .define_method("solution_value", &MPVariable::solution_value)
+    .define_method(
+      "+",
+      *[](MPVariable& self, MPVariable& other) {
+        LinearExpr s(&self);
+        LinearExpr o(&other);
+        return s + o;
+      })
+    .define_method(
+      "*",
+      *[](MPVariable& self, double other) {
+        LinearExpr s(&self);
+        return s * other;
+      });
+
+  define_class_under<LinearExpr>(rb_mORTools, "LinearExpr")
+    .define_constructor(Constructor<LinearExpr>())
+    .define_method(
+      "_add_linear_expr",
+      *[](LinearExpr& self, LinearExpr& other) {
+        return self + other;
+      })
+    .define_method(
+      "_add_mp_variable",
+      *[](LinearExpr& self, MPVariable &other) {
+        LinearExpr o(&other);
+        return self + o;
+      })
+    .define_method(
+      "_lte_double",
+      *[](LinearExpr& self, double other) {
+        LinearExpr o(other);
+        return self <= o;
+      })
+    .define_method(
+      "_lte_linear_expr",
+      *[](LinearExpr& self, LinearExpr& other) {
+        return self <= other;
+      })
+    .define_method(
+      "==",
+      *[](LinearExpr& self, double other) {
+        LinearExpr o(other);
+        return self == o;
+      })
+    .define_method(
+      "to_s",
+      *[](LinearExpr& self) {
+        return self.ToString();
+      })
+    .define_method(
+      "inspect",
+      *[](LinearExpr& self) {
+        return "#<ORTools::LinearExpr \"" + self.ToString() + "\">";
+      });
+
+  define_class_under<LinearRange>(rb_mORTools, "LinearRange");
 
   rb_cMPConstraint = define_class_under<MPConstraint>(rb_mORTools, "MPConstraint")
     .define_method("set_coefficient", &MPConstraint::SetCoefficient);
@@ -252,7 +311,11 @@ void Init_ext()
   define_class_under<MPSolver>(rb_mORTools, "Solver")
     .define_constructor(Constructor<MPSolver, std::string, MPSolver::OptimizationProblemType>())
     .define_method("infinity", &MPSolver::infinity)
-    .define_method("int_var", &MPSolver::MakeIntVar)
+    .define_method(
+      "int_var",
+      *[](MPSolver& self, double min, double max, const std::string& name) {
+        return self.MakeIntVar(min, max, name);
+      })
     .define_method("num_var", &MPSolver::MakeNumVar)
     .define_method("num_variables", &MPSolver::NumVariables)
     .define_method("num_constraints", &MPSolver::NumConstraints)
@@ -260,6 +323,16 @@ void Init_ext()
     .define_method("iterations", &MPSolver::iterations)
     .define_method("nodes", &MPSolver::nodes)
     .define_method("objective", &MPSolver::MutableObjective)
+    .define_method(
+      "minimize",
+      *[](MPSolver& self, LinearExpr& expr) {
+        return self.MutableObjective()->MinimizeLinearExpr(expr);
+      })
+    .define_method(
+      "add",
+      *[](MPSolver& self, const LinearRange& range) {
+        return self.MakeRowConstraint(range);
+      })
     .define_method(
       "constraint",
       *[](MPSolver& self, double lb, double ub) {
@@ -291,6 +364,7 @@ void Init_ext()
 
   // not to be confused with operations_research::IntVar
   define_class_under<operations_research::sat::IntVar>(rb_mORTools, "SatIntVar");
+  define_class_under<BoolVar>(rb_mORTools, "BoolVar");
 
   define_class_under<CpModelBuilder>(rb_mORTools, "CpModel")
     .define_constructor(Constructor<CpModelBuilder>())
@@ -299,6 +373,11 @@ void Init_ext()
       *[](CpModelBuilder& self, int64 start, int64 end, std::string name) {
         const Domain domain(start, end);
         return self.NewIntVar(domain).WithName(name);
+      })
+    .define_method(
+      "new_bool_var",
+      *[](CpModelBuilder& self, std::string name) {
+        return self.NewBoolVar().WithName(name);
       })
     .define_method(
       "add_not_equal",
