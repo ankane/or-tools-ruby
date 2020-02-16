@@ -21,8 +21,6 @@ class SchedulingTest < Minitest::Test
       end
     end
 
-    skip
-
     all_days.each do |d|
       all_shifts.each do |s|
         model.add(model.sum(all_nurses.map { |n| shifts[[n, d, s]] }) == 1)
@@ -39,7 +37,7 @@ class SchedulingTest < Minitest::Test
     max_shifts_per_nurse = min_shifts_per_nurse + 1
     all_nurses.each do |n|
       num_shifts_worked = model.sum(all_shifts.flat_map { |s| all_days.map { |d| shifts[[n, d, s]] } })
-      model.add(min_shifts_per_nurse <= num_shifts_worked)
+      model.add(num_shifts_worked > min_shifts_per_nurse)
       model.add(num_shifts_worked <= max_shifts_per_nurse)
     end
 

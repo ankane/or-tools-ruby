@@ -104,7 +104,13 @@ operations_research::sat::LinearExpr from_ruby<operations_research::sat::LinearE
   Array vars = x.call("vars");
   for(auto const& var: vars) {
     auto cvar = (Array) var;
-    expr.AddTerm(from_ruby<operations_research::sat::IntVar>(cvar[0]), from_ruby<int64>(cvar[1]));
+    // TODO clean up
+    Object o = cvar[0];
+    if (((Rice::String) o.call("class").call("name")).str() == "ORTools::BoolVar") {
+      expr.AddTerm(from_ruby<operations_research::sat::BoolVar>(cvar[0]), from_ruby<int64>(cvar[1]));
+    } else {
+      expr.AddTerm(from_ruby<operations_research::sat::IntVar>(cvar[0]), from_ruby<int64>(cvar[1]));
+    }
   }
   return expr;
 }
@@ -398,6 +404,17 @@ void Init_ext()
       *[](CpModelBuilder& self, operations_research::sat::IntVar x, operations_research::sat::IntVar y) {
         // TODO return value
         self.AddNotEqual(x, y);
+      })
+    .define_method(
+      "add_equal",
+      *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, int64 y) {
+        // TODO return value
+        self.AddEquality(x, y);
+      })
+    .define_method(
+      "add_greater_than",
+      *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, int64 y) {
+        self.AddGreaterThan(x, y);
       })
     .define_method(
       "add_less_or_equal",
