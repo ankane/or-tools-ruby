@@ -135,4 +135,12 @@ class RoutingTest < Minitest::Test
 
     assert_equal 1552, max_route_distance
   end
+
+  def test_search_parameters
+    search_parameters = ORTools.default_routing_search_parameters
+    search_parameters.first_solution_strategy = :path_cheapest_arc
+    search_parameters.local_search_metaheuristic = :guided_local_search
+    search_parameters.log_search = true
+    search_parameters.time_limit = 10 # seconds
+  end
 end

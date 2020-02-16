@@ -22,6 +22,7 @@ using operations_research::Domain;
 using operations_research::FirstSolutionStrategy;
 using operations_research::FlowQuantity;
 using operations_research::KnapsackSolver;
+using operations_research::LocalSearchMetaheuristic;
 using operations_research::MPConstraint;
 using operations_research::MPObjective;
 using operations_research::MPSolver;
@@ -165,6 +166,27 @@ void Init_ext()
         } else {
           throw std::runtime_error("Unknown first solution strategy: " + s);
         }
+      })
+    .define_method(
+      "local_search_metaheuristic=",
+      *[](RoutingSearchParameters& self, Symbol value) {
+        std::string s = Symbol(value).str();
+
+        if (s == "guided_local_search") {
+          return self.set_local_search_metaheuristic(LocalSearchMetaheuristic::GUIDED_LOCAL_SEARCH);
+        } else {
+          throw std::runtime_error("Unknown local search metaheuristic: " + s);
+        }
+      })
+    .define_method(
+      "log_search=",
+      *[](RoutingSearchParameters& self, bool value) {
+        self.set_log_search(value);
+      })
+    .define_method(
+      "time_limit=",
+      *[](RoutingSearchParameters& self, int value) {
+        self.mutable_time_limit()->set_seconds(value);
       });
 
   rb_cMPVariable = define_class_under<MPVariable>(rb_mORTools, "MPVariable")
