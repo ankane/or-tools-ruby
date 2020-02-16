@@ -879,7 +879,7 @@ else
 end
 ```
 
-## Assignment as a Min Cost Problem
+## Assignment as a MIP Problem
 
 [Guide](https://developers.google.com/optimization/assignment/assignment_mip)
 
