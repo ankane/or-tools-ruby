@@ -36,6 +36,7 @@ Routing
 
 - [Traveling Salesperson Problem (TSP)](#traveling-salesperson-problem-tsp)
 - [Vehicle Routing Problem (VRP)](#vehicle-routing-problem-vrp)
+- [Routing Options](#routing-options)
 
 Bin Packing
 
@@ -367,6 +368,20 @@ data[:num_vehicles].times do |vehicle_id|
   max_route_distance = [route_distance, max_route_distance].max
 end
 puts "Maximum of the route distances: #{max_route_distance}m"
+```
+
+### Routing Options
+
+[Guide](https://developers.google.com/optimization/routing/routing_options)
+
+```ruby
+search_parameters = ORTools.default_routing_search_parameters
+search_parameters.solution_limit = 10
+search_parameters.time_limit = 10 # seconds
+search_parameters.lns_time_limit = 10 # seconds
+search_parameters.first_solution_strategy = :path_cheapest_arc
+search_parameters.local_search_metaheuristic = :guided_local_search
+search_parameters.log_search = true
 ```
 
 ### The Knapsack Problem

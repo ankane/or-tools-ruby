@@ -222,9 +222,19 @@ void Init_ext()
         self.set_log_search(value);
       })
     .define_method(
+      "solution_limit=",
+      *[](RoutingSearchParameters& self, int64 value) {
+        self.set_solution_limit(value);
+      })
+    .define_method(
       "time_limit=",
-      *[](RoutingSearchParameters& self, int value) {
+      *[](RoutingSearchParameters& self, int64 value) {
         self.mutable_time_limit()->set_seconds(value);
+      })
+    .define_method(
+      "lns_time_limit=",
+      *[](RoutingSearchParameters& self, int64 value) {
+        self.mutable_lns_time_limit()->set_seconds(value);
       });
 
   rb_cMPVariable = define_class_under<MPVariable>(rb_mORTools, "MPVariable")
