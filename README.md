@@ -217,6 +217,8 @@ end
 
 ### Traveling Salesperson Problem (TSP)
 
+[Guide](https://developers.google.com/optimization/routing/tsp.html)
+
 Create the data
 
 ```ruby
@@ -282,6 +284,8 @@ puts plan_output
 ```
 
 ### Vehicle Routing Problem (VRP)
+
+[Guide](https://developers.google.com/optimization/routing/vrp)
 
 Create the data
 
