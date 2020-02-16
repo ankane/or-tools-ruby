@@ -317,6 +317,7 @@ void Init_ext()
         return self.MakeIntVar(min, max, name);
       })
     .define_method("num_var", &MPSolver::MakeNumVar)
+    .define_method("bool_var", &MPSolver::MakeBoolVar)
     .define_method("num_variables", &MPSolver::NumVariables)
     .define_method("num_constraints", &MPSolver::NumConstraints)
     .define_method("wall_time", &MPSolver::wall_time)

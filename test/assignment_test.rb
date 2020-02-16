@@ -62,4 +62,59 @@ class AssignmentTest < Minitest::Test
     assert_equal [8, 7, 6, 5], arcs.map { |i| min_cost_flow.head(i) }
     assert_equal [70, 55, 95, 45], arcs.map { |i| min_cost_flow.unit_cost(i) }
   end
+
+  # https://developers.google.com/optimization/assignment/assignment_mip
+  def test_assignment_mip
+    solver = ORTools::Solver.new("SolveAssignmentProblemMIP", :cbc)
+
+    cost = [[90, 76, 75, 70],
+            [35, 85, 55, 65],
+            [125, 95, 90, 105],
+            [45, 110, 95, 115],
+            [60, 105, 80, 75],
+            [45, 65, 110, 95]]
+
+    team1 = [0, 2, 4]
+    team2 = [1, 3, 5]
+    team_max = 2
+
+    num_workers = cost.length
+    num_tasks = cost[1].length
+    x = {}
+
+    num_workers.times do |i|
+      num_tasks.times do |j|
+        x[[i, j]] = solver.bool_var("x[#{i},#{j}]")
+      end
+    end
+
+    solver.minimize(solver.sum(
+      num_workers.times.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] * cost[i][j] } }
+    ))
+
+    num_workers.times do |i|
+      solver.add(solver.sum(num_tasks.times.map { |j| x[[i, j]] }) <= 1)
+    end
+
+    num_tasks.times do |j|
+      solver.add(solver.sum(num_workers.times.map { |i| x[[i, j]] }) == 1)
+    end
+
+    solver.add(solver.sum(team1.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] } }) <= team_max)
+    solver.add(solver.sum(team2.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] } }) <= team_max)
+    sol = solver.solve
+
+    assert_equal 250, solver.objective.value
+
+    assignments = []
+    num_workers.times do |i|
+      num_tasks.times do |j|
+        if x[[i, j]].solution_value > 0
+          assignments << [i, j]
+        end
+      end
+    end
+
+    assert_equal [[0, 2], [1, 0], [4, 3], [5, 1]], assignments
+  end
 end
