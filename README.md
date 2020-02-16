@@ -137,7 +137,7 @@ z = model.new_int_var(0, num_vals - 1, "z")
 Create the constraint
 
 ```ruby
-model.add_not_equal(x, y)
+model.add(x != y)
 ```
 
 Call the solver

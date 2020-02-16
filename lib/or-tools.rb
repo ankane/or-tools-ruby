@@ -2,10 +2,13 @@
 require "or_tools/ext"
 
 # modules
+require "or_tools/comparison"
+require "or_tools/cp_model"
 require "or_tools/cp_solver"
 require "or_tools/knapsack_solver"
 require "or_tools/linear_expr"
 require "or_tools/routing_model"
+require "or_tools/sat_int_var"
 require "or_tools/solver"
 require "or_tools/version"
 
