@@ -400,21 +400,29 @@ void Init_ext()
         return self.NewBoolVar().WithName(name);
       })
     .define_method(
-      "add_not_equal",
-      *[](CpModelBuilder& self, operations_research::sat::IntVar x, operations_research::sat::IntVar y) {
-        // TODO return value
-        self.AddNotEqual(x, y);
+      "add_equality",
+      *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, int64 y) {
+        self.AddEquality(x, y);
       })
     .define_method(
-      "add_equal",
-      *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, int64 y) {
-        // TODO return value
-        self.AddEquality(x, y);
+      "add_not_equal",
+      *[](CpModelBuilder& self, operations_research::sat::IntVar x, operations_research::sat::IntVar y) {
+        self.AddNotEqual(x, y);
       })
     .define_method(
       "add_greater_than",
       *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, int64 y) {
         self.AddGreaterThan(x, y);
+      })
+    .define_method(
+      "add_greater_or_equal",
+      *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, int64 y) {
+        self.AddGreaterOrEqual(x, y);
+      })
+    .define_method(
+      "add_less_than",
+      *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, int64 y) {
+        self.AddLessThan(x, y);
       })
     .define_method(
       "add_less_or_equal",

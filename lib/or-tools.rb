@@ -3,6 +3,7 @@ require "or_tools/ext"
 
 # modules
 require "or_tools/comparison"
+require "or_tools/comparison_operators"
 require "or_tools/cp_model"
 require "or_tools/cp_solver"
 require "or_tools/knapsack_solver"
