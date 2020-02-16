@@ -101,17 +101,25 @@ inline
 operations_research::sat::LinearExpr from_ruby<operations_research::sat::LinearExpr>(Object x)
 {
   operations_research::sat::LinearExpr expr;
-  Array vars = x.call("vars");
-  for(auto const& var: vars) {
-    auto cvar = (Array) var;
-    // TODO clean up
-    Object o = cvar[0];
-    if (((Rice::String) o.call("class").call("name")).str() == "ORTools::BoolVar") {
-      expr.AddTerm(from_ruby<operations_research::sat::BoolVar>(cvar[0]), from_ruby<int64>(cvar[1]));
-    } else {
-      expr.AddTerm(from_ruby<operations_research::sat::IntVar>(cvar[0]), from_ruby<int64>(cvar[1]));
+
+  if (x.respond_to("to_i")) {
+    expr = from_ruby<int64>(x.call("to_i"));
+  } else if (x.respond_to("vars")) {
+    Array vars = x.call("vars");
+    for(auto const& var: vars) {
+      auto cvar = (Array) var;
+      // TODO clean up
+      Object o = cvar[0];
+      if (((Rice::String) o.call("class").call("name")).str() == "ORTools::BoolVar") {
+        expr.AddTerm(from_ruby<operations_research::sat::BoolVar>(cvar[0]), from_ruby<int64>(cvar[1]));
+      } else {
+        expr.AddTerm(from_ruby<operations_research::sat::IntVar>(cvar[0]), from_ruby<int64>(cvar[1]));
+      }
     }
+  } else {
+    expr = from_ruby<operations_research::sat::IntVar>(x);
   }
+
   return expr;
 }
 
@@ -401,32 +409,32 @@ void Init_ext()
       })
     .define_method(
       "add_equality",
-      *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, int64 y) {
+      *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, operations_research::sat::LinearExpr y) {
         self.AddEquality(x, y);
       })
     .define_method(
       "add_not_equal",
-      *[](CpModelBuilder& self, operations_research::sat::IntVar x, operations_research::sat::IntVar y) {
+      *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, operations_research::sat::LinearExpr y) {
         self.AddNotEqual(x, y);
       })
     .define_method(
       "add_greater_than",
-      *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, int64 y) {
+      *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, operations_research::sat::LinearExpr y) {
         self.AddGreaterThan(x, y);
       })
     .define_method(
       "add_greater_or_equal",
-      *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, int64 y) {
+      *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, operations_research::sat::LinearExpr y) {
         self.AddGreaterOrEqual(x, y);
       })
     .define_method(
       "add_less_than",
-      *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, int64 y) {
+      *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, operations_research::sat::LinearExpr y) {
         self.AddLessThan(x, y);
       })
     .define_method(
       "add_less_or_equal",
-      *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, int64 y) {
+      *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, operations_research::sat::LinearExpr y) {
         self.AddLessOrEqual(x, y);
       })
     .define_method(
