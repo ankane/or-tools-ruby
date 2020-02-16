@@ -8,5 +8,9 @@ module ORTools
     def value(var)
       _solution_integer_value(@response, var)
     end
+
+    def objective_value
+      @response.objective_value
+    end
   end
 end

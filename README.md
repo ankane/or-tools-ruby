@@ -27,6 +27,7 @@ Linear Optimization
 Constraint Optimization
 
 - [CP-SAT Solver](#cp-sat-solver)
+- [Solving an Optimization Problem](#solving-an-optimization-problem)
 
 Integer Optimization
 
@@ -154,6 +155,54 @@ if status == :feasible
   puts "x = #{solver.value(x)}"
   puts "y = #{solver.value(y)}"
   puts "z = #{solver.value(z)}"
+end
+```
+
+### Solving an Optimization Problem
+
+[Guide](https://developers.google.com/optimization/cp/integer_opt_cp)
+
+Declare the model
+
+```ruby
+model = ORTools::CpModel.new
+```
+
+Create the variables
+
+```ruby
+var_upper_bound = [50, 45, 37].max
+x = model.new_int_var(0, var_upper_bound, "x")
+y = model.new_int_var(0, var_upper_bound, "y")
+z = model.new_int_var(0, var_upper_bound, "z")
+```
+
+Define the constraints
+
+```ruby
+model.add(x*2 + y*7 + z*3 <= 50)
+model.add(x*3 - y*5 + z*7 <= 45)
+model.add(x*5 + y*2 - z*6 <= 37)
+```
+
+Define the objective function
+
+```ruby
+model.maximize(x*2 + y*2 + z*3)
+```
+
+Call the solver
+
+```ruby
+solver = ORTools::CpSolver.new
+status = solver.solve(model)
+
+if status == :optimal
+  puts "Maximum of objective function: #{solver.objective_value}"
+  puts
+  puts "x value: #{solver.value(x)}"
+  puts "y value: #{solver.value(y)}"
+  puts "z value: #{solver.value(z)}"
 end
 ```
 

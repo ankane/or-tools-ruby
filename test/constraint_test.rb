@@ -21,6 +21,7 @@ class ConstraintTest < Minitest::Test
     assert_equal 0, solver.value(z)
   end
 
+  # https://developers.google.com/optimization/cp/integer_opt_cp
   def test_optimization
     model = ORTools::CpModel.new
     var_upper_bound = [50, 45, 37].max
@@ -38,7 +39,7 @@ class ConstraintTest < Minitest::Test
     status = solver.solve(model)
 
     assert_equal :optimal, status
-    # assert_equal 35, solver.objective_value
+    assert_equal 35, solver.objective_value
     assert_equal 7, solver.value(x)
     assert_equal 3, solver.value(y)
     assert_equal 5, solver.value(z)

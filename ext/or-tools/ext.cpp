@@ -428,6 +428,7 @@ void Init_ext()
       });
 
   define_class_under<CpSolverResponse>(rb_mORTools, "CpSolverResponse")
+    .define_method("objective_value", &CpSolverResponse::objective_value)
     .define_method(
       "status",
       *[](CpSolverResponse& self) {
