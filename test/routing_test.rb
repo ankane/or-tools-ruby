@@ -34,9 +34,7 @@ class RoutingTest < Minitest::Test
     transit_callback_index = routing.register_transit_callback(distance_callback)
     routing.set_arc_cost_evaluator_of_all_vehicles(transit_callback_index)
 
-    search_parameters = ORTools.default_routing_search_parameters
-    search_parameters.first_solution_strategy = :path_cheapest_arc
-    assignment = routing.solve_with_parameters(search_parameters)
+    assignment = routing.solve(first_solution_strategy: :path_cheapest_arc)
 
     assert_equal 7293, assignment.objective_value
 
@@ -97,9 +95,7 @@ class RoutingTest < Minitest::Test
     distance_dimension = routing.mutable_dimension(dimension_name)
     distance_dimension.global_span_cost_coefficient = 100
 
-    search_parameters = ORTools.default_routing_search_parameters
-    search_parameters.first_solution_strategy = :path_cheapest_arc
-    solution = routing.solve_with_parameters(search_parameters)
+    solution = routing.solve(first_solution_strategy: :path_cheapest_arc)
 
     routes = []
     distances = []

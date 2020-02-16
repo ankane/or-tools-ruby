@@ -262,9 +262,7 @@ routing.set_arc_cost_evaluator_of_all_vehicles(transit_callback_index)
 Run the solver
 
 ```ruby
-search_parameters = ORTools.default_routing_search_parameters
-search_parameters.first_solution_strategy = :path_cheapest_arc
-assignment = routing.solve_with_parameters(search_parameters)
+assignment = routing.solve(first_solution_strategy: :path_cheaper_arc)
 ```
 
 Print the solution
@@ -343,9 +341,7 @@ distance_dimension.global_span_cost_coefficient = 100
 Run the solver
 
 ```ruby
-search_parameters = ORTools.default_routing_search_parameters
-search_parameters.first_solution_strategy = :path_cheapest_arc
-solution = routing.solve_with_parameters(search_parameters)
+solution = routing.solve(first_solution_strategy: :path_cheapest_arc)
 ```
 
 Print the solution
@@ -375,13 +371,14 @@ puts "Maximum of the route distances: #{max_route_distance}m"
 [Guide](https://developers.google.com/optimization/routing/routing_options)
 
 ```ruby
-search_parameters = ORTools.default_routing_search_parameters
-search_parameters.solution_limit = 10
-search_parameters.time_limit = 10 # seconds
-search_parameters.lns_time_limit = 10 # seconds
-search_parameters.first_solution_strategy = :path_cheapest_arc
-search_parameters.local_search_metaheuristic = :guided_local_search
-search_parameters.log_search = true
+routing.solve(
+  solution_limit: 10,
+  time_limit: 10, # seconds,
+  lns_time_limit: 10, # seconds
+  first_solution_strategy: :path_cheapest_arc,
+  local_search_metaheuristic: :guided_local_search,
+  log_search: true
+)
 ```
 
 ### The Knapsack Problem
