@@ -1,5 +1,6 @@
 ## 0.1.1 (unreleased)
 
+- Added `RoutingModel`
 - Added `LinearSumAssignment`
 - Added `Solver`
 

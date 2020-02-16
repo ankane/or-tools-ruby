@@ -1,5 +1,7 @@
 // or-tools
 #include <ortools/algorithms/knapsack_solver.h>
+#include <ortools/constraint_solver/routing.h>
+#include <ortools/constraint_solver/routing_parameters.h>
 #include <ortools/graph/assignment.h>
 #include <ortools/graph/max_flow.h>
 #include <ortools/graph/min_cost_flow.h>
@@ -15,7 +17,9 @@
 #include <rice/Symbol.hpp>
 
 using operations_research::ArcIndex;
+using operations_research::DefaultRoutingSearchParameters;
 using operations_research::Domain;
+using operations_research::FirstSolutionStrategy;
 using operations_research::FlowQuantity;
 using operations_research::KnapsackSolver;
 using operations_research::MPConstraint;
@@ -23,6 +27,11 @@ using operations_research::MPObjective;
 using operations_research::MPSolver;
 using operations_research::MPVariable;
 using operations_research::NodeIndex;
+using operations_research::RoutingDimension;
+using operations_research::RoutingIndexManager;
+using operations_research::RoutingModel;
+using operations_research::RoutingNodeIndex;
+using operations_research::RoutingSearchParameters;
 using operations_research::SimpleLinearSumAssignment;
 using operations_research::SimpleMaxFlow;
 using operations_research::SimpleMinCostFlow;
@@ -30,7 +39,6 @@ using operations_research::SimpleMinCostFlow;
 using operations_research::sat::CpModelBuilder;
 using operations_research::sat::CpSolverResponse;
 using operations_research::sat::CpSolverStatus;
-using operations_research::sat::IntVar;
 using operations_research::sat::SolutionIntegerValue;
 
 using Rice::Array;
@@ -69,9 +77,41 @@ MPSolver::OptimizationProblemType from_ruby<MPSolver::OptimizationProblemType>(O
   }
 }
 
+template<>
+inline
+RoutingNodeIndex from_ruby<RoutingNodeIndex>(Object x)
+{
+  const RoutingNodeIndex index{from_ruby<int>(x)};
+  return index;
+}
+
+template<>
+inline
+Object to_ruby<RoutingNodeIndex>(RoutingNodeIndex const &x)
+{
+  return to_ruby<int>(x.value());
+}
+
+// need a wrapper class due to const
+class Assignment {
+  const operations_research::Assignment* self;
+  public:
+    Assignment(const operations_research::Assignment* v) {
+      self = v;
+    }
+    int64 ObjectiveValue() {
+      return self->ObjectiveValue();
+    }
+    int64 Value(const operations_research::IntVar* const var) const {
+      return self->Value(var);
+    }
+};
+
 Class rb_cMPVariable;
 Class rb_cMPConstraint;
 Class rb_cMPObjective;
+Class rb_cIntVar;
+Class rb_cRoutingDimension;
 
 template<>
 inline
@@ -94,10 +134,38 @@ Object to_ruby<MPObjective*>(MPObjective* const &x)
   return Rice::Data_Object<MPObjective>(x, rb_cMPObjective, nullptr, nullptr);
 }
 
+template<>
+inline
+Object to_ruby<operations_research::IntVar*>(operations_research::IntVar* const &x)
+{
+  return Rice::Data_Object<operations_research::IntVar>(x, rb_cIntVar, nullptr, nullptr);
+}
+
+template<>
+inline
+Object to_ruby<RoutingDimension*>(RoutingDimension* const &x)
+{
+  return Rice::Data_Object<RoutingDimension>(x, rb_cRoutingDimension, nullptr, nullptr);
+}
+
 extern "C"
 void Init_ext()
 {
-  Module rb_mORTools = define_module("ORTools");
+  Module rb_mORTools = define_module("ORTools")
+    .define_singleton_method("default_routing_search_parameters", &DefaultRoutingSearchParameters);
+
+  define_class_under<RoutingSearchParameters>(rb_mORTools, "RoutingSearchParameters")
+    .define_method(
+      "first_solution_strategy=",
+      *[](RoutingSearchParameters& self, Symbol value) {
+        std::string s = Symbol(value).str();
+
+        if (s == "path_cheapest_arc") {
+          return self.set_first_solution_strategy(FirstSolutionStrategy::PATH_CHEAPEST_ARC);
+        } else {
+          throw std::runtime_error("Unknown first solution strategy: " + s);
+        }
+      });
 
   rb_cMPVariable = define_class_under<MPVariable>(rb_mORTools, "MPVariable")
     .define_method("name", &MPVariable::name)
@@ -151,7 +219,8 @@ void Init_ext()
         }
       });
 
-  define_class_under<IntVar>(rb_mORTools, "IntVar");
+  // not to be confused with operations_research::IntVar
+  define_class_under<operations_research::sat::IntVar>(rb_mORTools, "SatIntVar");
 
   define_class_under<CpModelBuilder>(rb_mORTools, "CpModel")
     .define_constructor(Constructor<CpModelBuilder>())
@@ -163,7 +232,7 @@ void Init_ext()
       })
     .define_method(
       "add_not_equal",
-      *[](CpModelBuilder& self, IntVar x, IntVar y) {
+      *[](CpModelBuilder& self, operations_research::sat::IntVar x, operations_research::sat::IntVar y) {
         // TODO return value
         self.AddNotEqual(x, y);
       });
@@ -176,7 +245,7 @@ void Init_ext()
       })
     .define_method(
       "_solution_integer_value",
-      *[](Object self, CpSolverResponse& response, IntVar& x) {
+      *[](Object self, CpSolverResponse& response, operations_research::sat::IntVar& x) {
         return SolutionIntegerValue(response, x);
       });
 
@@ -185,6 +254,7 @@ void Init_ext()
       "status",
       *[](CpSolverResponse& self) {
         auto status = self.status();
+
         if (status == CpSolverStatus::OPTIMAL) {
           return Symbol("optimal");
         } else if (status == CpSolverStatus::FEASIBLE) {
@@ -196,6 +266,56 @@ void Init_ext()
         } else {
           throw std::runtime_error("Unknown solver status");
         }
+      });
+
+  define_class_under<RoutingIndexManager>(rb_mORTools, "RoutingIndexManager")
+    .define_constructor(Constructor<RoutingIndexManager, int, int, RoutingNodeIndex>())
+    .define_method("index_to_node", &RoutingIndexManager::IndexToNode);
+
+  define_class_under<Assignment>(rb_mORTools, "Assignment")
+    .define_method("objective_value", &Assignment::ObjectiveValue)
+    .define_method("value", &Assignment::Value);
+
+  // not to be confused with operations_research::sat::IntVar
+  rb_cIntVar = define_class_under<operations_research::IntVar>(rb_mORTools, "IntVar");
+
+  rb_cRoutingDimension = define_class_under<RoutingDimension>(rb_mORTools, "RoutingDimension")
+    .define_method("global_span_cost_coefficient=", &RoutingDimension::SetGlobalSpanCostCoefficient);
+
+  define_class_under<RoutingModel>(rb_mORTools, "RoutingModel")
+    .define_constructor(Constructor<RoutingModel, RoutingIndexManager>())
+    .define_method(
+      "register_transit_callback",
+      *[](RoutingModel& self, Object callback) {
+        return self.RegisterTransitCallback(
+          [callback](int64 from_index, int64 to_index) -> int64 {
+            return from_ruby<int64>(callback.call("call", from_index, to_index));
+          }
+        );
+      })
+    .define_method("depot", &RoutingModel::GetDepot)
+    .define_method("set_arc_cost_evaluator_of_all_vehicles", &RoutingModel::SetArcCostEvaluatorOfAllVehicles)
+    .define_method("set_arc_cost_evaluator_of_vehicle", &RoutingModel::SetArcCostEvaluatorOfVehicle)
+    .define_method("set_fixed_cost_of_all_vehicles", &RoutingModel::SetFixedCostOfAllVehicles)
+    .define_method("set_fixed_cost_of_vehicle", &RoutingModel::SetFixedCostOfVehicle)
+    .define_method("fixed_cost_of_vehicle", &RoutingModel::GetFixedCostOfVehicle)
+    .define_method("add_dimension", &RoutingModel::AddDimension)
+    .define_method("start", &RoutingModel::Start)
+    .define_method("end", &RoutingModel::End)
+    .define_method("start?", &RoutingModel::IsStart)
+    .define_method("end?", &RoutingModel::IsEnd)
+    .define_method("vehicle_index", &RoutingModel::VehicleIndex)
+    .define_method("next", &RoutingModel::Next)
+    .define_method("vehicle_used?", &RoutingModel::IsVehicleUsed)
+    .define_method("next_var", &RoutingModel::NextVar)
+    .define_method("arc_cost_for_vehicle", &RoutingModel::GetArcCostForVehicle)
+    .define_method("mutable_dimension", &RoutingModel::GetMutableDimension)
+    .define_method(
+      "solve_with_parameters",
+      *[](RoutingModel& self, const RoutingSearchParameters& search_parameters) {
+        auto assignment = self.SolveWithParameters(search_parameters);
+        // std::cout << assignment->DebugString();
+        return (Assignment) assignment;
       });
 
   define_class_under<KnapsackSolver>(rb_mORTools, "KnapsackSolver")
