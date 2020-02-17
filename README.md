@@ -31,7 +31,7 @@ Constraint Optimization
 
 Integer Optimization
 
-- [Mixed-Integer Programming](mixed-integer-programming)
+- [Mixed-Integer Programming](#mixed-integer-programming)
 
 Routing
 
