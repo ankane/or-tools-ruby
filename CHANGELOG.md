@@ -1,3 +1,7 @@
+## 0.1.2 (unreleased)
+
+- Added `lib_version` method
+
 ## 0.1.1 (2020-02-16)
 
 - Added `RoutingModel`

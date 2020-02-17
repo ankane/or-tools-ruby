@@ -1,5 +1,6 @@
 // or-tools
 #include <ortools/algorithms/knapsack_solver.h>
+#include <ortools/base/version.h>
 #include <ortools/constraint_solver/routing.h>
 #include <ortools/constraint_solver/routing_parameters.h>
 #include <ortools/graph/assignment.h>
@@ -183,7 +184,13 @@ extern "C"
 void Init_ext()
 {
   Module rb_mORTools = define_module("ORTools")
-    .define_singleton_method("default_routing_search_parameters", &DefaultRoutingSearchParameters);
+    .define_singleton_method("default_routing_search_parameters", &DefaultRoutingSearchParameters)
+    .define_singleton_method(
+      "lib_version",
+      *[]() {
+        return std::to_string(operations_research::OrToolsMajorVersion()) + "."
+          + std::to_string(operations_research::OrToolsMinorVersion());
+      });
 
   define_class_under<RoutingSearchParameters>(rb_mORTools, "RoutingSearchParameters")
     .define_method(
