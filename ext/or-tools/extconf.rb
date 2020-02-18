@@ -1,6 +1,6 @@
 require "mkmf-rice"
 
-abort "Missing stdc++" unless have_library("stdc++")
+# abort "Missing stdc++" unless have_library("stdc++")
 
 $CXXFLAGS << " -std=c++11 -DUSE_CBC"
 
