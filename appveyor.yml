@@ -26,7 +26,8 @@ build_script:
   # - cd ..
   # - set MAKE=C:\projects\or-tools\or-tools_VisualStudio2019-64bit_v7.5.7466\tools\make.exe
   # - set MAKE=ridk exec make
-  - alias make="ridk exec make"
+  # - alias make="ridk exec make"
+  - ridk enable
   - rake compile -- --with-or-tools-dir=C:\projects\or-tools\or-tools_VisualStudio2019-64bit_v7.5.7466
 
 test_script:
