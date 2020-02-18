@@ -1,5 +1,44 @@
 require_relative "test_helper"
 
+class NursesPartialSolutionPrinter #< ORTools::CpModel::CpSolverSolutionCallback
+  def initialize(shifts, num_nurses, num_days, num_shifts, sols)
+    super()
+    @shifts = shifts
+    @num_nurses = num_nurses
+    @num_days = num_days
+    @num_shifts = num_shifts
+    @solutions = sols
+    @solution_count = 0
+  end
+
+  def on_solution_callback
+    if @solutions.include?(@solution_count)
+      puts "Solution #{@solution_count}"
+      @num_days.times do |d|
+        puts "Day #{d}"
+        @num_nurses.times do |n|
+          working = false
+          @num_shifts.times do |s|
+            if value(@shifts[[n, d, s]])
+              working = true
+              puts "  Nurse %i works shift %i" % [n, s]
+            end
+          end
+          unless working
+            puts "  Nurse #{n} does not work"
+          end
+        end
+      end
+      puts
+    end
+    @solution_count += 1
+  end
+
+  def solution_count
+    @solution_count
+  end
+end
+
 class SchedulingTest < Minitest::Test
   # https://developers.google.com/optimization/scheduling/employee_scheduling
   def test_employee_scheduling
@@ -41,22 +80,19 @@ class SchedulingTest < Minitest::Test
       model.add(num_shifts_worked <= max_shifts_per_nurse)
     end
 
-    # Creates the solver and solve.
     solver = ORTools::CpSolver.new
     # solver.parameters.linearization_level = 0
-    # Display the first five solutions.
-    # a_few_solutions = 5.times.to_a
-    # solution_printer = NursesPartialSolutionPrinter(shifts, num_nurses,
-    #                                                 num_days, num_shifts,
-    #                                                 a_few_solutions)
-    # solver.SearchForAllSolutions(model, solution_printer)
+    a_few_solutions = 5.times.to_a
+    solution_printer = NursesPartialSolutionPrinter.new(
+      shifts, num_nurses, num_days, num_shifts, a_few_solutions
+    )
+    solver.search_for_all_solutions(model, solution_printer)
 
-    # # Statistics.
-    # print()
-    # print('Statistics')
-    # print('  - conflicts       : %i' % solver.NumConflicts())
-    # print('  - branches        : %i' % solver.NumBranches())
-    # print('  - wall time       : %f s' % solver.WallTime())
-    # print('  - solutions found : %i' % solution_printer.solution_count())
+    puts
+    puts "Statistics"
+    puts "  - conflicts       : %i" % solver.num_conflicts
+    puts "  - branches        : %i" % solver.num_branches
+    puts "  - wall time       : %f s" % solver.wall_time
+    puts "  - solutions found : %i" % solution_printer.solution_count
   end
 end
