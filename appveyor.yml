@@ -6,7 +6,7 @@ environment:
 
 install:
   - set PATH=C:\Ruby%RUBY_VERSION%\bin;%PATH%
-  # - bundle install
+  - bundle install
 
 build: off
 
@@ -22,10 +22,10 @@ build_script:
   - cd or-tools_VisualStudio2019-64bit_v7.5.7466
   - '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" x64'
   # - nmake test_cc
-  - tools\make test_cc
-  - set MAKE=C:\projects\or-tools\or-tools_VisualStudio2019-64bit_v7.5.7466\tools\make.exe
-  - cd ..
-  - bundle exec rake compile -rdevkit -- --with-or-tools-dir=C:\projects\or-tools\or-tools_VisualStudio2019-64bit_v7.5.7466
+  # - tools\make test_cc
+  # - set MAKE=C:\projects\or-tools\or-tools_VisualStudio2019-64bit_v7.5.7466\tools\make.exe
+  # - cd ..
+  - bundle exec rake compile -- --with-or-tools-dir=C:\projects\or-tools\or-tools_VisualStudio2019-64bit_v7.5.7466
 
 test_script:
   - bundle exec rake test
