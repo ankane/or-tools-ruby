@@ -9,6 +9,9 @@ $CXXFLAGS << " -Wno-sign-compare -Wno-shorten-64-to-32 -Wno-ignored-qualifiers"
 
 inc, lib = dir_config("or-tools")
 
+p inc
+p lib
+
 inc ||= "/usr/local/include"
 lib ||= "/usr/local/lib"
 
