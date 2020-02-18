@@ -115,7 +115,7 @@ operations_research::sat::LinearExpr from_ruby<operations_research::sat::LinearE
       // TODO clean up
       Object o = cvar[0];
       if (((Rice::String) o.call("class").call("name")).str() == "ORTools::BoolVar") {
-        expr.AddTerm(from_ruby<operations_research::sat::BoolVar>(cvar[0]), from_ruby<int64>(cvar[1]));
+        expr.AddVar(from_ruby<operations_research::sat::BoolVar>(cvar[0]));
       } else {
         expr.AddTerm(from_ruby<operations_research::sat::IntVar>(cvar[0]), from_ruby<int64>(cvar[1]));
       }
