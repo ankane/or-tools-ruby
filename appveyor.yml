@@ -19,12 +19,12 @@ before_build:
 build_script:
   - curl -fSL -o or-tools.zip https://github.com/google/or-tools/releases/download/v7.5/or-tools_VisualStudio2019-64bit_v7.5.7466.zip
   - unzip or-tools.zip
-  - cd or-tools_VisualStudio2019-64bit_v7.5.7466
   - '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" x64'
+  # - cd or-tools_VisualStudio2019-64bit_v7.5.7466
   # - nmake test_cc
   # - tools\make test_cc
-  # - set MAKE=C:\projects\or-tools\or-tools_VisualStudio2019-64bit_v7.5.7466\tools\make.exe
   # - cd ..
+  # - set MAKE=C:\projects\or-tools\or-tools_VisualStudio2019-64bit_v7.5.7466\tools\make.exe
   - bundle exec rake compile -- --with-or-tools-dir=C:\projects\or-tools\or-tools_VisualStudio2019-64bit_v7.5.7466
 
 test_script:
