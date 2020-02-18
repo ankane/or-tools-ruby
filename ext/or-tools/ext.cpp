@@ -15,6 +15,7 @@
 #include <rice/Constructor.hpp>
 #include <rice/Hash.hpp>
 #include <rice/Module.hpp>
+#include <rice/String.hpp>
 #include <rice/Symbol.hpp>
 
 using operations_research::ArcIndex;
@@ -53,6 +54,7 @@ using Rice::Constructor;
 using Rice::Hash;
 using Rice::Module;
 using Rice::Object;
+using Rice::String;
 using Rice::Symbol;
 using Rice::define_module;
 using Rice::define_class_under;
@@ -400,7 +402,13 @@ void Init_ext()
 
   // not to be confused with operations_research::IntVar
   define_class_under<operations_research::sat::IntVar>(rb_mORTools, "SatIntVar");
-  define_class_under<BoolVar>(rb_mORTools, "BoolVar");
+  define_class_under<BoolVar>(rb_mORTools, "BoolVar")
+    .define_method(
+      "inspect",
+      *[](BoolVar& self) {
+        String name(self.Name());
+        return "#<ORTools::BoolVar @name=" + name.inspect().str() + ">";
+      });
 
   define_class_under<CpModelBuilder>(rb_mORTools, "CpModel")
     .define_constructor(Constructor<CpModelBuilder>())
