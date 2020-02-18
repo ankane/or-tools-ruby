@@ -1,6 +1,8 @@
 require_relative "test_helper"
 
 class NursesPartialSolutionPrinter < ORTools::CpSolverSolutionCallback
+  attr_reader :solution_count
+
   def initialize(shifts, num_nurses, num_days, num_shifts, sols)
     super()
     @shifts = shifts
@@ -32,10 +34,6 @@ class NursesPartialSolutionPrinter < ORTools::CpSolverSolutionCallback
       puts
     end
     @solution_count += 1
-  end
-
-  def solution_count
-    @solution_count
   end
 end
 
@@ -88,11 +86,8 @@ class SchedulingTest < Minitest::Test
     )
     solver.search_for_all_solutions(model, solution_printer)
 
-    puts
-    puts "Statistics"
-    puts "  - conflicts       : %i" % solver.num_conflicts
-    puts "  - branches        : %i" % solver.num_branches
-    puts "  - wall time       : %f s" % solver.wall_time
-    puts "  - solutions found : %i" % solution_printer.solution_count
+    assert_equal 895, solver.num_conflicts
+    assert_equal 63883, solver.num_branches
+    assert_equal 5184, solution_printer.solution_count
   end
 end

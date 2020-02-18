@@ -46,6 +46,7 @@ using operations_research::sat::CpModelBuilder;
 using operations_research::sat::CpSolverResponse;
 using operations_research::sat::CpSolverStatus;
 using operations_research::sat::NewFeasibleSolutionObserver;
+using operations_research::sat::SatParameters;
 using operations_research::sat::SolutionIntegerValue;
 
 using Rice::Array;
@@ -471,8 +472,16 @@ void Init_ext()
       "_solve_with_observer",
       *[](Object self, CpModelBuilder& model, Object callback) {
         operations_research::sat::Model m;
+
+        // set parameters for SearchForAllSolutions
+        SatParameters parameters;
+        parameters.set_enumerate_all_solutions(true);
+        m.Add(NewSatParameters(parameters));
+
         m.Add(NewFeasibleSolutionObserver(
           [callback](const CpSolverResponse& r) {
+            // TODO find a better way to do this
+            callback.call("response=", r);
             callback.call("on_solution_callback");
           })
         );
@@ -494,6 +503,8 @@ void Init_ext()
     .define_method("num_conflicts", &CpSolverResponse::num_conflicts)
     .define_method("num_branches", &CpSolverResponse::num_branches)
     .define_method("wall_time", &CpSolverResponse::wall_time)
+    // .define_method("solution_integer_value", &SolutionIntegerValue)
+    .define_method("solution_boolean_value", &operations_research::sat::SolutionBooleanValue)
     .define_method(
       "status",
       *[](CpSolverResponse& self) {

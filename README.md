@@ -56,6 +56,10 @@ Assignment
 - [Assignment as a Min Cost Problem](#assignment-as-a-min-cost-problem)
 - [Assignment as a MIP Problem](#assignment-as-a-mip-problem)
 
+Scheduling
+
+- [Employee Scheduling](#employee-scheduling)
+
 ### The Glop Linear Solver
 
 [Guide](https://developers.google.com/optimization/lp/glop)
@@ -962,6 +966,123 @@ end
 
 puts
 puts "Time = #{solver.wall_time} milliseconds"
+```
+
+## Employee Scheduling
+
+[Guide](https://developers.google.com/optimization/scheduling/employee_scheduling)
+
+Define the data
+
+```ruby
+num_nurses = 4
+num_shifts = 3
+num_days = 3
+all_nurses = num_nurses.times.to_a
+all_shifts = num_shifts.times.to_a
+all_days = num_days.times.to_a
+```
+
+Create the variables
+
+```ruby
+model = ORTools::CpModel.new
+
+shifts = {}
+all_nurses.each do |n|
+  all_days.each do |d|
+    all_shifts.each do |s|
+      shifts[[n, d, s]] = model.new_bool_var("shift_n%id%is%i" % [n, d, s])
+    end
+  end
+end
+```
+
+Assign nurses to shifts
+
+```ruby
+all_days.each do |d|
+  all_shifts.each do |s|
+    model.add(model.sum(all_nurses.map { |n| shifts[[n, d, s]] }) == 1)
+  end
+end
+
+all_nurses.each do |n|
+  all_days.each do |d|
+    model.add(model.sum(all_shifts.map { |s| shifts[[n, d, s]] }) <= 1)
+  end
+end
+```
+
+Assign shifts evenly
+
+```ruby
+min_shifts_per_nurse = (num_shifts * num_days) / num_nurses
+max_shifts_per_nurse = min_shifts_per_nurse + 1
+all_nurses.each do |n|
+  num_shifts_worked = model.sum(all_days.flat_map { |d| all_shifts.map { |s| shifts[[n, d, s]] } })
+  model.add(num_shifts_worked >= min_shifts_per_nurse)
+  model.add(num_shifts_worked <= max_shifts_per_nurse)
+end
+```
+
+Create a printer
+
+```ruby
+class NursesPartialSolutionPrinter < ORTools::CpSolverSolutionCallback
+  attr_reader :solution_count
+
+  def initialize(shifts, num_nurses, num_days, num_shifts, sols)
+    super()
+    @shifts = shifts
+    @num_nurses = num_nurses
+    @num_days = num_days
+    @num_shifts = num_shifts
+    @solutions = sols
+    @solution_count = 0
+  end
+
+  def on_solution_callback
+    if @solutions.include?(@solution_count)
+      puts "Solution #{@solution_count}"
+      @num_days.times do |d|
+        puts "Day #{d}"
+        @num_nurses.times do |n|
+          working = false
+          @num_shifts.times do |s|
+            if value(@shifts[[n, d, s]])
+              working = true
+              puts "  Nurse %i works shift %i" % [n, s]
+            end
+          end
+          unless working
+            puts "  Nurse #{n} does not work"
+          end
+        end
+      end
+      puts
+    end
+    @solution_count += 1
+  end
+end
+```
+
+Call the solver and display the results
+
+```ruby
+solver = ORTools::CpSolver.new
+a_few_solutions = 5.times.to_a
+solution_printer = NursesPartialSolutionPrinter.new(
+  shifts, num_nurses, num_days, num_shifts, a_few_solutions
+)
+solver.search_for_all_solutions(model, solution_printer)
+
+puts
+puts "Statistics"
+puts "  - conflicts       : %i" % solver.num_conflicts
+puts "  - branches        : %i" % solver.num_branches
+puts "  - wall time       : %f s" % solver.wall_time
+puts "  - solutions found : %i" % solution_printer.solution_count
 ```
 
 ## History

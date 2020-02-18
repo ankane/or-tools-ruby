@@ -82,7 +82,7 @@ def main():
 
     # Creates the solver and solve.
     solver = cp_model.CpSolver()
-    solver.parameters.linearization_level = 0
+    # solver.parameters.linearization_level = 0
     # Display the first five solutions.
     a_few_solutions = range(5)
     solution_printer = NursesPartialSolutionPrinter(shifts, num_nurses,
