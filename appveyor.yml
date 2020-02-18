@@ -20,6 +20,7 @@ build_script:
   - curl -fSL -o or-tools.zip https://github.com/google/or-tools/releases/download/v7.5/or-tools_VisualStudio2019-64bit_v7.5.7466.zip
   - unzip or-tools.zip
   - cd or-tools_VisualStudio2019-64bit_v7.5.7466
+  - "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
   - tools\make.exe test_cc
   - set MAKE=C:\projects\or-tools\or-tools_VisualStudio2019-64bit_v7.5.7466\tools\make.exe
   - cd ..
