@@ -44,6 +44,7 @@ using operations_research::sat::BoolVar;
 using operations_research::sat::CpModelBuilder;
 using operations_research::sat::CpSolverResponse;
 using operations_research::sat::CpSolverStatus;
+using operations_research::sat::NewFeasibleSolutionObserver;
 using operations_research::sat::SolutionIntegerValue;
 
 using Rice::Array;
@@ -457,6 +458,17 @@ void Init_ext()
 
   define_class_under(rb_mORTools, "CpSolver")
     .define_method(
+      "_solve_with_observer",
+      *[](Object self, CpModelBuilder& model, Object callback) {
+        operations_research::sat::Model m;
+        m.Add(NewFeasibleSolutionObserver(
+          [callback](const CpSolverResponse& r) {
+            callback.call("on_solution_callback");
+          })
+        );
+        return SolveCpModel(model.Build(), &m);
+      })
+    .define_method(
       "_solve",
       *[](Object self, CpModelBuilder& model) {
         return Solve(model.Build());
@@ -469,6 +481,9 @@ void Init_ext()
 
   define_class_under<CpSolverResponse>(rb_mORTools, "CpSolverResponse")
     .define_method("objective_value", &CpSolverResponse::objective_value)
+    .define_method("num_conflicts", &CpSolverResponse::num_conflicts)
+    .define_method("num_branches", &CpSolverResponse::num_branches)
+    .define_method("wall_time", &CpSolverResponse::wall_time)
     .define_method(
       "status",
       *[](CpSolverResponse& self) {

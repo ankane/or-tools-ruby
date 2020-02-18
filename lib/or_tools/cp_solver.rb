@@ -1,5 +1,11 @@
+require "forwardable"
+
 module ORTools
   class CpSolver
+    extend Forwardable
+
+    def_delegators :@response, :objective_value, :num_conflicts, :num_branches, :wall_time
+
     def solve(model)
       @response = _solve(model)
       @response.status
@@ -9,8 +15,9 @@ module ORTools
       _solution_integer_value(@response, var)
     end
 
-    def objective_value
-      @response.objective_value
+    def search_for_all_solutions(model, observer)
+      @response = _solve_with_observer(model, observer)
+      @response.status
     end
   end
 end
