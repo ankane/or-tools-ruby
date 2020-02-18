@@ -1,6 +1,6 @@
 require_relative "test_helper"
 
-class NursesPartialSolutionPrinter #< ORTools::CpModel::CpSolverSolutionCallback
+class NursesPartialSolutionPrinter < ORTools::CpSolverSolutionCallback
   def initialize(shifts, num_nurses, num_days, num_shifts, sols)
     super()
     @shifts = shifts
