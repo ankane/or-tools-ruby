@@ -6,7 +6,7 @@ environment:
 
 install:
   - set PATH=C:\Ruby%RUBY_VERSION%\bin;%PATH%
-  - bundle install
+  # - bundle install
 
 build: off
 
@@ -19,6 +19,8 @@ before_build:
 build_script:
   - curl -fSL -o or-tools.zip https://github.com/google/or-tools/releases/download/v7.5/or-tools_VisualStudio2019-64bit_v7.5.7466.zip
   - unzip or-tools.zip
+  - or-tools_VisualStudio2019-64bit_v7.5.7466\tools\make.exe test_cc
+  - set MAKE=C:\projects\or-tools\or-tools_VisualStudio2019-64bit_v7.5.7466\tools\make.exe
   - bundle exec rake compile -rdevkit -- --with-or-tools-dir=C:\projects\or-tools\or-tools_VisualStudio2019-64bit_v7.5.7466
 
 test_script:
