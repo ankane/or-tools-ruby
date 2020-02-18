@@ -1,0 +1,22 @@
+environment:
+  matrix:
+    - RUBY_VERSION: "26-x64"
+
+install:
+  - set PATH=C:\Ruby%RUBY_VERSION%\bin;%PATH%
+  - bundle install
+
+build: off
+
+before_build:
+  - ruby -v
+  - gem -v
+  - bundle -v
+
+build_script:
+  - curl -fSL -o or-tools.zip https://github.com/google/or-tools/releases/download/v7.5/or-tools_VisualStudio2019-64bit_v7.5.7466.zip
+  - unzip or-tools.zip
+  - bundle exec rake compile -rdevkit -- --with-or-tools-dir=or-tools
+
+test_script:
+  - bundle exec rake test
