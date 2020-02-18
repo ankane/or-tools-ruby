@@ -7,5 +7,9 @@ module ORTools
       @left = left
       @right = right
     end
+
+    def inspect
+      "#{left.inspect} #{operator} #{right.inspect}"
+    end
   end
 end

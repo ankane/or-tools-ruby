@@ -403,6 +403,7 @@ void Init_ext()
   // not to be confused with operations_research::IntVar
   define_class_under<operations_research::sat::IntVar>(rb_mORTools, "SatIntVar");
   define_class_under<BoolVar>(rb_mORTools, "BoolVar")
+    .define_method("name", &BoolVar::Name)
     .define_method("index", &BoolVar::index)
     .define_method(
       "inspect",

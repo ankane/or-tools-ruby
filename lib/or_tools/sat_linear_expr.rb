@@ -16,6 +16,10 @@ module ORTools
       add(other, -1)
     end
 
+    def inspect
+      vars.map { |v| v[0].is_a?(BoolVar) ? v[0].name : v[0].name + " * " + v[1] }.join(" + ")
+    end
+
     private
 
     def add(other, sign)
