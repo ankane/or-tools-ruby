@@ -1,4 +1,4 @@
-## 0.1.2 (unreleased)
+## 0.1.2 (2020-02-18)
 
 - Added support for scheduling
 - Added `lib_version` method
