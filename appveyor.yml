@@ -24,8 +24,8 @@ build_script:
   # - nmake test_cc
   # - tools\make test_cc
   # - cd ..
-  - set MAKE=C:\projects\or-tools\or-tools_VisualStudio2019-64bit_v7.5.7466\tools\make.exe
-  # - set MAKE=nmake
+  # - set MAKE=C:\projects\or-tools\or-tools_VisualStudio2019-64bit_v7.5.7466\tools\make.exe
+  - set MAKE=nmake
   - bundle exec rake compile -- --with-or-tools-dir=C:\projects\or-tools\or-tools_VisualStudio2019-64bit_v7.5.7466
 
 test_script:
