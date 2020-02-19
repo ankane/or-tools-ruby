@@ -14,26 +14,24 @@ class NursesPartialSolutionPrinter < ORTools::CpSolverSolutionCallback
   end
 
   def on_solution_callback
-    if @solution_count < 2
-      solution = []
-      @num_days.times do |d|
-        day = []
-        @num_nurses.times do |n|
-          working = false
-          @num_shifts.times do |s|
-            if value(@shifts[[n, d, s]])
-              working = true
-              day[n] = s
-            end
-          end
-          unless working
-            day[n] = nil
+    solution = []
+    @num_days.times do |d|
+      day = []
+      @num_nurses.times do |n|
+        working = false
+        @num_shifts.times do |s|
+          if value(@shifts[[n, d, s]])
+            working = true
+            day[n] = s
           end
         end
-        solution << day
+        unless working
+          day[n] = nil
+        end
       end
-      @solutions << solution
+      solution << day
     end
+    @solutions[solution] = true
     @solution_count += 1
   end
 end
@@ -81,7 +79,7 @@ class SchedulingTest < Minitest::Test
 
     solver = ORTools::CpSolver.new
     # solver.parameters.linearization_level = 0
-    solutions = []
+    solutions = {}
     solution_printer = NursesPartialSolutionPrinter.new(
       shifts, num_nurses, num_days, num_shifts, solutions
     )
@@ -89,13 +87,12 @@ class SchedulingTest < Minitest::Test
 
     assert_equal 5184, solution_printer.solution_count
 
-    skip if ENV["TRAVIS"]
+    s1 = [[nil, 2, 0, 1], [1, 0, 2, nil], [0, 1, nil, 2]]
+    s2 = [[nil, 2, 0, 1], [2, 1, 0, nil], [0, 1, nil, 2]]
+    assert solutions[s1]
+    assert solutions[s2]
 
-    expected = [
-      [[nil, 2, 0, 1], [1, 0, 2, nil], [0, 1, nil, 2]],
-      [[nil, 2, 0, 1], [2, 1, 0, nil], [0, 1, nil, 2]]
-    ]
-    assert_equal expected, solutions
+    skip if ENV["TRAVIS"]
 
     assert_equal 895, solver.num_conflicts
     assert_equal 63883, solver.num_branches
