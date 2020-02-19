@@ -3,35 +3,36 @@ require_relative "test_helper"
 class NursesPartialSolutionPrinter < ORTools::CpSolverSolutionCallback
   attr_reader :solution_count
 
-  def initialize(shifts, num_nurses, num_days, num_shifts, sols)
+  def initialize(shifts, num_nurses, num_days, num_shifts, solutions)
     super()
     @shifts = shifts
     @num_nurses = num_nurses
     @num_days = num_days
     @num_shifts = num_shifts
-    @solutions = sols
+    @solutions = solutions
     @solution_count = 0
   end
 
   def on_solution_callback
-    if @solutions.include?(@solution_count)
-      puts "Solution #{@solution_count}"
+    if @solution_count < 2
+      solution = []
       @num_days.times do |d|
-        puts "Day #{d}"
+        day = []
         @num_nurses.times do |n|
           working = false
           @num_shifts.times do |s|
             if value(@shifts[[n, d, s]])
               working = true
-              puts "  Nurse %i works shift %i" % [n, s]
+              day[n] = s
             end
           end
           unless working
-            puts "  Nurse #{n} does not work"
+            day[n] = nil
           end
         end
+        solution << day
       end
-      puts
+      @solutions << solution
     end
     @solution_count += 1
   end
@@ -80,13 +81,19 @@ class SchedulingTest < Minitest::Test
 
     solver = ORTools::CpSolver.new
     # solver.parameters.linearization_level = 0
-    a_few_solutions = 5.times.to_a
+    solutions = []
     solution_printer = NursesPartialSolutionPrinter.new(
-      shifts, num_nurses, num_days, num_shifts, a_few_solutions
+      shifts, num_nurses, num_days, num_shifts, solutions
     )
     solver.search_for_all_solutions(model, solution_printer)
 
     assert_equal 5184, solution_printer.solution_count
+
+    expected = [
+      [[nil, 2, 0, 1], [1, 0, 2, nil], [0, 1, nil, 2]],
+      [[nil, 2, 0, 1], [2, 1, 0, nil], [0, 1, nil, 2]]
+    ]
+    assert_equal expected, solutions
 
     skip if ENV["TRAVIS"]
 
