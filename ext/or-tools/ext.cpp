@@ -293,6 +293,11 @@ void Init_ext()
       *[](MPVariable& self, double other) {
         LinearExpr s(&self);
         return s * other;
+      })
+    .define_method(
+      "inspect",
+      *[](MPVariable& self) {
+        return "#<ORTools::MPVariable @name=\"" + self.name() + "\">";
       });
 
   define_class_under<LinearExpr>(rb_mORTools, "LinearExpr")
