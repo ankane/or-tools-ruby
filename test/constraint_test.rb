@@ -85,8 +85,8 @@ class ConstraintTest < Minitest::Test
 
     model.add_all_different(letters)
 
-    model.add(c * base + p + i * base + s + f * (base * base) + u * base +
-      n == t * (base * base * base) + r * (base * base) + u * base + e)
+    model.add(c * base + p + i * base + s + f * base * base + u * base +
+      n == t * base * base * base + r * base * base + u * base + e)
 
     solver = ORTools::CpSolver.new
     solution_printer = VarArraySolutionPrinter.new(letters)
