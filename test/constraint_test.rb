@@ -64,8 +64,6 @@ class ConstraintTest < Minitest::Test
   end
 
   def test_cryptoarithmetic
-    skip
-
     model = ORTools::CpModel.new
 
     base = 10

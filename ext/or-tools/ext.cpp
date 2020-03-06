@@ -201,10 +201,9 @@ class IntVarSpan {
 
 template<>
 inline
-absl::Span<const operations_research::sat::IntVar> from_ruby<absl::Span<const operations_research::sat::IntVar>>(Object x)
+IntVarSpan from_ruby<IntVarSpan>(Object x)
 {
-  auto res = IntVarSpan(x);
-  return res;
+  return IntVarSpan(x);
 }
 
 extern "C"
@@ -488,7 +487,7 @@ void Init_ext()
       })
     .define_method(
       "add_all_different",
-      *[](CpModelBuilder& self, absl::Span<const operations_research::sat::IntVar> vars) {
+      *[](CpModelBuilder& self, IntVarSpan vars) {
         self.AddAllDifferent(vars);
       })
     .define_method(
