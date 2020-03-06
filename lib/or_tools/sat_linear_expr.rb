@@ -33,7 +33,7 @@ module ORTools
         else
           "#{k} * #{v[1]}"
         end
-      end.join(" + ")
+      end.join(" + ").sub(" + -", " - ")
     end
 
     private
