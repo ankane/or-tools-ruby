@@ -11,10 +11,10 @@ class VarArraySolutionPrinter < ORTools::CpSolverSolutionCallback
 
   def on_solution_callback
     @solution_count += 1
-    @variables.each do |v|
-      print "%s=%i " % [v.name, value(v)]
-    end
-    puts
+    # @variables.each do |v|
+    #   print "%s=%i " % [v.name, value(v)]
+    # end
+    # puts
   end
 end
 
@@ -63,6 +63,7 @@ class ConstraintTest < Minitest::Test
     assert_equal 5, solver.value(z)
   end
 
+  # https://developers.google.com/optimization/cp/cryptarithmetic
   def test_cryptoarithmetic
     model = ORTools::CpModel.new
 
@@ -90,12 +91,8 @@ class ConstraintTest < Minitest::Test
     solution_printer = VarArraySolutionPrinter.new(letters)
     status = solver.search_for_all_solutions(model, solution_printer)
 
-    puts
-    puts "Statistics"
-    # puts "  - status          : %s" % solver.status_name(status)
-    puts "  - conflicts       : %i" % solver.num_conflicts
-    puts "  - branches        : %i" % solver.num_branches
-    puts "  - wall time       : %f s" % solver.wall_time
-    puts "  - solutions found : %i" % solution_printer.solution_count
+    assert_equal 116, solver.num_conflicts
+    assert_equal 457, solver.num_branches
+    assert_equal 72, solution_printer.solution_count
   end
 end

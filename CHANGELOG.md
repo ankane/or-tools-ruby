@@ -1,3 +1,7 @@
+## 0.1.3 (unreleased)
+
+- Added `add_all_different` to `CpModel`
+
 ## 0.1.2 (2020-02-18)
 
 - Added support for scheduling
