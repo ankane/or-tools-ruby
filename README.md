@@ -283,7 +283,7 @@ status = solver.search_for_all_solutions(model, solution_printer)
 
 puts
 puts "Statistics"
-# puts "  - status          : %s" % solver.status_name(status)
+puts "  - status          : %s" % status
 puts "  - conflicts       : %i" % solver.num_conflicts
 puts "  - branches        : %i" % solver.num_branches
 puts "  - wall time       : %f s" % solver.wall_time
