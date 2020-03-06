@@ -65,6 +65,7 @@ Scheduling
 Other Examples
 
 - [Sudoku](#sudoku)
+- [Set Partitioning](#set-partitioning)
 
 ### The Glop Linear Solver
 
@@ -1305,6 +1306,59 @@ status = solver.solve(model)
 if status == :feasible
   line.each do |i|
     p line.map { |j| solver.value(grid[[i, j]]) }
+  end
+end
+```
+
+## Set Partitioning
+
+[Example](https://pythonhosted.org/PuLP/CaseStudies/a_set_partitioning_problem.html)
+
+```ruby
+# A set partitioning model of a wedding seating problem
+# Authors: Stuart Mitchell 2009
+
+max_tables = 5
+max_table_size = 4
+guests = %w(A B C D E F G I J K L M N O P Q R)
+
+# Find the happiness of the table
+# by calculating the maximum distance between the letters
+def happiness(table)
+  (table[0].ord - table[-1].ord).abs
+end
+
+# create list of all possible tables
+possible_tables = []
+(1..max_table_size).each do |i|
+  possible_tables += guests.combination(i).to_a
+end
+
+solver = ORTools::Solver.new("Wedding Seating Model", :cbc)
+
+# create a binary variable to state that a table setting is used
+x = {}
+possible_tables.each do |table|
+  x[table] = solver.int_var(0, 1, "table #{table.join(", ")}")
+end
+
+solver.minimize(solver.sum(possible_tables.map { |table| x[table] * happiness(table) }))
+
+# specify the maximum number of tables
+solver.add(solver.sum(x.values) <= max_tables)
+
+# a guest must seated at one and only one table
+guests.each do |guest|
+  tables_with_guest = possible_tables.select { |table| table.include?(guest) }
+  solver.add(solver.sum(tables_with_guest.map { |table| x[table] }) == 1)
+end
+
+status = solver.solve
+
+puts "The chosen tables are out of a total of %s:" % possible_tables.size
+possible_tables.each do |table|
+  if x[table].solution_value == 1
+    p table
   end
 end
 ```
