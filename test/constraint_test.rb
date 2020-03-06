@@ -95,4 +95,34 @@ class ConstraintTest < Minitest::Test
     assert_equal 457, solver.num_branches
     assert_equal 72, solution_printer.solution_count
   end
+
+  # https://developers.google.com/optimization/cp/queens
+  def test_queens
+    board_size = 8
+
+    model = ORTools::CpModel.new
+    queens = board_size.times.map { |i| model.new_int_var(0, board_size - 1, "x%i" % i) }
+
+    model.add_all_different(queens)
+
+    board_size.times do |i|
+      diag1 = []
+      diag2 = []
+      board_size.times do |j|
+        q1 = model.new_int_var(0, 2 * board_size, "diag1_%i" % i)
+        diag1 << q1
+        model.add(q1 == queens[j] + j)
+        q2 = model.new_int_var(-board_size, board_size, "diag2_%i" % i)
+        diag2 << q2
+        model.add(q2 == queens[j] - j)
+      end
+      model.add_all_different(diag1)
+      model.add_all_different(diag2)
+    end
+
+    solver = ORTools::CpSolver.new
+    solution_printer = VarArraySolutionPrinter.new(queens)
+    status = solver.search_for_all_solutions(model, solution_printer)
+    assert_equal 92, solution_printer.solution_count
+  end
 end

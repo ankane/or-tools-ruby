@@ -115,8 +115,11 @@ operations_research::sat::LinearExpr from_ruby<operations_research::sat::LinearE
       auto cvar = (Array) var;
       // TODO clean up
       Object o = cvar[0];
-      if (((Rice::String) o.call("class").call("name")).str() == "ORTools::BoolVar") {
+      std::string type = ((String) o.call("class").call("name")).str();
+      if (type == "ORTools::BoolVar") {
         expr.AddVar(from_ruby<operations_research::sat::BoolVar>(cvar[0]));
+      } else if (type == "Integer") {
+        expr.AddConstant(from_ruby<int64>(cvar[0]));
       } else {
         expr.AddTerm(from_ruby<operations_research::sat::IntVar>(cvar[0]), from_ruby<int64>(cvar[1]));
       }

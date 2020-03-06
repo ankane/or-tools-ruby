@@ -29,6 +29,7 @@ Constraint Optimization
 - [CP-SAT Solver](#cp-sat-solver)
 - [Solving an Optimization Problem](#solving-an-optimization-problem)
 - [Cryptarithmetic](#cryptarithmetic)
+- [The N-queens Problem](#the-n-queens-problem)
 
 Integer Optimization
 
@@ -283,6 +284,76 @@ puts "  - conflicts       : %i" % solver.num_conflicts
 puts "  - branches        : %i" % solver.num_branches
 puts "  - wall time       : %f s" % solver.wall_time
 puts "  - solutions found : %i" % solution_printer.solution_count
+```
+
+### The N-queens Problem
+
+[Guide](https://developers.google.com/optimization/cp/queens)
+
+*[master]*
+
+Declare the model
+
+```ruby
+board_size = 8
+model = ORTools::CpModel.new
+```
+
+Create the variables
+
+```ruby
+queens = board_size.times.map { |i| model.new_int_var(0, board_size - 1, "x%i" % i) }
+```
+
+Create the constraints
+
+```ruby
+board_size.times do |i|
+  diag1 = []
+  diag2 = []
+  board_size.times do |j|
+    q1 = model.new_int_var(0, 2 * board_size, "diag1_%i" % i)
+    diag1 << q1
+    model.add(q1 == queens[j] + j)
+    q2 = model.new_int_var(-board_size, board_size, "diag2_%i" % i)
+    diag2 << q2
+    model.add(q2 == queens[j] - j)
+  end
+  model.add_all_different(diag1)
+  model.add_all_different(diag2)
+end
+```
+
+Create a solution printer
+
+```ruby
+class SolutionPrinter < ORTools::CpSolverSolutionCallback
+  attr_reader :solution_count
+
+  def initialize(variables)
+    super()
+    @variables = variables
+    @solution_count = 0
+  end
+
+  def on_solution_callback
+    @solution_count += 1
+    @variables.each do |v|
+      print "%s = %i " % [v.name, value(v)]
+    end
+    puts
+  end
+end
+```
+
+Call the solver and display the results
+
+```ruby
+solver = ORTools::CpSolver.new
+solution_printer = SolutionPrinter.new(queens)
+status = solver.search_for_all_solutions(model, solution_printer)
+puts
+puts "Solutions found : %i" % solution_printer.solution_count
 ```
 
 ### Mixed-Integer Programming
