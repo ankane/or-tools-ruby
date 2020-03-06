@@ -1,5 +1,23 @@
 require_relative "test_helper"
 
+class VarArraySolutionPrinter < ORTools::CpSolverSolutionCallback
+  attr_reader :solution_count
+
+  def initialize(variables)
+    super()
+    @variables = variables
+    @solution_count = 0
+  end
+
+  def on_solution_callback
+    @solution_count += 1
+    @variables.each do |v|
+      print "%s=%i " % [v.name, value(v)]
+    end
+    puts
+  end
+end
+
 class ConstraintTest < Minitest::Test
   # https://developers.google.com/optimization/cp/cp_solver
   def test_cp_sat_solver
@@ -43,5 +61,43 @@ class ConstraintTest < Minitest::Test
     assert_equal 7, solver.value(x)
     assert_equal 3, solver.value(y)
     assert_equal 5, solver.value(z)
+  end
+
+  def test_cryptoarithmetic
+    skip
+
+    model = ORTools::CpModel.new
+
+    base = 10
+
+    c = model.new_int_var(1, base - 1, "C")
+    p = model.new_int_var(0, base - 1, "P")
+    i = model.new_int_var(1, base - 1, "I")
+    s = model.new_int_var(0, base - 1, "S")
+    f = model.new_int_var(1, base - 1, "F")
+    u = model.new_int_var(0, base - 1, "U")
+    n = model.new_int_var(0, base - 1, "N")
+    t = model.new_int_var(1, base - 1, "T")
+    r = model.new_int_var(0, base - 1, "R")
+    e = model.new_int_var(0, base - 1, "E")
+
+    letters = [c, p, i, s, f, u, n, t, r, e]
+
+    model.add_all_different(letters)
+
+    model.add(c * base + p + i * base + s + f * (base * base) + u * base +
+      n == t * (base * base * base) + r * (base * base) + u * base + e)
+
+    solver = ORTools::CpSolver.new
+    solution_printer = VarArraySolutionPrinter.new(letters)
+    status = solver.search_for_all_solutions(model, solution_printer)
+
+    puts
+    puts "Statistics"
+    # puts "  - status          : %s" % solver.status_name(status)
+    puts "  - conflicts       : %i" % solver.num_conflicts
+    puts "  - branches        : %i" % solver.num_branches
+    puts "  - wall time       : %f s" % solver.wall_time
+    puts "  - solutions found : %i" % solution_printer.solution_count
   end
 end

@@ -27,7 +27,7 @@ module ORTools
         case other
         when SatLinearExpr
           other.vars
-        when BoolVar
+        when BoolVar, SatIntVar
           [[other, 1]]
         else
           raise ArgumentError, "Unsupported type"

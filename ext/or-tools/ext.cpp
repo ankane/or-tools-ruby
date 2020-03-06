@@ -184,6 +184,29 @@ Object to_ruby<RoutingDimension*>(RoutingDimension* const &x)
   return Rice::Data_Object<RoutingDimension>(x, rb_cRoutingDimension, nullptr, nullptr);
 }
 
+// need a wrapper class since absl::Span doesn't own
+class IntVarSpan {
+  std::vector<operations_research::sat::IntVar> vec;
+  public:
+    IntVarSpan(Object x) {
+      Array a = Array(x);
+      for (std::size_t i = 0; i < a.size(); ++i) {
+        vec.push_back(from_ruby<operations_research::sat::IntVar>(a[i]));
+      }
+    }
+    operator absl::Span<const operations_research::sat::IntVar>() {
+      return absl::Span<const operations_research::sat::IntVar>(vec);
+    }
+};
+
+template<>
+inline
+absl::Span<const operations_research::sat::IntVar> from_ruby<absl::Span<const operations_research::sat::IntVar>>(Object x)
+{
+  auto res = IntVarSpan(x);
+  return res;
+}
+
 extern "C"
 void Init_ext()
 {
@@ -407,7 +430,9 @@ void Init_ext()
       });
 
   // not to be confused with operations_research::IntVar
-  define_class_under<operations_research::sat::IntVar>(rb_mORTools, "SatIntVar");
+  define_class_under<operations_research::sat::IntVar>(rb_mORTools, "SatIntVar")
+    .define_method("name", &operations_research::sat::IntVar::Name);
+
   define_class_under<BoolVar>(rb_mORTools, "BoolVar")
     .define_method("name", &BoolVar::Name)
     .define_method("index", &BoolVar::index)
@@ -462,6 +487,11 @@ void Init_ext()
         self.AddLessOrEqual(x, y);
       })
     .define_method(
+      "add_all_different",
+      *[](CpModelBuilder& self, absl::Span<const operations_research::sat::IntVar> vars) {
+        self.AddAllDifferent(vars);
+      })
+    .define_method(
       "maximize",
       *[](CpModelBuilder& self, operations_research::sat::LinearExpr expr) {
         self.Maximize(expr);
@@ -508,7 +538,12 @@ void Init_ext()
     .define_method("num_conflicts", &CpSolverResponse::num_conflicts)
     .define_method("num_branches", &CpSolverResponse::num_branches)
     .define_method("wall_time", &CpSolverResponse::wall_time)
-    // .define_method("solution_integer_value", &SolutionIntegerValue)
+    .define_method(
+      "solution_integer_value",
+      *[](CpSolverResponse& self, operations_research::sat::IntVar& x) {
+        operations_research::sat::LinearExpr expr(x);
+        return SolutionIntegerValue(self, expr);
+      })
     .define_method("solution_boolean_value", &operations_research::sat::SolutionBooleanValue)
     .define_method(
       "status",
