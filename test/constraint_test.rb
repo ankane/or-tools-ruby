@@ -18,6 +18,35 @@ class VarArraySolutionPrinter < ORTools::CpSolverSolutionCallback
   end
 end
 
+class DiagramPrinter < ORTools::CpSolverSolutionCallback
+  attr_reader :solution_count
+
+  def initialize(variables)
+    super()
+    @variables = variables
+    @solution_count = 0
+  end
+
+  def on_solution_callback
+    @solution_count += 1
+
+    # @variables.each do |v|
+    #   queen_col = value(v)
+    #   board_size = @variables.size
+
+    #   board_size.times do |j|
+    #     if j == queen_col
+    #       print("Q ")
+    #     else
+    #       print("_ ")
+    #     end
+    #   end
+    #   puts
+    # end
+    # puts
+  end
+end
+
 class ConstraintTest < Minitest::Test
   # https://developers.google.com/optimization/cp/cp_solver
   def test_cp_sat_solver
@@ -121,7 +150,7 @@ class ConstraintTest < Minitest::Test
     end
 
     solver = ORTools::CpSolver.new
-    solution_printer = VarArraySolutionPrinter.new(queens)
+    solution_printer = DiagramPrinter.new(queens)
     status = solver.search_for_all_solutions(model, solution_printer)
     assert_equal 92, solution_printer.solution_count
   end
