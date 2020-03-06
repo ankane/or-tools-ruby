@@ -62,6 +62,10 @@ Scheduling
 
 - [Employee Scheduling](#employee-scheduling)
 
+Other Examples
+
+- [Sudoku](#sudoku)
+
 ### The Glop Linear Solver
 
 [Guide](https://developers.google.com/optimization/lp/glop)
@@ -1229,6 +1233,80 @@ puts "  - conflicts       : %i" % solver.num_conflicts
 puts "  - branches        : %i" % solver.num_branches
 puts "  - wall time       : %f s" % solver.wall_time
 puts "  - solutions found : %i" % solution_printer.solution_count
+```
+
+## Sudoku
+
+[Example](https://github.com/google/or-tools/blob/stable/examples/python/sudoku_sat.py)
+
+```ruby
+# create the model
+model = ORTools::CpModel.new
+
+cell_size = 3
+line_size = cell_size**2
+line = (0...line_size).to_a
+cell = (0...cell_size).to_a
+
+initial_grid = [
+  [0, 6, 0, 0, 5, 0, 0, 2, 0],
+  [0, 0, 0, 3, 0, 0, 0, 9, 0],
+  [7, 0, 0, 6, 0, 0, 0, 1, 0],
+  [0, 0, 6, 0, 3, 0, 4, 0, 0],
+  [0, 0, 4, 0, 7, 0, 1, 0, 0],
+  [0, 0, 5, 0, 9, 0, 8, 0, 0],
+  [0, 4, 0, 0, 0, 1, 0, 0, 6],
+  [0, 3, 0, 0, 0, 8, 0, 0, 0],
+  [0, 2, 0, 0, 4, 0, 0, 5, 0]
+]
+
+grid = {}
+line.each do |i|
+  line.each do |j|
+    grid[[i, j]] = model.new_int_var(1, line_size, "grid %i %i" % [i, j])
+  end
+end
+
+# all different on rows
+line.each do |i|
+  model.add_all_different(line.map { |j| grid[[i, j]] })
+end
+
+# all different on columns
+line.each do |j|
+  model.add_all_different(line.map { |i| grid[[i, j]] })
+end
+
+# all different on cells
+cell.each do |i|
+  cell.each do |j|
+    one_cell = []
+    cell.each do |di|
+      cell.each do |dj|
+        one_cell << grid[[i * cell_size + di, j * cell_size + dj]]
+      end
+    end
+    model.add_all_different(one_cell)
+  end
+end
+
+# initial values
+line.each do |i|
+  line.each do |j|
+    if initial_grid[i][j] != 0
+      model.add(grid[[i, j]] == initial_grid[i][j])
+    end
+  end
+end
+
+# solve and print solution
+solver = ORTools::CpSolver.new
+status = solver.solve(model)
+if status == :feasible
+  line.each do |i|
+    p line.map { |j| solver.value(grid[[i, j]]) }
+  end
+end
 ```
 
 ## History
