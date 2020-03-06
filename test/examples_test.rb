@@ -79,4 +79,53 @@ class ORToolsTest < Minitest::Test
 
     assert_equal expected, actual
   end
+
+  # https://pythonhosted.org/PuLP/CaseStudies/a_set_partitioning_problem.html
+  def test_set_partitioning
+    # A set partitioning model of a wedding seating problem
+    # Authors: Stuart Mitchell 2009
+
+    max_tables = 5
+    max_table_size = 4
+    guests = %w(A B C D E F G I J K L M N O P Q R)
+
+    # Find the happiness of the table
+    # by calculating the maximum distance between the letters
+    def happiness(table)
+      (table[0].ord - table[-1].ord).abs
+    end
+
+    # create list of all possible tables
+    possible_tables = []
+    (1..max_table_size).each do |i|
+      possible_tables += guests.combination(i).to_a
+    end
+
+    solver = ORTools::Solver.new("Wedding Seating Model", :cbc)
+
+    # create a binary variable to state that a table setting is used
+    x = {}
+    possible_tables.each do |table|
+      x[table] = solver.int_var(0, 1, "table #{table.join(", ")}")
+    end
+
+    solver.minimize(solver.sum(possible_tables.map { |table| x[table] * happiness(table) }))
+
+    # specify the maximum number of tables
+    solver.add(solver.sum(x.values) <= max_tables)
+
+    # a guest must seated at one and only one table
+    guests.each do |guest|
+      tables_with_guest = possible_tables.select { |table| table.include?(guest) }
+      solver.add(solver.sum(tables_with_guest.map { |table| x[table] }) == 1)
+    end
+
+    status = solver.solve
+
+    assert_equal 3213, possible_tables.size
+
+    final_tables = possible_tables.select { |table| x[table].solution_value == 1 }
+    expected = [["M", "N"], ["E", "F", "G"], ["A", "B", "C", "D"], ["I", "J", "K", "L"], ["O", "P", "Q", "R"]]
+    assert_equal expected, final_tables
+  end
 end
