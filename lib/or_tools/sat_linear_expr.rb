@@ -25,7 +25,15 @@ module ORTools
     end
 
     def inspect
-      vars.map { |v| v[0].is_a?(BoolVar) || v[0].is_a?(SatIntVar) ? v[0].name : v[0].name + " * " + v[1] }.join(" + ")
+      vars.map do |v|
+        k = v[0]
+        k = k.respond_to?(:name) ? k.name : k.inspect
+        if v[1] == 1
+          k
+        else
+          "#{k} * #{v[1]}"
+        end
+      end.join(" + ")
     end
 
     private
