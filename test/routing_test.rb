@@ -282,22 +282,29 @@ class RoutingTest < Minitest::Test
     solution = routing.solve(first_solution_strategy: :parallel_cheapest_insertion)
 
     total_distance = 0
+    routes = []
     data[:num_vehicles].times do |vehicle_id|
       index = routing.start(vehicle_id)
       plan_output = String.new("Route for vehicle #{vehicle_id}:\n")
       route_distance = 0
+      route = []
       while !routing.end?(index)
         plan_output += " #{manager.index_to_node(index)} -> "
+        route << manager.index_to_node(index)
         previous_index = index
         index = solution.value(routing.next_var(index))
         route_distance += routing.arc_cost_for_vehicle(previous_index, index, vehicle_id)
       end
+      route << manager.index_to_node(index)
+      routes << route
       plan_output += "#{manager.index_to_node(index)}\n"
       plan_output += "Distance of the route: #{route_distance}m\n\n"
-      puts plan_output
+      # puts plan_output
       total_distance += route_distance
     end
-    puts "Total Distance of all routes: #{total_distance}m"
+
+    assert_equal [[0, 13, 15, 11, 12, 0], [0, 5, 2, 10, 16, 14, 9, 0], [0, 4, 3, 0], [0, 7, 1, 6, 8, 0]], routes
+    assert_equal 6916, total_distance
   end
 
   def test_vrptw
