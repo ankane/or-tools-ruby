@@ -1056,6 +1056,7 @@ data[:bin_capacities] = [100, 100, 100, 100, 100]
 solver = ORTools::Solver.new("simple_mip_program", :cbc)
 
 # create the variables
+# x[i, j] = 1 if item i is packed in bin j
 x = {}
 data[:items].each do |i|
   data[:bins].each do |j|
@@ -1064,6 +1065,7 @@ data[:items].each do |i|
 end
 
 # define the constraints
+# each item can be in at most one bin
 data[:items].each do |i|
   sum = ORTools::LinearExpr.new
   data[:bins].each do |j|
@@ -1072,6 +1074,7 @@ data[:items].each do |i|
   solver.add(sum <= 1.0)
 end
 
+# the amount packed in each bin cannot exceed its capacity
 data[:bins].each do |j|
   weight = ORTools::LinearExpr.new
   data[:items].each do |i|
