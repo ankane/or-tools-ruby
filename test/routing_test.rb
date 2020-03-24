@@ -359,7 +359,7 @@ class RoutingTest < Minitest::Test
       transit_callback_index,
       30,  # allow waiting time
       30,  # maximum time per vehicle
-      false,  # Don't force start cumul to zero.
+      false,  # don't force start cumul to zero
       time
     )
     time_dimension = routing.mutable_dimension(time)
@@ -466,7 +466,7 @@ class RoutingTest < Minitest::Test
       transit_callback_index,
       60,  # allow waiting time
       60,  # maximum time per vehicle
-      false,  # Don't force start cumul to zero.
+      false,  # don't force start cumul to zero
       time
     )
     time_dimension = routing.mutable_dimension(time)
