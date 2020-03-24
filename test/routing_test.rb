@@ -401,7 +401,7 @@ class RoutingTest < Minitest::Test
     puts "Total time of all routes: #{total_time}min"
   end
 
-  def test_vrptw_resources
+  def test_cvrptw_resources
     data = {}
     data[:time_matrix] = [
       [0, 6, 9, 8, 7, 3, 6, 2, 3, 2, 6, 6, 4, 4, 5, 9, 7],
@@ -506,23 +506,29 @@ class RoutingTest < Minitest::Test
 
     solution = routing.solve(first_solution_strategy: :path_cheapest_arc)
 
+    routes = []
     time_dimension = routing.mutable_dimension("Time")
     total_time = 0
     data[:num_vehicles].times do |vehicle_id|
       index = routing.start(vehicle_id)
       plan_output = String.new("Route for vehicle #{vehicle_id}:\n")
+      route = []
       while !routing.end?(index)
         time_var = time_dimension.cumul_var(index)
         plan_output += "#{manager.index_to_node(index)} Time(#{solution.min(time_var)},#{solution.max(time_var)}) -> "
+        route << manager.index_to_node(index)
         index = solution.value(routing.next_var(index))
       end
+      route << manager.index_to_node(index)
+      routes << route
       time_var = time_dimension.cumul_var(index)
       plan_output += "#{manager.index_to_node(index)} Time(#{solution.min(time_var)},#{solution.max(time_var)})\n"
       plan_output += "Time of the route: #{solution.min(time_var)}min\n\n"
-      puts plan_output
       total_time += solution.min(time_var)
     end
-    puts "Total time of all routes: #{total_time}min"
+
+    assert_equal [[0, 8, 14, 16, 0], [0, 12, 13, 15, 11, 0], [0, 7, 1, 4, 3, 0], [0, 9, 5, 6, 2, 10, 0]], routes
+    assert_equal 90, total_time
   end
 
   def test_penalties
