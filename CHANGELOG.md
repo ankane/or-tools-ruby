@@ -1,3 +1,7 @@
+## 0.1.4 (unreleased)
+
+- Added support for the Job Shop Problem
+
 ## 0.1.3 (2020-03-24)
 
 - Added support for more routing problems
