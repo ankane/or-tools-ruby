@@ -142,12 +142,12 @@ class SchedulingTest < Minitest::Test
       end
     end
 
-    # Makespan objective.
+    # makespan objective
     obj_var = model.new_int_var(0, horizon, "makespan")
     model.add_max_equality(obj_var, jobs_data.map.with_index { |job, job_id| all_tasks[[job_id, job.size - 1]][:end] })
     model.minimize(obj_var)
 
-    # Solve model.
+    # solve model
     solver = ORTools::CpSolver.new
     status = solver.solve(model)
 
