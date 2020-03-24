@@ -100,4 +100,92 @@ class SchedulingTest < Minitest::Test
     assert_equal 895, solver.num_conflicts
     assert_equal 63883, solver.num_branches
   end
+
+  def test_job_shop
+    model = ORTools::CpModel.new
+
+    jobs_data = [
+      [[0, 3], [1, 2], [2, 2]],
+      [[0, 2], [2, 1], [1, 4]],
+      [[1, 4], [2, 3]]
+    ]
+
+    machines_count = 1 + jobs_data.flat_map { |job| job.map { |task| task[0] }  }.max
+    all_machines = machines_count.times.to_a
+
+    horizon = jobs_data.flat_map { |job| job.map { |task| task[1] }  }.sum
+
+    all_tasks = {}
+    machine_to_intervals = Hash.new { |hash, key| hash[key] = [] }
+
+    jobs_data.each_with_index do |job, job_id|
+      job.each_with_index do |task, task_id|
+        machine = task[0]
+        duration = task[1]
+        suffix = "_%i_%i" % [job_id, task_id]
+        start_var = model.new_int_var(0, horizon, "start" + suffix)
+        duration_var = model.new_int_var(duration, duration, "duration" + suffix)
+        end_var = model.new_int_var(0, horizon, "end" + suffix)
+        interval_var = model.new_interval_var(start_var, duration_var, end_var, "interval" + suffix)
+        all_tasks[[job_id, task_id]] = {start: start_var, end: end_var, interval: interval_var}
+        machine_to_intervals[machine] << interval_var
+      end
+    end
+
+    all_machines.each do |machine|
+      model.add_no_overlap(machine_to_intervals[machine])
+    end
+
+    jobs_data.each_with_index do |job, job_id|
+      (job.size - 1).times do |task_id|
+        model.add(all_tasks[[job_id, task_id + 1]][:start] >= all_tasks[[job_id, task_id]][:end])
+      end
+    end
+
+    # Makespan objective.
+    obj_var = model.new_int_var(0, horizon, "makespan")
+    model.add_max_equality(obj_var, jobs_data.map.with_index { |job, job_id| all_tasks[[job_id, job.size - 1]][:end] })
+    model.minimize(obj_var)
+
+    # Solve model.
+    solver = ORTools::CpSolver.new
+    status = solver.solve(model)
+
+    assigned_jobs = Hash.new { |hash, key| hash[key] = [] }
+    jobs_data.each_with_index do |job, job_id|
+      job.each_with_index do |task, task_id|
+        machine = task[0]
+        assigned_jobs[machine] << {
+          start: solver.value(all_tasks[[job_id, task_id]][:start]),
+          job: job_id,
+          index: task_id,
+          duration: task[1]
+        }
+      end
+    end
+
+    output = String.new("")
+    all_machines.each do |machine|
+      assigned_jobs[machine].sort_by! { |v| v[:start] }
+      sol_line_tasks = "Machine #{machine}: "
+      sol_line = "           "
+
+      assigned_jobs[machine].each do |assigned_task|
+        name = "job_%i_%i" % [assigned_task[:job], assigned_task[:index]]
+        sol_line_tasks += "%-10s" % name
+        start = assigned_task[:start]
+        duration = assigned_task[:duration]
+        sol_tmp = "[%i,%i]" % [start, start + duration]
+        sol_line += "%-10s" % sol_tmp
+      end
+
+      sol_line += "\n"
+      sol_line_tasks += "\n"
+      output += sol_line_tasks
+      output += sol_line
+    end
+
+    puts "Optimal Schedule Length: %i" % solver.objective_value
+    puts output
+  end
 end

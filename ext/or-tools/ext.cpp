@@ -239,6 +239,28 @@ IntVarSpan from_ruby<IntVarSpan>(Object x)
   return IntVarSpan(x);
 }
 
+// need a wrapper class since absl::Span doesn't own
+class IntervalVarSpan {
+  std::vector<operations_research::sat::IntervalVar> vec;
+  public:
+    IntervalVarSpan(Object x) {
+      Array a = Array(x);
+      for (std::size_t i = 0; i < a.size(); ++i) {
+        vec.push_back(from_ruby<operations_research::sat::IntervalVar>(a[i]));
+      }
+    }
+    operator absl::Span<const operations_research::sat::IntervalVar>() {
+      return absl::Span<const operations_research::sat::IntervalVar>(vec);
+    }
+};
+
+template<>
+inline
+IntervalVarSpan from_ruby<IntervalVarSpan>(Object x)
+{
+  return IntervalVarSpan(x);
+}
+
 extern "C"
 void Init_ext()
 {
@@ -486,6 +508,10 @@ void Init_ext()
   define_class_under<operations_research::sat::IntVar>(rb_mORTools, "SatIntVar")
     .define_method("name", &operations_research::sat::IntVar::Name);
 
+  // not to be confused with operations_research::sat::IntVar
+  define_class_under<operations_research::sat::IntervalVar>(rb_mORTools, "SatIntervalVar")
+    .define_method("name", &operations_research::sat::IntervalVar::Name);
+
   define_class_under<BoolVar>(rb_mORTools, "BoolVar")
     .define_method("name", &BoolVar::Name)
     .define_method("index", &BoolVar::index)
@@ -508,6 +534,11 @@ void Init_ext()
       "new_bool_var",
       *[](CpModelBuilder& self, std::string name) {
         return self.NewBoolVar().WithName(name);
+      })
+    .define_method(
+      "new_interval_var",
+      *[](CpModelBuilder& self, operations_research::sat::IntVar start, operations_research::sat::IntVar size, operations_research::sat::IntVar end, std::string name) {
+        return self.NewIntervalVar(start, size, end).WithName(name);
       })
     .define_method(
       "add_equality",
@@ -543,6 +574,16 @@ void Init_ext()
       "add_all_different",
       *[](CpModelBuilder& self, IntVarSpan vars) {
         self.AddAllDifferent(vars);
+      })
+    .define_method(
+      "add_max_equality",
+      *[](CpModelBuilder& self, operations_research::sat::IntVar target, IntVarSpan vars) {
+        self.AddMaxEquality(target, vars);
+      })
+    .define_method(
+      "add_no_overlap",
+      *[](CpModelBuilder& self, IntervalVarSpan vars) {
+        self.AddNoOverlap(vars);
       })
     .define_method(
       "maximize",
