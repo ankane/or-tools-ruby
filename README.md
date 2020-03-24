@@ -1541,6 +1541,7 @@ puts "  - solutions found : %i" % solution_printer.solution_count
 [Guide](https://developers.google.com/optimization/scheduling/job_shop)
 
 ```ruby
+# create the model
 model = ORTools::CpModel.new
 
 jobs_data = [
@@ -1552,8 +1553,10 @@ jobs_data = [
 machines_count = 1 + jobs_data.flat_map { |job| job.map { |task| task[0] }  }.max
 all_machines = machines_count.times.to_a
 
+# computes horizon dynamically as the sum of all durations
 horizon = jobs_data.flat_map { |job| job.map { |task| task[1] }  }.sum
 
+# creates job intervals and add to the corresponding machine lists
 all_tasks = {}
 machine_to_intervals = Hash.new { |hash, key| hash[key] = [] }
 
@@ -1571,10 +1574,12 @@ jobs_data.each_with_index do |job, job_id|
   end
 end
 
+# create and add disjunctive constraints
 all_machines.each do |machine|
   model.add_no_overlap(machine_to_intervals[machine])
 end
 
+# precedences inside a job
 jobs_data.each_with_index do |job, job_id|
   (job.size - 1).times do |task_id|
     model.add(all_tasks[[job_id, task_id + 1]][:start] >= all_tasks[[job_id, task_id]][:end])
@@ -1590,6 +1595,7 @@ model.minimize(obj_var)
 solver = ORTools::CpSolver.new
 status = solver.solve(model)
 
+# create one list of assigned tasks per machine
 assigned_jobs = Hash.new { |hash, key| hash[key] = [] }
 jobs_data.each_with_index do |job, job_id|
   job.each_with_index do |task, task_id|
@@ -1603,18 +1609,22 @@ jobs_data.each_with_index do |job, job_id|
   end
 end
 
+# create per machine output lines
 output = String.new("")
 all_machines.each do |machine|
+  # sort by starting time
   assigned_jobs[machine].sort_by! { |v| v[:start] }
   sol_line_tasks = "Machine #{machine}: "
   sol_line = "           "
 
   assigned_jobs[machine].each do |assigned_task|
     name = "job_%i_%i" % [assigned_task[:job], assigned_task[:index]]
+    # add spaces to output to align columns
     sol_line_tasks += "%-10s" % name
     start = assigned_task[:start]
     duration = assigned_task[:duration]
     sol_tmp = "[%i,%i]" % [start, start + duration]
+    # add spaces to output to align columns
     sol_line += "%-10s" % sol_tmp
   end
 
@@ -1624,6 +1634,7 @@ all_machines.each do |machine|
   output += sol_line
 end
 
+# finally print the solution found
 puts "Optimal Schedule Length: %i" % solver.objective_value
 puts output
 ```
