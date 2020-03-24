@@ -39,6 +39,11 @@ Routing
 
 - [Traveling Salesperson Problem (TSP)](#traveling-salesperson-problem-tsp)
 - [Vehicle Routing Problem (VRP)](#vehicle-routing-problem-vrp)
+- [Capacity Constraints](#capacity-constraints)
+- [Pickups and Deliveries](#pickups-and-deliveries)
+- [Time Window Constraints](#time-window-constraints)
+- [Resource Constraints](#resource-constraints)
+- [Penalties and Dropping Visits](#penalties-and-dropping-visits)
 - [Routing Options](#routing-options)
 
 Bin Packing
@@ -572,6 +577,26 @@ data[:num_vehicles].times do |vehicle_id|
 end
 puts "Maximum of the route distances: #{max_route_distance}m"
 ```
+
+### Capacity Constraints
+
+[Guide](https://developers.google.com/optimization/routing/cvrp)
+
+### Pickups and Deliveries
+
+[Guide](https://developers.google.com/optimization/routing/pickup_delivery)
+
+### Time Window Constraints
+
+[Guide](https://developers.google.com/optimization/routing/vrptw)
+
+### Resource Constraints
+
+[Guide](https://developers.google.com/optimization/routing/cvrptw_resources)
+
+### Penalties and Dropping Visits
+
+[Guide](https://developers.google.com/optimization/routing/penalties)
 
 ### Routing Options
 
