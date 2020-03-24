@@ -189,28 +189,34 @@ class RoutingTest < Minitest::Test
 
     total_distance = 0
     total_load = 0
+    routes = []
     data[:num_vehicles].times do |vehicle_id|
       index = routing.start(vehicle_id)
       plan_output = String.new("Route for vehicle #{vehicle_id}:\n")
       route_distance = 0
       route_load = 0
+      route = []
       while !routing.end?(index)
         node_index = manager.index_to_node(index)
+        route << node_index
         route_load += data[:demands][node_index]
         plan_output += " #{node_index} Load(#{route_load}) -> "
         previous_index = index
         index = solution.value(routing.next_var(index))
         route_distance += routing.arc_cost_for_vehicle(previous_index, index, vehicle_id)
       end
+      route << manager.index_to_node(index)
+      routes << route
       plan_output += " #{manager.index_to_node(index)} Load(#{route_load})\n"
       plan_output += "Distance of the route: #{route_distance}m\n"
       plan_output += "Load of the route: #{route_load}\n\n"
-      puts plan_output
       total_distance += route_distance
       total_load += route_load
     end
-    puts "Total distance of all routes: #{total_distance}m"
-    puts "Total load of all routes: #{total_load}"
+
+    assert_equal [[0, 1, 4, 3, 15, 0], [0, 14, 16, 10, 2, 0], [0, 7, 13, 12, 11, 0], [0, 9, 8, 6, 5, 0]], routes
+    assert_equal 6872, total_distance
+    assert_equal 60, total_load
   end
 
   def test_pickup_delivery
