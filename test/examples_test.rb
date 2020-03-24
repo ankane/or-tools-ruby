@@ -280,17 +280,17 @@ class ORToolsTest < Minitest::Test
     # Symmetry breaking. First guest seats on the first table.
     model.add(seats[[0, 0]] == 1)
 
-    skip "Not completed yet"
-
     ### Solve model
     solver = ORTools::CpSolver.new
     solution_printer = WeddingChartPrinter.new(seats, names, num_tables, num_guests)
-    solver.search_for_all_solutions(model, solution_printer)
+    solver.solve_with_solution_callback(model, solution_printer)
 
     puts "Statistics"
     puts "  - conflicts    : %i" % solver.num_conflicts
     puts "  - branches     : %i" % solver.num_branches
     puts "  - wall time    : %f s" % solver.wall_time
     puts "  - num solutions: %i" % solution_printer.num_solutions
+
+    assert_equal 8, solution_printer.num_solutions
   end
 end

@@ -633,13 +633,15 @@ void Init_ext()
   define_class_under(rb_mORTools, "CpSolver")
     .define_method(
       "_solve_with_observer",
-      *[](Object self, CpModelBuilder& model, Object callback) {
+      *[](Object self, CpModelBuilder& model, Object callback, bool all_solutions) {
         operations_research::sat::Model m;
 
-        // set parameters for SearchForAllSolutions
-        SatParameters parameters;
-        parameters.set_enumerate_all_solutions(true);
-        m.Add(NewSatParameters(parameters));
+        if (all_solutions) {
+          // set parameters for SearchForAllSolutions
+          SatParameters parameters;
+          parameters.set_enumerate_all_solutions(true);
+          m.Add(NewSatParameters(parameters));
+        }
 
         m.Add(NewFeasibleSolutionObserver(
           [callback](const CpSolverResponse& r) {
