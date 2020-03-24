@@ -594,6 +594,24 @@ void Init_ext()
     .define_method("global_span_cost_coefficient=", &RoutingDimension::SetGlobalSpanCostCoefficient)
     .define_method("cumul_var", &RoutingDimension::CumulVar);
 
+  define_class_under<operations_research::Solver>(rb_mORTools, "Solver2")
+    .define_method(
+      "add",
+      *[](operations_research::Solver& self, Object o) {
+        operations_research::IntExpr* left(from_ruby<operations_research::IntVar*>(o.call("left")));
+        operations_research::IntExpr* right(from_ruby<operations_research::IntVar*>(o.call("right")));
+        operations_research::Constraint* constraint;
+        auto op = o.call("operator").to_s().str();
+        if (op == "==") {
+          constraint = self.MakeEquality(left, right);
+        } else if (op == "<=") {
+          constraint = self.MakeLessOrEqual(left, right);
+        } else {
+          throw std::runtime_error("Unknown operator");
+        }
+        self.AddConstraint(constraint);
+      });
+
   define_class_under<RoutingModel>(rb_mORTools, "RoutingModel")
     .define_constructor(Constructor<RoutingModel, RoutingIndexManager>())
     .define_method(
@@ -615,6 +633,7 @@ void Init_ext()
         );
       })
     .define_method("depot", &RoutingModel::GetDepot)
+    .define_method("vehicle_var", &RoutingModel::VehicleVar)
     .define_method("set_arc_cost_evaluator_of_all_vehicles", &RoutingModel::SetArcCostEvaluatorOfAllVehicles)
     .define_method("set_arc_cost_evaluator_of_vehicle", &RoutingModel::SetArcCostEvaluatorOfVehicle)
     .define_method("set_fixed_cost_of_all_vehicles", &RoutingModel::SetFixedCostOfAllVehicles)
@@ -630,6 +649,8 @@ void Init_ext()
         }
         self.AddDimensionWithVehicleCapacity(evaluator_index, slack_max, vehicle_capacities, fix_start_cumul_to_zero, name);
       })
+    .define_method("add_pickup_and_delivery", &RoutingModel::AddPickupAndDelivery)
+    .define_method("solver", &RoutingModel::solver)
     .define_method("start", &RoutingModel::Start)
     .define_method("end", &RoutingModel::End)
     .define_method("start?", &RoutingModel::IsStart)
