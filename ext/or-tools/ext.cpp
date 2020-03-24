@@ -343,6 +343,12 @@ void Init_ext()
         return s + other;
       })
     .define_method(
+      "-",
+      *[](MPVariable& self, LinearExpr& other) {
+        LinearExpr s(&self);
+        return s - other;
+      })
+    .define_method(
       "*",
       *[](MPVariable& self, double other) {
         LinearExpr s(&self);
