@@ -586,40 +586,42 @@ class RoutingTest < Minitest::Test
 
     assignment = routing.solve(first_solution_strategy: :path_cheapest_arc)
 
-    dropped_nodes = String.new("Dropped nodes:")
+    dropped_nodes = []
     routing.size.times do |node|
       next if routing.start?(node) || routing.end?(node)
 
       if assignment.value(routing.next_var(node)) == node
-        dropped_nodes += " #{manager.index_to_node(node)}"
+        dropped_nodes << manager.index_to_node(node)
       end
     end
-    puts dropped_nodes
+    assert_equal [6, 15], dropped_nodes
 
     total_distance = 0
     total_load = 0
+    routes = []
     data[:num_vehicles].times do |vehicle_id|
       index = routing.start(vehicle_id)
       plan_output = "Route for vehicle #{vehicle_id}:\n"
       route_distance = 0
       route_load = 0
+      route = []
       while !routing.end?(index)
         node_index = manager.index_to_node(index)
         route_load += data[:demands][node_index]
-        plan_output += " #{node_index} Load(#{route_load}) -> "
         previous_index = index
         index = assignment.value(routing.next_var(index))
         route_distance += routing.arc_cost_for_vehicle(previous_index, index, vehicle_id)
+        route << node_index
       end
-      plan_output += " #{manager.index_to_node(index)} Load(#{route_load})\n"
-      plan_output += "Distance of the route: #{route_distance}m\n"
-      plan_output += "Load of the route: #{route_load}\n\n"
-      puts plan_output
+      route << manager.index_to_node(index)
+      routes << route
       total_distance += route_distance
       total_load += route_load
     end
-    puts "Total Distance of all routes: #{total_distance}m"
-    puts "Total Load of all routes: #{total_load}"
+
+    assert_equal [[0, 9, 14, 16, 0], [0, 12, 11, 4, 3, 1, 0], [0, 7, 13, 0], [0, 8, 10, 2, 5, 0]], routes
+    assert_equal 5936, total_distance
+    assert_equal 56, total_load
   end
 
   # https://developers.google.com/optimization/routing/routing_options
