@@ -117,7 +117,7 @@ operations_research::sat::LinearExpr from_ruby<operations_research::sat::LinearE
       Object o = cvar[0];
       std::string type = ((String) o.call("class").call("name")).str();
       if (type == "ORTools::BoolVar") {
-        expr.AddVar(from_ruby<operations_research::sat::BoolVar>(cvar[0]));
+        expr.AddTerm(from_ruby<operations_research::sat::BoolVar>(cvar[0]), from_ruby<int64>(cvar[1]));
       } else if (type == "Integer") {
         expr.AddConstant(from_ruby<int64>(cvar[0]));
       } else {
