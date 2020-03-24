@@ -232,10 +232,10 @@ class ORToolsTest < Minitest::Test
       end
     end
 
+    skip "Not completed yet"
+
     # Objective
-    # model.maximize(model.sum(c[g1][g2] * colocated[g1, g2]
-    #         for g1 in range(num_guests - 1) for g2 in range(g1 + 1, num_guests)
-    #         if c[g1][g2] > 0))
+    model.maximize(model.sum((num_guests - 1).times.map { |g1| (g1 + 1).upto(num_guests - 1).select { |g2| c[g1][g2] > 0 }.map { |g2| colocated[[g1, g2]] * c[g1][g2] } }))
 
     #
     # Constraints
