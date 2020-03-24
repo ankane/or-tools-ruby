@@ -76,22 +76,15 @@ Other Examples
 
 [Guide](https://developers.google.com/optimization/lp/glop)
 
-Declare the solver
-
 ```ruby
+# declare the solver
 solver = ORTools::Solver.new("LinearProgrammingExample", :glop)
-```
 
-Create the variables
-
-```ruby
+# create the variables
 x = solver.num_var(0, solver.infinity, "x")
 y = solver.num_var(0, solver.infinity, "y")
-```
 
-Define the constraints
-
-```ruby
+# define the constraints
 constraint0 = solver.constraint(-solver.infinity, 14)
 constraint0.set_coefficient(x, 1)
 constraint0.set_coefficient(y, 2)
@@ -103,26 +96,17 @@ constraint1.set_coefficient(y, -1)
 constraint2 = solver.constraint(-solver.infinity, 2)
 constraint2.set_coefficient(x, 1)
 constraint2.set_coefficient(y, -1)
-```
 
-Define the objective function
-
-```ruby
+# define the objective function
 objective = solver.objective
 objective.set_coefficient(x, 3)
 objective.set_coefficient(y, 4)
 objective.set_maximization
-```
 
-Invoke the solver
-
-```ruby
+# invoke the solver
 solver.solve
-```
 
-Display the solution
-
-```ruby
+# display the solution
 opt_solution = 3 * x.solution_value + 4 * y.solution_value
 puts "Number of variables = #{solver.num_variables}"
 puts "Number of constraints = #{solver.num_constraints}"
@@ -136,37 +120,24 @@ puts "Optimal objective value = #{opt_solution}"
 
 [Guide](https://developers.google.com/optimization/cp/cp_solver)
 
-Declare the model
-
 ```ruby
+# declare the model
 model = ORTools::CpModel.new
-```
 
-Create the variables
-
-```ruby
+# create the variables
 num_vals = 3
 x = model.new_int_var(0, num_vals - 1, "x")
 y = model.new_int_var(0, num_vals - 1, "y")
 z = model.new_int_var(0, num_vals - 1, "z")
-```
 
-Create the constraint
-
-```ruby
+# create the constraint
 model.add(x != y)
-```
 
-Call the solver
-
-```ruby
+# call the solver
 solver = ORTools::CpSolver.new
 status = solver.solve(model)
-```
 
-Display the first solution
-
-```ruby
+# display the first solution
 if status == :feasible
   puts "x = #{solver.value(x)}"
   puts "y = #{solver.value(y)}"
@@ -178,38 +149,25 @@ end
 
 [Guide](https://developers.google.com/optimization/cp/integer_opt_cp)
 
-Declare the model
-
 ```ruby
+# declare the model
 model = ORTools::CpModel.new
-```
 
-Create the variables
-
-```ruby
+# create the variables
 var_upper_bound = [50, 45, 37].max
 x = model.new_int_var(0, var_upper_bound, "x")
 y = model.new_int_var(0, var_upper_bound, "y")
 z = model.new_int_var(0, var_upper_bound, "z")
-```
 
-Define the constraints
-
-```ruby
+# define the constraints
 model.add(x*2 + y*7 + z*3 <= 50)
 model.add(x*3 - y*5 + z*7 <= 45)
 model.add(x*5 + y*2 - z*6 <= 37)
-```
 
-Define the objective function
-
-```ruby
+# define the objective function
 model.maximize(x*2 + y*2 + z*3)
-```
 
-Call the solver
-
-```ruby
+# call the solver
 solver = ORTools::CpSolver.new
 status = solver.solve(model)
 
@@ -226,9 +184,8 @@ end
 
 [Guide](https://developers.google.com/optimization/cp/cryptarithmetic)
 
-Define the variables
-
 ```ruby
+# define the variables
 model = ORTools::CpModel.new
 
 base = 10
@@ -245,20 +202,14 @@ r = model.new_int_var(0, base - 1, "R")
 e = model.new_int_var(0, base - 1, "E")
 
 letters = [c, p, i, s, f, u, n, t, r, e]
-```
 
-Define the constraints
-
-```ruby
+# define the constraints
 model.add_all_different(letters)
 
 model.add(c * base + p + i * base + s + f * base * base + u * base +
   n == t * base * base * base + r * base * base + u * base + e)
-```
 
-Define the solution printer
-
-```ruby
+# define the solution printer
 class VarArraySolutionPrinter < ORTools::CpSolverSolutionCallback
   attr_reader :solution_count
 
@@ -276,11 +227,8 @@ class VarArraySolutionPrinter < ORTools::CpSolverSolutionCallback
     puts
   end
 end
-```
 
-Invoke the solver
-
-```ruby
+# invoke the solver
 solver = ORTools::CpSolver.new
 solution_printer = VarArraySolutionPrinter.new(letters)
 status = solver.search_for_all_solutions(model, solution_printer)
@@ -298,22 +246,15 @@ puts "  - solutions found : %i" % solution_printer.solution_count
 
 [Guide](https://developers.google.com/optimization/cp/queens)
 
-Declare the model
-
 ```ruby
+# declare the model
 board_size = 8
 model = ORTools::CpModel.new
-```
 
-Create the variables
-
-```ruby
+# create the variables
 queens = board_size.times.map { |i| model.new_int_var(0, board_size - 1, "x%i" % i) }
-```
 
-Create the constraints
-
-```ruby
+# create the constraints
 board_size.times do |i|
   diag1 = []
   diag2 = []
@@ -328,11 +269,8 @@ board_size.times do |i|
   model.add_all_different(diag1)
   model.add_all_different(diag2)
 end
-```
 
-Create a solution printer
-
-```ruby
+# create a solution printer
 class SolutionPrinter < ORTools::CpSolverSolutionCallback
   attr_reader :solution_count
 
@@ -350,11 +288,8 @@ class SolutionPrinter < ORTools::CpSolverSolutionCallback
     puts
   end
 end
-```
 
-Call the solver and display the results
-
-```ruby
+# call the solver and display the results
 solver = ORTools::CpSolver.new
 solution_printer = SolutionPrinter.new(queens)
 status = solver.search_for_all_solutions(model, solution_printer)
@@ -366,25 +301,18 @@ puts "Solutions found : %i" % solution_printer.solution_count
 
 [Guide](https://developers.google.com/optimization/mip/integer_opt)
 
-Declare the MIP solver
-
 ```ruby
+# declare the MIP solver
 solver = ORTools::Solver.new("simple_mip_program", :cbc)
-```
 
-Define the variables
-
-```ruby
+# define the variables
 infinity = solver.infinity
 x = solver.int_var(0.0, infinity, "x")
 y = solver.int_var(0.0, infinity, "y")
 
 puts "Number of variables = #{solver.num_variables}"
-```
 
-Define the constraints
-
-```ruby
+# define the constraints
 c0 = solver.constraint(-infinity, 17.5)
 c0.set_coefficient(x, 1)
 c0.set_coefficient(y, 7)
@@ -394,26 +322,17 @@ c1.set_coefficient(x, 1);
 c1.set_coefficient(y, 0);
 
 puts "Number of constraints = #{solver.num_constraints}"
-```
 
-Define the objective
-
-```ruby
+# define the objective
 objective = solver.objective
 objective.set_coefficient(x, 1)
 objective.set_coefficient(y, 10)
 objective.set_maximization
-```
 
-Call the solver
-
-```ruby
+# call the solver
 status = solver.solve
-```
 
-Display the solution
-
-```ruby
+# display the solution
 if status == :optimal
   puts "Solution:"
   puts "Objective value = #{solver.objective.value}"
@@ -428,9 +347,8 @@ end
 
 [Guide](https://developers.google.com/optimization/routing/tsp.html)
 
-Create the data
-
 ```ruby
+# create the data
 data = {}
 data[:distance_matrix] = [
   [0, 2451, 713, 1018, 1631, 1374, 2408, 213, 2571, 875, 1420, 2145, 1972],
@@ -449,11 +367,8 @@ data[:distance_matrix] = [
 ]
 data[:num_vehicles] = 1
 data[:depot] = 0
-```
 
-Create the distance callback
-
-```ruby
+# create the distance callback
 manager = ORTools::RoutingIndexManager.new(data[:distance_matrix].length, data[:num_vehicles], data[:depot])
 routing = ORTools::RoutingModel.new(manager)
 
@@ -465,17 +380,11 @@ end
 
 transit_callback_index = routing.register_transit_callback(distance_callback)
 routing.set_arc_cost_evaluator_of_all_vehicles(transit_callback_index)
-```
 
-Run the solver
-
-```ruby
+# run the solver
 assignment = routing.solve(first_solution_strategy: :path_cheaper_arc)
-```
 
-Print the solution
-
-```ruby
+# print the solution
 puts "Objective: #{assignment.objective_value} miles"
 index = routing.start(0)
 plan_output = String.new("Route for vehicle 0:\n")
@@ -494,9 +403,8 @@ puts plan_output
 
 [Guide](https://developers.google.com/optimization/routing/vrp)
 
-Create the data
-
 ```ruby
+# create the data
 data = {}
 data[:distance_matrix] = [
   [0, 548, 776, 696, 582, 274, 502, 194, 308, 194, 536, 502, 388, 354, 468, 776, 662],
@@ -519,11 +427,8 @@ data[:distance_matrix] = [
 ]
 data[:num_vehicles] = 4
 data[:depot] = 0
-```
 
-Define the distance callback
-
-```ruby
+# define the distance callback
 manager = ORTools::RoutingIndexManager.new(data[:distance_matrix].length, data[:num_vehicles], data[:depot])
 routing = ORTools::RoutingModel.new(manager)
 
@@ -535,26 +440,17 @@ end
 
 transit_callback_index = routing.register_transit_callback(distance_callback)
 routing.set_arc_cost_evaluator_of_all_vehicles(transit_callback_index)
-```
 
-Add a distance dimension
-
-```ruby
+# add a distance dimension
 dimension_name = "Distance"
 routing.add_dimension(transit_callback_index, 0, 3000, true, dimension_name)
 distance_dimension = routing.mutable_dimension(dimension_name)
 distance_dimension.global_span_cost_coefficient = 100
-```
 
-Run the solver
-
-```ruby
+# run the solver
 solution = routing.solve(first_solution_strategy: :path_cheapest_arc)
-```
 
-Print the solution
-
-```ruby
+# print the solution
 max_route_distance = 0
 data[:num_vehicles].times do |vehicle_id|
   index = routing.start(vehicle_id)
@@ -1100,9 +996,8 @@ routing.solve(
 
 [Guide](https://developers.google.com/optimization/bin/knapsack)
 
-Create the data
-
 ```ruby
+# create the data
 values = [
   360, 83, 59, 130, 431, 67, 230, 52, 93, 125, 670, 892, 600, 38, 48, 147,
   78, 256, 63, 17, 120, 164, 432, 35, 92, 110, 22, 42, 50, 323, 514, 28,
@@ -1115,17 +1010,11 @@ weights = [[
   3, 86, 66, 31, 65, 0, 79, 20, 65, 52, 13
 ]]
 capacities = [850]
-```
 
-Declare the solver
-
-```ruby
+# declare the solver
 solver = ORTools::KnapsackSolver.new(:branch_and_bound, "KnapsackExample")
-```
 
-Call the solver
-
-```ruby
+# call the solver
 solver.init(values, weights, capacities)
 computed_value = solver.solve
 
@@ -1149,9 +1038,8 @@ puts "Packed weights: #{packed_weights}"
 
 [Guide](https://developers.google.com/optimization/bin/multiple_knapsack)
 
-Create the data
-
 ```ruby
+# create the data
 data = {}
 weights = [48, 30, 42, 36, 36, 48, 42, 42, 36, 24, 30, 30, 42, 36, 36]
 values = [10, 30, 25, 50, 35, 30, 15, 40, 30, 35, 45, 10, 20, 30, 25]
@@ -1162,28 +1050,19 @@ data[:num_items] = weights.length
 num_bins = 5
 data[:bins] = (0...num_bins).to_a
 data[:bin_capacities] = [100, 100, 100, 100, 100]
-```
 
-Declare the solver
-
-```ruby
+# declare the solver
 solver = ORTools::Solver.new("simple_mip_program", :cbc)
-```
 
-Create the variables
-
-```ruby
+# create the variables
 x = {}
 data[:items].each do |i|
   data[:bins].each do |j|
     x[[i, j]] = solver.int_var(0, 1, "x_%i_%i" % [i, j])
   end
 end
-```
 
-Define the constraints
-
-```ruby
+# define the constraints
 data[:items].each do |i|
   sum = ORTools::LinearExpr.new
   data[:bins].each do |j|
@@ -1199,11 +1078,8 @@ data[:bins].each do |j|
   end
   solver.add(weight <= data[:bin_capacities][j])
 end
-```
 
-Define the objective
-
-```ruby
+# define the objective
 objective = solver.objective
 
 data[:items].each do |i|
@@ -1212,11 +1088,8 @@ data[:items].each do |i|
   end
 end
 objective.set_maximization
-```
 
-Call the solver and print the solution
-
-```ruby
+# call the solver and print the solution
 status = solver.solve
 
 if status == :optimal
@@ -1248,26 +1121,19 @@ end
 
 [Guide](https://developers.google.com/optimization/bin/bin_packing)
 
-Create the data
-
 ```ruby
+# create the data
 data = {}
 weights = [48, 30, 19, 36, 36, 27, 42, 42, 36, 24, 30]
 data[:weights] = weights
 data[:items] = (0...weights.length).to_a
 data[:bins] = data[:items]
 data[:bin_capacity] = 100
-```
 
-Declare the solver
-
-```ruby
+# declare the solver
 solver = ORTools::Solver.new("simple_mip_program", :cbc)
-```
 
-Create the variables
-
-```ruby
+# create the variables
 x = {}
 data[:items].each do |i|
   data[:bins].each do |j|
@@ -1279,11 +1145,8 @@ y = {}
 data[:bins].each do |j|
   y[j] = solver.int_var(0, 1, "y[%i]" % j)
 end
-```
 
-Define the constraints
-
-```ruby
+# define the constraints
 data[:items].each do |i|
   solver.add(solver.sum(data[:bins].map { |j| x[[i, j]] }) == 1)
 end
@@ -1292,17 +1155,11 @@ data[:bins].each do |j|
   sum = solver.sum(data[:items].map { |i| x[[i, j]] * data[:weights][i] })
   solver.add(sum <= y[j] * data[:bin_capacity])
 end
-```
 
-Define the objective
-
-```ruby
+# define the objective
 solver.minimize(solver.sum(data[:bins].map { |j| y[j] }))
-```
 
-Call the solver and print the solution
-
-```ruby
+# call the solver and print the solution
 if status == :optimal
   num_bins = 0
   data[:bins].each do |j|
@@ -1336,27 +1193,20 @@ end
 
 [Guide](https://developers.google.com/optimization/flow/maxflow)
 
-Define the data
-
 ```ruby
+# define the data
 start_nodes = [0, 0, 0, 1, 1, 2, 2, 3, 3]
 end_nodes = [1, 2, 3, 2, 4, 3, 4, 2, 4]
 capacities = [20, 30, 10, 40, 30, 10, 20, 5, 20]
-```
 
-Declare the solver and add the arcs
-
-```ruby
+# declare the solver and add the arcs
 max_flow = ORTools::SimpleMaxFlow.new
 
 start_nodes.length.times do |i|
   max_flow.add_arc_with_capacity(start_nodes[i], end_nodes[i], capacities[i])
 end
-```
 
-Invoke the solver and display the results
-
-```ruby
+# invoke the solver and display the results
 if max_flow.solve(0, 4) == :optimal
   puts "Max flow: #{max_flow.optimal_flow}"
   puts
@@ -1380,19 +1230,15 @@ end
 
 [Guide](https://developers.google.com/optimization/flow/mincostflow)
 
-Define the data
-
 ```ruby
+# define the data
 start_nodes = [ 0, 0,  1, 1,  1,  2, 2,  3, 4]
 end_nodes   = [ 1, 2,  2, 3,  4,  3, 4,  4, 2]
 capacities  = [15, 8, 20, 4, 10, 15, 4, 20, 5]
 unit_costs  = [ 4, 4,  2, 2,  6,  1, 3,  2, 3]
 supplies = [20, 0, 0, -5, -15]
-```
 
-Declare the solver and add the arcs
-
-```ruby
+# declare the solver and add the arcs
 min_cost_flow = ORTools::SimpleMinCostFlow.new
 
 start_nodes.length.times do |i|
@@ -1404,11 +1250,8 @@ end
 supplies.length.times do |i|
   min_cost_flow.set_node_supply(i, supplies[i])
 end
-```
 
-Invoke the solver and display the results
-
-```ruby
+# invoke the solver and display the results
 if min_cost_flow.solve == :optimal
   puts "Minimum cost #{min_cost_flow.optimal_cost}"
   puts
@@ -1432,9 +1275,8 @@ end
 
 [Guide](https://developers.google.com/optimization/assignment/simple_assignment)
 
-Create the data
-
 ```ruby
+# create the data
 cost = [[ 90,  76, 75,  70],
         [ 35,  85, 55,  65],
         [125,  95, 90, 105],
@@ -1442,17 +1284,11 @@ cost = [[ 90,  76, 75,  70],
 
 rows = cost.length
 cols = cost[0].length
-```
 
-Create the solver
-
-```ruby
+# create the solver
 assignment = ORTools::LinearSumAssignment.new
-```
 
-Add the costs to the solver
-
-```ruby
+# add the costs to the solver
 rows.times do |worker|
   cols.times do |task|
     if cost[worker][task]
@@ -1460,11 +1296,8 @@ rows.times do |worker|
     end
   end
 end
-```
 
-Invoke the solver
-
-```ruby
+# invoke the solver
 solve_status = assignment.solve
 if solve_status == :optimal
   puts "Total cost = #{assignment.optimal_cost}"
@@ -1487,15 +1320,11 @@ end
 
 [Guide](https://developers.google.com/optimization/assignment/assignment_min_cost_flow)
 
-Create the solver
-
 ```ruby
+# create the solver
 min_cost_flow = ORTools::SimpleMinCostFlow.new
-```
 
-Create the data
-
-```ruby
+# create the data
 start_nodes = [0, 0, 0, 0] + [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4] + [5, 6, 7, 8]
 end_nodes = [1, 2, 3, 4] + [5, 6, 7, 8, 5, 6, 7, 8, 5, 6, 7, 8, 5, 6, 7, 8] + [9, 9, 9, 9]
 capacities = [1, 1, 1, 1] + [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] + [1, 1, 1, 1]
@@ -1504,11 +1333,8 @@ supplies = [4, 0, 0, 0, 0, 0, 0, 0, 0, -4]
 source = 0
 sink = 9
 tasks = 4
-```
 
-Create the graph and constraints
-
-```ruby
+# create the graph and constraints
 start_nodes.length.times do |i|
   min_cost_flow.add_arc_with_capacity_and_unit_cost(
     start_nodes[i], end_nodes[i], capacities[i], costs[i]
@@ -1518,11 +1344,8 @@ end
 supplies.length.times do |i|
   min_cost_flow.set_node_supply(i, supplies[i])
 end
-```
 
-Invoke the solver
-
-```ruby
+# invoke the solver
 if min_cost_flow.solve == :optimal
   puts "Total cost = #{min_cost_flow.optimal_cost}"
   puts
@@ -1546,15 +1369,11 @@ end
 
 [Guide](https://developers.google.com/optimization/assignment/assignment_mip)
 
-Create the solver
-
 ```ruby
+# create the solver
 solver = ORTools::Solver.new("SolveAssignmentProblemMIP", :cbc)
-```
 
-Create the data
-
-```ruby
+# create the data
 cost = [[90, 76, 75, 70],
         [35, 85, 55, 65],
         [125, 95, 90, 105],
@@ -1565,11 +1384,8 @@ cost = [[90, 76, 75, 70],
 team1 = [0, 2, 4]
 team2 = [1, 3, 5]
 team_max = 2
-```
 
-Create the variables
-
-```ruby
+# create the variables
 num_workers = cost.length
 num_tasks = cost[1].length
 x = {}
@@ -1579,19 +1395,13 @@ num_workers.times do |i|
     x[[i, j]] = solver.bool_var("x[#{i},#{j}]")
   end
 end
-```
 
-Create the objective function
-
-```ruby
+# create the objective function
 solver.minimize(solver.sum(
   num_workers.times.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] * cost[i][j] } }
 ))
-```
 
-Create the constraints
-
-```ruby
+# create the constraints
 num_workers.times do |i|
   solver.add(solver.sum(num_tasks.times.map { |j| x[[i, j]] }) <= 1)
 end
@@ -1602,11 +1412,8 @@ end
 
 solver.add(solver.sum(team1.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] } }) <= team_max)
 solver.add(solver.sum(team2.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] } }) <= team_max)
-```
 
-Invoke the solver
-
-```ruby
+# invoke the solver
 sol = solver.solve
 
 puts "Total cost = #{solver.objective.value}"
@@ -1631,20 +1438,16 @@ puts "Time = #{solver.wall_time} milliseconds"
 
 [Guide](https://developers.google.com/optimization/scheduling/employee_scheduling)
 
-Define the data
-
 ```ruby
+# define the data
 num_nurses = 4
 num_shifts = 3
 num_days = 3
 all_nurses = num_nurses.times.to_a
 all_shifts = num_shifts.times.to_a
 all_days = num_days.times.to_a
-```
 
-Create the variables
-
-```ruby
+# create the variables
 model = ORTools::CpModel.new
 
 shifts = {}
@@ -1655,11 +1458,8 @@ all_nurses.each do |n|
     end
   end
 end
-```
 
-Assign nurses to shifts
-
-```ruby
+# assign nurses to shifts
 all_days.each do |d|
   all_shifts.each do |s|
     model.add(model.sum(all_nurses.map { |n| shifts[[n, d, s]] }) == 1)
@@ -1671,11 +1471,8 @@ all_nurses.each do |n|
     model.add(model.sum(all_shifts.map { |s| shifts[[n, d, s]] }) <= 1)
   end
 end
-```
 
-Assign shifts evenly
-
-```ruby
+# assign shifts evenly
 min_shifts_per_nurse = (num_shifts * num_days) / num_nurses
 max_shifts_per_nurse = min_shifts_per_nurse + 1
 all_nurses.each do |n|
@@ -1683,11 +1480,8 @@ all_nurses.each do |n|
   model.add(num_shifts_worked >= min_shifts_per_nurse)
   model.add(num_shifts_worked <= max_shifts_per_nurse)
 end
-```
 
-Create a printer
-
-```ruby
+# create a printer
 class NursesPartialSolutionPrinter < ORTools::CpSolverSolutionCallback
   attr_reader :solution_count
 
@@ -1724,11 +1518,8 @@ class NursesPartialSolutionPrinter < ORTools::CpSolverSolutionCallback
     @solution_count += 1
   end
 end
-```
 
-Call the solver and display the results
-
-```ruby
+# call the solver and display the results
 solver = ORTools::CpSolver.new
 a_few_solutions = 5.times.to_a
 solution_printer = NursesPartialSolutionPrinter.new(
