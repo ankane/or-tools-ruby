@@ -20,6 +20,10 @@ class LinearTest < Minitest::Test
     constraint2.set_coefficient(x, 1)
     constraint2.set_coefficient(y, -1)
 
+    # solver.add(x + y * 2 <= 14)
+    # solver.add(x*3 + y >= 0)
+    # solver.add(x - y <= 2)
+
     objective = solver.objective
     objective.set_coefficient(x, 3)
     objective.set_coefficient(y, 4)
