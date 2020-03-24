@@ -1,5 +1,6 @@
-## 0.1.3 (unreleased)
+## 0.1.3 (2020-03-24)
 
+- Added support for more routing problems
 - Added `add_all_different` to `CpModel`
 
 ## 0.1.2 (2020-02-18)

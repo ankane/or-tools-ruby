@@ -226,8 +226,6 @@ end
 
 [Guide](https://developers.google.com/optimization/cp/cryptarithmetic)
 
-*[master]*
-
 Define the variables
 
 ```ruby
@@ -299,8 +297,6 @@ puts "  - solutions found : %i" % solution_printer.solution_count
 ### The N-queens Problem
 
 [Guide](https://developers.google.com/optimization/cp/queens)
-
-*[master]*
 
 Declare the model
 
