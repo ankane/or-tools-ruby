@@ -384,21 +384,28 @@ class RoutingTest < Minitest::Test
 
     time_dimension = routing.mutable_dimension("Time")
     total_time = 0
+    routes = []
     data[:num_vehicles].times do |vehicle_id|
       index = routing.start(vehicle_id)
       plan_output = String.new("Route for vehicle #{vehicle_id}:\n")
+      route = []
       while !routing.end?(index)
         time_var = time_dimension.cumul_var(index)
         plan_output += "#{manager.index_to_node(index)} Time(#{solution.min(time_var)},#{solution.max(time_var)}) -> "
+        route << manager.index_to_node(index)
         index = solution.value(routing.next_var(index))
       end
+      route << manager.index_to_node(index)
+      routes << route
       time_var = time_dimension.cumul_var(index)
       plan_output += "#{manager.index_to_node(index)} Time(#{solution.min(time_var)},#{solution.max(time_var)})\n"
       plan_output += "Time of the route: #{solution.min(time_var)}min\n\n"
-      puts plan_output
+      # puts plan_output
       total_time += solution.min(time_var)
     end
-    puts "Total time of all routes: #{total_time}min"
+
+    assert_equal [[0, 9, 14, 16, 0], [0, 7, 1, 4, 3, 0], [0, 12, 13, 15, 11, 0], [0, 5, 8, 6, 2, 10, 0]], routes
+    assert_equal 82, total_time
   end
 
   def test_cvrptw_resources
