@@ -685,6 +685,7 @@ void Init_ext()
         );
       })
     .define_method("depot", &RoutingModel::GetDepot)
+    .define_method("size", &RoutingModel::Size)
     .define_method("vehicle_var", &RoutingModel::VehicleVar)
     .define_method("set_arc_cost_evaluator_of_all_vehicles", &RoutingModel::SetArcCostEvaluatorOfAllVehicles)
     .define_method("set_arc_cost_evaluator_of_vehicle", &RoutingModel::SetArcCostEvaluatorOfVehicle)
@@ -700,6 +701,15 @@ void Init_ext()
           vehicle_capacities.push_back(from_ruby<int64>(vc[i]));
         }
         self.AddDimensionWithVehicleCapacity(evaluator_index, slack_max, vehicle_capacities, fix_start_cumul_to_zero, name);
+      })
+    .define_method(
+      "add_disjunction",
+      *[](RoutingModel& self, Array rb_indices, int64 penalty) {
+        std::vector<int64> indices;
+        for (std::size_t i = 0; i < rb_indices.size(); ++i) {
+          indices.push_back(from_ruby<int64>(rb_indices[i]));
+        }
+        self.AddDisjunction(indices, penalty);
       })
     .define_method("add_pickup_and_delivery", &RoutingModel::AddPickupAndDelivery)
     .define_method("solver", &RoutingModel::solver)
