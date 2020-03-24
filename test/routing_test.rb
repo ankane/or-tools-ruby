@@ -254,7 +254,6 @@ class RoutingTest < Minitest::Test
     data[:depot] = 0
 
     manager = ORTools::RoutingIndexManager.new(data[:distance_matrix].size, data[:num_vehicles], data[:depot])
-
     routing = ORTools::RoutingModel.new(manager)
 
     distance_callback = lambda do |from_index, to_index|
@@ -468,7 +467,6 @@ class RoutingTest < Minitest::Test
     data[:depot] = 0
 
     manager = ORTools::RoutingIndexManager.new(data[:time_matrix].size, data[:num_vehicles], data[:depot])
-
     routing = ORTools::RoutingModel.new(manager)
 
     time_callback = lambda do |from_index, to_index|
@@ -578,7 +576,6 @@ class RoutingTest < Minitest::Test
     data[:depot] = 0
 
     manager = ORTools::RoutingIndexManager.new(data[:distance_matrix].size, data[:num_vehicles], data[:depot])
-
     routing = ORTools::RoutingModel.new(manager)
 
     distance_callback = lambda do |from_index, to_index|

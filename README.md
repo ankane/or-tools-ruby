@@ -698,7 +698,6 @@ data[:num_vehicles] = 4
 data[:depot] = 0
 
 manager = ORTools::RoutingIndexManager.new(data[:distance_matrix].size, data[:num_vehicles], data[:depot])
-
 routing = ORTools::RoutingModel.new(manager)
 
 distance_callback = lambda do |from_index, to_index|
@@ -906,7 +905,6 @@ data[:depot_capacity] = 2
 data[:depot] = 0
 
 manager = ORTools::RoutingIndexManager.new(data[:time_matrix].size, data[:num_vehicles], data[:depot])
-
 routing = ORTools::RoutingModel.new(manager)
 
 time_callback = lambda do |from_index, to_index|
@@ -1014,7 +1012,6 @@ data[:num_vehicles] = 4
 data[:depot] = 0
 
 manager = ORTools::RoutingIndexManager.new(data[:distance_matrix].size, data[:num_vehicles], data[:depot])
-
 routing = ORTools::RoutingModel.new(manager)
 
 distance_callback = lambda do |from_index, to_index|
