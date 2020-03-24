@@ -338,10 +338,9 @@ void Init_ext()
     .define_method("solution_value", &MPVariable::solution_value)
     .define_method(
       "+",
-      *[](MPVariable& self, MPVariable& other) {
+      *[](MPVariable& self, LinearExpr& other) {
         LinearExpr s(&self);
-        LinearExpr o(&other);
-        return s + o;
+        return s + other;
       })
     .define_method(
       "*",
@@ -367,6 +366,17 @@ void Init_ext()
       *[](LinearExpr& self, MPVariable &other) {
         LinearExpr o(&other);
         return self + o;
+      })
+    .define_method(
+      "_gte_double",
+      *[](LinearExpr& self, double other) {
+        LinearExpr o(other);
+        return self >= o;
+      })
+    .define_method(
+      "_gte_linear_expr",
+      *[](LinearExpr& self, LinearExpr& other) {
+        return self >= other;
       })
     .define_method(
       "_lte_double",

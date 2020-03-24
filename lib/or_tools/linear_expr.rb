@@ -8,6 +8,14 @@ module ORTools
       end
     end
 
+    def >=(other)
+      if other.is_a?(LinearExpr)
+        _gte_linear_expr(other)
+      else
+        _gte_double(other)
+      end
+    end
+
     def <=(other)
       if other.is_a?(LinearExpr)
         _lte_linear_expr(other)
