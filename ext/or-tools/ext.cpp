@@ -605,6 +605,15 @@ void Init_ext()
           }
         );
       })
+    .define_method(
+      "register_unary_transit_callback",
+      *[](RoutingModel& self, Object callback) {
+        return self.RegisterUnaryTransitCallback(
+          [callback](int64 from_index) -> int64 {
+            return from_ruby<int64>(callback.call("call", from_index));
+          }
+        );
+      })
     .define_method("depot", &RoutingModel::GetDepot)
     .define_method("set_arc_cost_evaluator_of_all_vehicles", &RoutingModel::SetArcCostEvaluatorOfAllVehicles)
     .define_method("set_arc_cost_evaluator_of_vehicle", &RoutingModel::SetArcCostEvaluatorOfVehicle)
@@ -612,6 +621,15 @@ void Init_ext()
     .define_method("set_fixed_cost_of_vehicle", &RoutingModel::SetFixedCostOfVehicle)
     .define_method("fixed_cost_of_vehicle", &RoutingModel::GetFixedCostOfVehicle)
     .define_method("add_dimension", &RoutingModel::AddDimension)
+    .define_method(
+      "add_dimension_with_vehicle_capacity",
+      *[](RoutingModel& self, int evaluator_index, int64 slack_max, Array vc, bool fix_start_cumul_to_zero, const std::string& name) {
+        std::vector<int64> vehicle_capacities;
+        for (std::size_t i = 0; i < vc.size(); ++i) {
+          vehicle_capacities.push_back(from_ruby<int64>(vc[i]));
+        }
+        self.AddDimensionWithVehicleCapacity(evaluator_index, slack_max, vehicle_capacities, fix_start_cumul_to_zero, name);
+      })
     .define_method("start", &RoutingModel::Start)
     .define_method("end", &RoutingModel::End)
     .define_method("start?", &RoutingModel::IsStart)
