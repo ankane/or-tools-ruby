@@ -71,6 +71,7 @@ Scheduling
 Other Examples
 
 - [Sudoku](#sudoku)
+- [Wedding Seating Chart](#wedding-seating-chart)
 - [Set Partitioning](#set-partitioning)
 
 ### The Glop Linear Solver
@@ -1718,6 +1719,164 @@ if status == :feasible
     p line.map { |j| solver.value(grid[[i, j]]) }
   end
 end
+```
+
+## Wedding Seating Chart
+
+[Example](https://github.com/google/or-tools/blob/stable/examples/python/wedding_optimal_chart_sat.py)
+
+```ruby
+# From
+# Meghan L. Bellows and J. D. Luc Peterson
+# "Finding an optimal seating chart for a wedding"
+# http://www.improbable.com/news/2012/Optimal-seating-chart.pdf
+# http://www.improbable.com/2012/02/12/finding-an-optimal-seating-chart-for-a-wedding
+#
+# Every year, millions of brides (not to mention their mothers, future
+# mothers-in-law, and occasionally grooms) struggle with one of the
+# most daunting tasks during the wedding-planning process: the
+# seating chart. The guest responses are in, banquet hall is booked,
+# menu choices have been made. You think the hard parts are over,
+# but you have yet to embark upon the biggest headache of them all.
+# In order to make this process easier, we present a mathematical
+# formulation that models the seating chart problem. This model can
+# be solved to find the optimal arrangement of guests at tables.
+# At the very least, it can provide a starting point and hopefully
+# minimize stress and arguments.
+#
+# Adapted from
+# https://github.com/google/or-tools/blob/stable/examples/python/wedding_optimal_chart_sat.py
+
+# Easy problem (from the paper)
+# num_tables = 2
+# table_capacity = 10
+# min_known_neighbors = 1
+
+# Slightly harder problem (also from the paper)
+num_tables = 5
+table_capacity = 4
+min_known_neighbors = 1
+
+# Connection matrix: who knows who, and how strong
+# is the relation
+c = [
+  [1, 50, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+  [50, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+  [1, 1, 1, 50, 1, 1, 1, 1, 10, 0, 0, 0, 0, 0, 0, 0, 0],
+  [1, 1, 50, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+  [1, 1, 1, 1, 1, 50, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+  [1, 1, 1, 1, 50, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+  [1, 1, 1, 1, 1, 1, 1, 50, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+  [1, 1, 1, 1, 1, 1, 50, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+  [1, 1, 10, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 50, 1, 1, 1, 1, 1, 1],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 50, 1, 1, 1, 1, 1, 1, 1],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]
+]
+
+# Names of the guests. B: Bride side, G: Groom side
+names = [
+  "Deb (B)", "John (B)", "Martha (B)", "Travis (B)", "Allan (B)",
+  "Lois (B)", "Jayne (B)", "Brad (B)", "Abby (B)", "Mary Helen (G)",
+  "Lee (G)", "Annika (G)", "Carl (G)", "Colin (G)", "Shirley (G)",
+  "DeAnn (G)", "Lori (G)"
+]
+
+num_guests = c.size
+
+all_tables = num_tables.times.to_a
+all_guests = num_guests.times.to_a
+
+# create the cp model
+model = ORTools::CpModel.new
+
+# decision variables
+seats = {}
+all_tables.each do |t|
+  all_guests.each do |g|
+    seats[[t, g]] = model.new_bool_var("guest %i seats on table %i" % [g, t])
+  end
+end
+
+colocated = {}
+(num_guests - 1).times do |g1|
+  (g1 + 1).upto(num_guests - 1) do |g2|
+    colocated[[g1, g2]] = model.new_bool_var("guest %i seats with guest %i" % [g1, g2])
+  end
+end
+
+same_table = {}
+(num_guests - 1).times do |g1|
+  (g1 + 1).upto(num_guests - 1) do |g2|
+    all_tables.each do |t|
+      same_table[[g1, g2, t]] = model.new_bool_var("guest %i seats with guest %i on table %i" % [g1, g2, t])
+    end
+  end
+end
+
+# Objective
+model.maximize(model.sum((num_guests - 1).times.flat_map { |g1| (g1 + 1).upto(num_guests - 1).select { |g2| c[g1][g2] > 0 }.map { |g2| colocated[[g1, g2]] * c[g1][g2] } }))
+
+#
+# Constraints
+#
+
+# Everybody seats at one table.
+all_guests.each do |g|
+  model.add(model.sum(all_tables.map { |t| seats[[t, g]] }) == 1)
+end
+
+# Tables have a max capacity.
+all_tables.each do |t|
+  model.add(model.sum(all_guests.map { |g| seats[[t, g]] }) <= table_capacity)
+end
+
+# Link colocated with seats
+(num_guests - 1).times do |g1|
+  (g1 + 1).upto(num_guests - 1) do |g2|
+    all_tables.each do |t|
+      # Link same_table and seats.
+      model.add_bool_or([seats[[t, g1]].not, seats[[t, g2]].not, same_table[[g1, g2, t]]])
+      model.add_implication(same_table[[g1, g2, t]], seats[[t, g1]])
+      model.add_implication(same_table[[g1, g2, t]], seats[[t, g2]])
+    end
+
+    # Link colocated and same_table.
+    model.add(model.sum(all_tables.map { |t| same_table[[g1, g2, t]] }) == colocated[[g1, g2]])
+  end
+end
+
+# Min known neighbors rule.
+all_tables.each do |t|
+  model.add(
+    model.sum(
+      (num_guests - 1).times.flat_map { |g1|
+        (g1 + 1).upto(num_guests - 1).select { |g2| c[g1][g2] > 0 }.flat_map { |g2|
+          all_tables.map { |t2| same_table[[g1, g2, t2]] }
+        }
+      }
+    ) >= min_known_neighbors
+  )
+end
+
+# Symmetry breaking. First guest seats on the first table.
+model.add(seats[[0, 0]] == 1)
+
+### Solve model
+solver = ORTools::CpSolver.new
+solution_printer = WeddingChartPrinter.new(seats, names, num_tables, num_guests)
+solver.solve_with_solution_callback(model, solution_printer)
+
+puts "Statistics"
+puts "  - conflicts    : %i" % solver.num_conflicts
+puts "  - branches     : %i" % solver.num_branches
+puts "  - wall time    : %f s" % solver.wall_time
+puts "  - num solutions: %i" % solution_printer.num_solutions
 ```
 
 ## Set Partitioning
