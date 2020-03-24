@@ -433,6 +433,11 @@ void Init_ext()
     .define_method("nodes", &MPSolver::nodes)
     .define_method("objective", &MPSolver::MutableObjective)
     .define_method(
+      "maximize",
+      *[](MPSolver& self, LinearExpr& expr) {
+        return self.MutableObjective()->MaximizeLinearExpr(expr);
+      })
+    .define_method(
       "minimize",
       *[](MPSolver& self, LinearExpr& expr) {
         return self.MutableObjective()->MinimizeLinearExpr(expr);

@@ -8,26 +8,27 @@ class LinearTest < Minitest::Test
     x = solver.num_var(0, solver.infinity, "x")
     y = solver.num_var(0, solver.infinity, "y")
 
-    constraint0 = solver.constraint(-solver.infinity, 14)
-    constraint0.set_coefficient(x, 1)
-    constraint0.set_coefficient(y, 2)
+    # constraint0 = solver.constraint(-solver.infinity, 14)
+    # constraint0.set_coefficient(x, 1)
+    # constraint0.set_coefficient(y, 2)
 
-    constraint1 = solver.constraint(0, solver.infinity)
-    constraint1.set_coefficient(x, 3)
-    constraint1.set_coefficient(y, -1)
+    # constraint1 = solver.constraint(0, solver.infinity)
+    # constraint1.set_coefficient(x, 3)
+    # constraint1.set_coefficient(y, -1)
 
     constraint2 = solver.constraint(-solver.infinity, 2)
     constraint2.set_coefficient(x, 1)
     constraint2.set_coefficient(y, -1)
 
-    # solver.add(x + y * 2 <= 14)
-    # solver.add(x*3 + y >= 0)
-    # solver.add(x - y <= 2)
+    # objective = solver.objective
+    # objective.set_coefficient(x, 3)
+    # objective.set_coefficient(y, 4)
+    # objective.set_maximization
 
-    objective = solver.objective
-    objective.set_coefficient(x, 3)
-    objective.set_coefficient(y, 4)
-    objective.set_maximization
+    solver.add(x + y * 2 <= 14)
+    solver.add(x*3 + y >= 0)
+    # solver.add(x - y <= 2)
+    solver.maximize(x * 3 + y * 4)
 
     solver.solve
 
