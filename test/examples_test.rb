@@ -1,5 +1,34 @@
 require_relative "test_helper"
 
+class WeddingChartPrinter < ORTools::CpSolverSolutionCallback
+  attr_reader :num_solutions
+
+  def initialize(seats, names, num_tables, num_guests)
+    super
+    @num_solutions = 0
+    @start_time = time.time()
+    @seats = seats
+    @names = names
+    @num_tables = num_tables
+    @num_guests = num_guests
+  end
+
+  def on_solution_callback
+    current_time = Time.now
+    puts "Solution %i, time = %f s, objective = %i" % [@num_solutions, current_time - @start_time, objective_value]
+    @num_solutions += 1
+
+    @num_tables.times do |t|
+      puts "Table %d: " % t
+      @num_guests.times do |g|
+        if value(@seats[[t, g]])
+          puts "  " + @names[g]
+        end
+      end
+    end
+  end
+end
+
 class ORToolsTest < Minitest::Test
   def test_sudoku
     model = ORTools::CpModel.new
@@ -127,5 +156,146 @@ class ORToolsTest < Minitest::Test
     final_tables = possible_tables.select { |table| x[table].solution_value == 1 }
     expected = [["M", "N"], ["E", "F", "G"], ["A", "B", "C", "D"], ["I", "J", "K", "L"], ["O", "P", "Q", "R"]]
     assert_equal expected, final_tables
+  end
+
+  # https://github.com/google/or-tools/blob/stable/examples/python/wedding_optimal_chart_sat.py
+  def test_wedding
+    # Easy problem (from the paper)
+    # num_tables = 2
+    # table_capacity = 10
+    # min_known_neighbors = 1
+
+    # Slightly harder problem (also from the paper)
+    num_tables = 5
+    table_capacity = 4
+    min_known_neighbors = 1
+
+    # Connection matrix: who knows who, and how strong
+    # is the relation
+    c = [
+      [1, 50, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+      [50, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+      [1, 1, 1, 50, 1, 1, 1, 1, 10, 0, 0, 0, 0, 0, 0, 0, 0],
+      [1, 1, 50, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+      [1, 1, 1, 1, 1, 50, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+      [1, 1, 1, 1, 50, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+      [1, 1, 1, 1, 1, 1, 1, 50, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+      [1, 1, 1, 1, 1, 1, 50, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+      [1, 1, 10, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 50, 1, 1, 1, 1, 1, 1],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 50, 1, 1, 1, 1, 1, 1, 1],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]
+    ]
+
+    # Names of the guests. B: Bride side, G: Groom side
+    names = [
+      "Deb (B)", "John (B)", "Martha (B)", "Travis (B)", "Allan (B)",
+      "Lois (B)", "Jayne (B)", "Brad (B)", "Abby (B)", "Mary Helen (G)",
+      "Lee (G)", "Annika (G)", "Carl (G)", "Colin (G)", "Shirley (G)",
+      "DeAnn (G)", "Lori (G)"
+    ]
+
+    num_guests = c.size
+
+    all_tables = num_tables.times.to_a
+    all_guests = num_guests.times.to_a
+
+    # create the cp model
+    model = ORTools::CpModel.new
+
+    # decision variables
+    seats = {}
+    all_tables.each do |t|
+      all_guests.each do |g|
+        seats[[t, g]] = model.new_bool_var("guest %i seats on table %i" % [g, t])
+      end
+    end
+
+    colocated = {}
+    (num_guests - 1).times do |g1|
+      (g1 + 1).upto(num_guests - 1) do |g2|
+        colocated[[g1, g2]] = model.new_bool_var("guest %i seats with guest %i" % [g1, g2])
+      end
+    end
+
+    same_table = {}
+    (num_guests - 1).times do |g1|
+      (g1 + 1).upto(num_guests - 1) do |g2|
+        all_tables.each do |t|
+          same_table[[g1, g2, t]] = model.new_bool_var("guest %i seats with guest %i on table %i" % [g1, g2, t])
+        end
+      end
+    end
+
+    # Objective
+    # model.maximize(model.sum(c[g1][g2] * colocated[g1, g2]
+    #         for g1 in range(num_guests - 1) for g2 in range(g1 + 1, num_guests)
+    #         if c[g1][g2] > 0))
+
+    #
+    # Constraints
+    #
+
+    # Everybody seats at one table.
+    all_guests.each do |g|
+      model.add(model.sum(all_tables.map { |t| seats[[t, g]] }) == 1)
+    end
+
+    # Tables have a max capacity.
+    all_tables.each do |t|
+      model.add(model.sum(all_guests.map { |g| seats[[t, g]] }) <= table_capacity)
+    end
+
+    # Link colocated with seats
+    (num_guests - 1).times do |g1|
+      (g1 + 1).upto(num_guests - 1) do |g2|
+        all_tables.each do |t|
+          # Link same_table and seats.
+          # model.add_bool_or([
+          #     seats[(t, g1)].Not(), seats[(t, g2)].Not(),
+          #     same_table[(g1, g2, t)]
+          # ])
+          model.add_implication(same_table[[g1, g2, t]], seats[[t, g1]])
+          model.add_implication(same_table[[g1, g2, t]], seats[[t, g2]])
+        end
+
+        # Link colocated and same_table.
+        model.add(model.sum(all_tables.map { |t| same_table[[g1, g2, t]] } == colocated[[g1, g2]]))
+      end
+    end
+
+    # Min known neighbors rule.
+    all_tables.each do |t|
+#       model.add(
+#         model.sum(
+# #           all_tables.map { |t|  }
+
+# # same_table[(g1, g2, t)]
+# #               for g1 in range(num_guests - 1)
+# #               for g2 in range(g1 + 1, num_guests) for t in all_tables
+# #               if C[g1][g2] > 0) >= min_known_neighbors
+
+#         ) >= min_known_neighbors
+#       )
+    end
+
+    # Symmetry breaking. First guest seats on the first table.
+    model.add(seats[[0, 0]] == 1)
+
+    ### Solve model
+    solver = ORTools::CpSolver.new
+    solution_printer = WeddingChartPrinter.new(seats, names, num_tables, num_guests)
+    solver.solve_with_solution_callback(model, solution_printer)
+
+    puts "Statistics"
+    puts "  - conflicts    : %i" % solver.num_conflicts
+    puts "  - branches     : %i" % solver.num_branches
+    puts "  - wall time    : %f s" % solver.wall_time
+    puts "  - num solutions: %i" % solution_printer.num_solutions
   end
 end

@@ -504,13 +504,13 @@ void Init_ext()
         }
       });
 
-  // not to be confused with operations_research::IntVar
   define_class_under<operations_research::sat::IntVar>(rb_mORTools, "SatIntVar")
     .define_method("name", &operations_research::sat::IntVar::Name);
 
-  // not to be confused with operations_research::sat::IntVar
   define_class_under<operations_research::sat::IntervalVar>(rb_mORTools, "SatIntervalVar")
     .define_method("name", &operations_research::sat::IntervalVar::Name);
+
+  define_class_under<operations_research::sat::Constraint>(rb_mORTools, "SatConstraint");
 
   define_class_under<BoolVar>(rb_mORTools, "BoolVar")
     .define_method("name", &BoolVar::Name)
@@ -585,6 +585,7 @@ void Init_ext()
       *[](CpModelBuilder& self, IntervalVarSpan vars) {
         self.AddNoOverlap(vars);
       })
+    .define_method("add_implication", &CpModelBuilder::AddImplication)
     .define_method(
       "maximize",
       *[](CpModelBuilder& self, operations_research::sat::LinearExpr expr) {
