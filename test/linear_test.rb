@@ -16,9 +16,9 @@ class LinearTest < Minitest::Test
     # constraint1.set_coefficient(x, 3)
     # constraint1.set_coefficient(y, -1)
 
-    constraint2 = solver.constraint(-solver.infinity, 2)
-    constraint2.set_coefficient(x, 1)
-    constraint2.set_coefficient(y, -1)
+    # constraint2 = solver.constraint(-solver.infinity, 2)
+    # constraint2.set_coefficient(x, 1)
+    # constraint2.set_coefficient(y, -1)
 
     # objective = solver.objective
     # objective.set_coefficient(x, 3)
@@ -27,7 +27,7 @@ class LinearTest < Minitest::Test
 
     solver.add(x + y * 2 <= 14)
     solver.add(x*3 + y >= 0)
-    # solver.add(x - y <= 2)
+    solver.add(x + y * -1 <= 2)
     solver.maximize(x * 3 + y * 4)
 
     solver.solve
