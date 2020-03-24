@@ -481,8 +481,6 @@ class RoutingTest < Minitest::Test
       time_dimension.cumul_var(index).set_range(data[:time_windows][0][0], data[:time_windows][0][1])
     end
 
-    skip "Not finished yet"
-
     solver = routing.solver
     intervals = []
     data[:num_vehicles].times do |i|
@@ -508,19 +506,19 @@ class RoutingTest < Minitest::Test
 
     solution = routing.solve(first_solution_strategy: :path_cheapest_arc)
 
-    time_dimension = routing.GetDimensionOrDie('Time')
+    time_dimension = routing.mutable_dimension("Time")
     total_time = 0
     data[:num_vehicles].times do |vehicle_id|
       index = routing.start(vehicle_id)
       plan_output = String.new("Route for vehicle #{vehicle_id}:\n")
       while !routing.end?(index)
         time_var = time_dimension.cumul_var(index)
-        plan_output += "#{manager.index_to_node(index)} Time(#{solution.min(time_var)},#{solution.max(time_var)})\n"
+        plan_output += "#{manager.index_to_node(index)} Time(#{solution.min(time_var)},#{solution.max(time_var)}) -> "
         index = solution.value(routing.next_var(index))
       end
       time_var = time_dimension.cumul_var(index)
       plan_output += "#{manager.index_to_node(index)} Time(#{solution.min(time_var)},#{solution.max(time_var)})\n"
-      plan_output += "Time of the route: #{solution.min(time_var)}min\n"
+      plan_output += "Time of the route: #{solution.min(time_var)}min\n\n"
       puts plan_output
       total_time += solution.min(time_var)
     end

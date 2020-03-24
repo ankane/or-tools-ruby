@@ -156,7 +156,9 @@ Class rb_cMPVariable;
 Class rb_cMPConstraint;
 Class rb_cMPObjective;
 Class rb_cIntVar;
+Class rb_cIntervalVar;
 Class rb_cRoutingDimension;
+Class rb_cConstraint;
 Class rb_cSolver2;
 
 template<>
@@ -189,9 +191,23 @@ Object to_ruby<operations_research::IntVar*>(operations_research::IntVar* const 
 
 template<>
 inline
+Object to_ruby<operations_research::IntervalVar*>(operations_research::IntervalVar* const &x)
+{
+  return Rice::Data_Object<operations_research::IntervalVar>(x, rb_cIntervalVar, nullptr, nullptr);
+}
+
+template<>
+inline
 Object to_ruby<RoutingDimension*>(RoutingDimension* const &x)
 {
   return Rice::Data_Object<RoutingDimension>(x, rb_cRoutingDimension, nullptr, nullptr);
+}
+
+template<>
+inline
+Object to_ruby<operations_research::Constraint*>(operations_research::Constraint* const &x)
+{
+  return Rice::Data_Object<operations_research::Constraint>(x, rb_cConstraint, nullptr, nullptr);
 }
 
 template<>
@@ -598,26 +614,54 @@ void Init_ext()
         self.SetRange(new_min, new_max);
       });
 
+  rb_cIntervalVar = define_class_under<operations_research::IntervalVar>(rb_mORTools, "IntervalVar");
+
   rb_cRoutingDimension = define_class_under<RoutingDimension>(rb_mORTools, "RoutingDimension")
     .define_method("global_span_cost_coefficient=", &RoutingDimension::SetGlobalSpanCostCoefficient)
     .define_method("cumul_var", &RoutingDimension::CumulVar);
+
+  rb_cConstraint = define_class_under<operations_research::Constraint>(rb_mORTools, "Constraint");
 
   rb_cSolver2 = define_class_under<operations_research::Solver>(rb_mORTools, "Solver2")
     .define_method(
       "add",
       *[](operations_research::Solver& self, Object o) {
-        operations_research::IntExpr* left(from_ruby<operations_research::IntVar*>(o.call("left")));
-        operations_research::IntExpr* right(from_ruby<operations_research::IntVar*>(o.call("right")));
         operations_research::Constraint* constraint;
-        auto op = o.call("operator").to_s().str();
-        if (op == "==") {
-          constraint = self.MakeEquality(left, right);
-        } else if (op == "<=") {
-          constraint = self.MakeLessOrEqual(left, right);
+        if (o.respond_to("left")) {
+          operations_research::IntExpr* left(from_ruby<operations_research::IntVar*>(o.call("left")));
+          operations_research::IntExpr* right(from_ruby<operations_research::IntVar*>(o.call("right")));
+          auto op = o.call("operator").to_s().str();
+          if (op == "==") {
+            constraint = self.MakeEquality(left, right);
+          } else if (op == "<=") {
+            constraint = self.MakeLessOrEqual(left, right);
+          } else {
+            throw std::runtime_error("Unknown operator");
+          }
         } else {
-          throw std::runtime_error("Unknown operator");
+          constraint = from_ruby<operations_research::Constraint*>(o);
         }
         self.AddConstraint(constraint);
+      })
+    .define_method(
+      "fixed_duration_interval_var",
+      *[](operations_research::Solver& self, operations_research::IntVar* const start_variable, int64 duration, const std::string& name) {
+        return self.MakeFixedDurationIntervalVar(start_variable, duration, name);
+      })
+    .define_method(
+      "cumulative",
+      *[](operations_research::Solver& self, Array rb_intervals, Array rb_demands, int64 capacity, const std::string& name) {
+        std::vector<operations_research::IntervalVar*> intervals;
+        for (std::size_t i = 0; i < rb_intervals.size(); ++i) {
+          intervals.push_back(from_ruby<operations_research::IntervalVar*>(rb_intervals[i]));
+        }
+
+        std::vector<int64> demands;
+        for (std::size_t i = 0; i < rb_demands.size(); ++i) {
+          demands.push_back(from_ruby<int64>(rb_demands[i]));
+        }
+
+        return self.MakeCumulative(intervals, demands, capacity, name);
       });
 
   define_class_under<RoutingModel>(rb_mORTools, "RoutingModel")
