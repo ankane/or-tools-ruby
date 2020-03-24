@@ -1280,7 +1280,7 @@ else
 end
 ```
 
-## Assignment
+### Assignment
 
 [Guide](https://developers.google.com/optimization/assignment/simple_assignment)
 
@@ -1325,7 +1325,7 @@ elsif solve_status == :possible_overflow
 end
 ```
 
-## Assignment as a Min Cost Problem
+### Assignment as a Min Cost Problem
 
 [Guide](https://developers.google.com/optimization/assignment/assignment_min_cost_flow)
 
@@ -1374,7 +1374,7 @@ else
 end
 ```
 
-## Assignment as a MIP Problem
+### Assignment as a MIP Problem
 
 [Guide](https://developers.google.com/optimization/assignment/assignment_mip)
 
@@ -1443,7 +1443,7 @@ puts
 puts "Time = #{solver.wall_time} milliseconds"
 ```
 
-## Employee Scheduling
+### Employee Scheduling
 
 [Guide](https://developers.google.com/optimization/scheduling/employee_scheduling)
 
@@ -1544,7 +1544,7 @@ puts "  - wall time       : %f s" % solver.wall_time
 puts "  - solutions found : %i" % solution_printer.solution_count
 ```
 
-## The Job Shop Problem
+### The Job Shop Problem
 
 [Guide](https://developers.google.com/optimization/scheduling/job_shop)
 
@@ -1647,7 +1647,7 @@ puts "Optimal Schedule Length: %i" % solver.objective_value
 puts output
 ```
 
-## Sudoku
+### Sudoku
 
 [Example](https://github.com/google/or-tools/blob/stable/examples/python/sudoku_sat.py)
 
@@ -1721,7 +1721,7 @@ if status == :feasible
 end
 ```
 
-## Wedding Seating Chart
+### Wedding Seating Chart
 
 [Example](https://github.com/google/or-tools/blob/stable/examples/python/wedding_optimal_chart_sat.py)
 
@@ -1867,7 +1867,7 @@ end
 # Symmetry breaking. First guest seats on the first table.
 model.add(seats[[0, 0]] == 1)
 
-### Solve model
+# Solve model
 solver = ORTools::CpSolver.new
 solution_printer = WeddingChartPrinter.new(seats, names, num_tables, num_guests)
 solver.solve_with_solution_callback(model, solution_printer)
@@ -1879,7 +1879,7 @@ puts "  - wall time    : %f s" % solver.wall_time
 puts "  - num solutions: %i" % solution_printer.num_solutions
 ```
 
-## Set Partitioning
+### Set Partitioning
 
 [Example](https://pythonhosted.org/PuLP/CaseStudies/a_set_partitioning_problem.html)
 
