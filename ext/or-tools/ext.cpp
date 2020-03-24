@@ -144,6 +144,12 @@ class Assignment {
     int64 Value(const operations_research::IntVar* const var) const {
       return self->Value(var);
     }
+    int64 Min(const operations_research::IntVar* const var) const {
+      return self->Min(var);
+    }
+    int64 Max(const operations_research::IntVar* const var) const {
+      return self->Max(var);
+    }
 };
 
 Class rb_cMPVariable;
@@ -567,17 +573,26 @@ void Init_ext()
 
   define_class_under<RoutingIndexManager>(rb_mORTools, "RoutingIndexManager")
     .define_constructor(Constructor<RoutingIndexManager, int, int, RoutingNodeIndex>())
-    .define_method("index_to_node", &RoutingIndexManager::IndexToNode);
+    .define_method("index_to_node", &RoutingIndexManager::IndexToNode)
+    .define_method("node_to_index", &RoutingIndexManager::NodeToIndex);
 
   define_class_under<Assignment>(rb_mORTools, "Assignment")
     .define_method("objective_value", &Assignment::ObjectiveValue)
-    .define_method("value", &Assignment::Value);
+    .define_method("value", &Assignment::Value)
+    .define_method("min", &Assignment::Min)
+    .define_method("max", &Assignment::Max);
 
   // not to be confused with operations_research::sat::IntVar
-  rb_cIntVar = define_class_under<operations_research::IntVar>(rb_mORTools, "IntVar");
+  rb_cIntVar = define_class_under<operations_research::IntVar>(rb_mORTools, "IntVar")
+    .define_method(
+      "set_range",
+      *[](operations_research::IntVar& self, int64 new_min, int64 new_max) {
+        self.SetRange(new_min, new_max);
+      });
 
   rb_cRoutingDimension = define_class_under<RoutingDimension>(rb_mORTools, "RoutingDimension")
-    .define_method("global_span_cost_coefficient=", &RoutingDimension::SetGlobalSpanCostCoefficient);
+    .define_method("global_span_cost_coefficient=", &RoutingDimension::SetGlobalSpanCostCoefficient)
+    .define_method("cumul_var", &RoutingDimension::CumulVar);
 
   define_class_under<RoutingModel>(rb_mORTools, "RoutingModel")
     .define_constructor(Constructor<RoutingModel, RoutingIndexManager>())
@@ -607,6 +622,7 @@ void Init_ext()
     .define_method("next_var", &RoutingModel::NextVar)
     .define_method("arc_cost_for_vehicle", &RoutingModel::GetArcCostForVehicle)
     .define_method("mutable_dimension", &RoutingModel::GetMutableDimension)
+    .define_method("add_variable_minimized_by_finalizer", &RoutingModel::AddVariableMinimizedByFinalizer)
     .define_method(
       "solve_with_parameters",
       *[](RoutingModel& self, const RoutingSearchParameters& search_parameters) {

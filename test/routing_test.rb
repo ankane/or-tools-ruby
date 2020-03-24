@@ -132,6 +132,107 @@ class RoutingTest < Minitest::Test
     assert_equal 1552, max_route_distance
   end
 
+  def test_vrptw
+    data = {}
+    data[:time_matrix] = [
+      [0, 6, 9, 8, 7, 3, 6, 2, 3, 2, 6, 6, 4, 4, 5, 9, 7],
+      [6, 0, 8, 3, 2, 6, 8, 4, 8, 8, 13, 7, 5, 8, 12, 10, 14],
+      [9, 8, 0, 11, 10, 6, 3, 9, 5, 8, 4, 15, 14, 13, 9, 18, 9],
+      [8, 3, 11, 0, 1, 7, 10, 6, 10, 10, 14, 6, 7, 9, 14, 6, 16],
+      [7, 2, 10, 1, 0, 6, 9, 4, 8, 9, 13, 4, 6, 8, 12, 8, 14],
+      [3, 6, 6, 7, 6, 0, 2, 3, 2, 2, 7, 9, 7, 7, 6, 12, 8],
+      [6, 8, 3, 10, 9, 2, 0, 6, 2, 5, 4, 12, 10, 10, 6, 15, 5],
+      [2, 4, 9, 6, 4, 3, 6, 0, 4, 4, 8, 5, 4, 3, 7, 8, 10],
+      [3, 8, 5, 10, 8, 2, 2, 4, 0, 3, 4, 9, 8, 7, 3, 13, 6],
+      [2, 8, 8, 10, 9, 2, 5, 4, 3, 0, 4, 6, 5, 4, 3, 9, 5],
+      [6, 13, 4, 14, 13, 7, 4, 8, 4, 4, 0, 10, 9, 8, 4, 13, 4],
+      [6, 7, 15, 6, 4, 9, 12, 5, 9, 6, 10, 0, 1, 3, 7, 3, 10],
+      [4, 5, 14, 7, 6, 7, 10, 4, 8, 5, 9, 1, 0, 2, 6, 4, 8],
+      [4, 8, 13, 9, 8, 7, 10, 3, 7, 4, 8, 3, 2, 0, 4, 5, 6],
+      [5, 12, 9, 14, 12, 6, 6, 7, 3, 3, 4, 7, 6, 4, 0, 9, 2],
+      [9, 10, 18, 6, 8, 12, 15, 8, 13, 9, 13, 3, 4, 5, 9, 0, 9],
+      [7, 14, 9, 16, 14, 8, 5, 10, 6, 5, 4, 10, 8, 6, 2, 9, 0],
+    ]
+    data[:time_windows] = [
+      [0, 5],  # depot
+      [7, 12],  # 1
+      [10, 15],  # 2
+      [16, 18],  # 3
+      [10, 13],  # 4
+      [0, 5],  # 5
+      [5, 10],  # 6
+      [0, 4],  # 7
+      [5, 10],  # 8
+      [0, 3],  # 9
+      [10, 16],  # 10
+      [10, 15],  # 11
+      [0, 5],  # 12
+      [5, 10],  # 13
+      [7, 8],  # 14
+      [10, 15],  # 15
+      [11, 15],  # 16
+    ]
+    data[:num_vehicles] = 4
+    data[:depot] = 0
+
+    manager = ORTools::RoutingIndexManager.new(data[:time_matrix].size, data[:num_vehicles], data[:depot])
+    routing = ORTools::RoutingModel.new(manager)
+
+    time_callback = lambda do |from_index, to_index|
+      from_node = manager.index_to_node(from_index)
+      to_node = manager.index_to_node(to_index)
+      data[:time_matrix][from_node][to_node]
+    end
+
+    transit_callback_index = routing.register_transit_callback(time_callback)
+    routing.set_arc_cost_evaluator_of_all_vehicles(transit_callback_index)
+    time = "Time"
+    routing.add_dimension(
+      transit_callback_index,
+      30,  # allow waiting time
+      30,  # maximum time per vehicle
+      false,  # Don't force start cumul to zero.
+      time
+    )
+    time_dimension = routing.mutable_dimension(time)
+
+    data[:time_windows].each_with_index do |time_window, location_idx|
+      next if location_idx == 0
+      index = manager.node_to_index(location_idx)
+      time_dimension.cumul_var(index).set_range(time_window[0], time_window[1])
+    end
+
+    data[:num_vehicles].times do |vehicle_id|
+      index = routing.start(vehicle_id)
+      time_dimension.cumul_var(index).set_range(data[:time_windows][0][0], data[:time_windows][0][1])
+    end
+
+    data[:num_vehicles].times do |i|
+      routing.add_variable_minimized_by_finalizer(time_dimension.cumul_var(routing.start(i)))
+      routing.add_variable_minimized_by_finalizer(time_dimension.cumul_var(routing.end(i)))
+    end
+
+    solution = routing.solve(first_solution_strategy: :path_cheapest_arc)
+
+    time_dimension = routing.mutable_dimension("Time")
+    total_time = 0
+    data[:num_vehicles].times do |vehicle_id|
+      index = routing.start(vehicle_id)
+      plan_output = String.new("Route for vehicle #{vehicle_id}:\n")
+      while !routing.end?(index)
+        time_var = time_dimension.cumul_var(index)
+        plan_output += "#{manager.index_to_node(index)} Time(#{solution.min(time_var)},#{solution.max(time_var)}) -> "
+        index = solution.value(routing.next_var(index))
+      end
+      time_var = time_dimension.cumul_var(index)
+      plan_output += "#{manager.index_to_node(index)} Time(#{solution.min(time_var)},#{solution.max(time_var)})\n"
+      plan_output += "Time of the route: #{solution.min(time_var)}min\n\n"
+      puts plan_output
+      total_time += solution.min(time_var)
+    end
+    puts "Total time of all routes: #{total_time}min"
+  end
+
   # https://developers.google.com/optimization/routing/routing_options
   def test_search_parameters
     search_parameters = ORTools.default_routing_search_parameters
