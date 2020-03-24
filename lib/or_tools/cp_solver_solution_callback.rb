@@ -12,5 +12,9 @@ module ORTools
         raise "Unsupported type"
       end
     end
+
+    def objective_value
+      @response.objective_value
+    end
   end
 end

@@ -4,9 +4,9 @@ class WeddingChartPrinter < ORTools::CpSolverSolutionCallback
   attr_reader :num_solutions
 
   def initialize(seats, names, num_tables, num_guests)
-    super
+    super()
     @num_solutions = 0
-    @start_time = time.time()
+    @start_time = Time.now
     @seats = seats
     @names = names
     @num_tables = num_tables
@@ -232,10 +232,8 @@ class ORToolsTest < Minitest::Test
       end
     end
 
-    skip "Not completed yet"
-
     # Objective
-    model.maximize(model.sum((num_guests - 1).times.map { |g1| (g1 + 1).upto(num_guests - 1).select { |g2| c[g1][g2] > 0 }.map { |g2| colocated[[g1, g2]] * c[g1][g2] } }))
+    model.maximize(model.sum((num_guests - 1).times.flat_map { |g1| (g1 + 1).upto(num_guests - 1).select { |g2| c[g1][g2] > 0 }.map { |g2| colocated[[g1, g2]] * c[g1][g2] } }))
 
     #
     # Constraints
@@ -256,41 +254,38 @@ class ORToolsTest < Minitest::Test
       (g1 + 1).upto(num_guests - 1) do |g2|
         all_tables.each do |t|
           # Link same_table and seats.
-          # model.add_bool_or([
-          #     seats[(t, g1)].Not(), seats[(t, g2)].Not(),
-          #     same_table[(g1, g2, t)]
-          # ])
+          model.add_bool_or([seats[[t, g1]].not, seats[[t, g2]].not, same_table[[g1, g2, t]]])
           model.add_implication(same_table[[g1, g2, t]], seats[[t, g1]])
           model.add_implication(same_table[[g1, g2, t]], seats[[t, g2]])
         end
 
         # Link colocated and same_table.
-        model.add(model.sum(all_tables.map { |t| same_table[[g1, g2, t]] } == colocated[[g1, g2]]))
+        model.add(model.sum(all_tables.map { |t| same_table[[g1, g2, t]] }) == colocated[[g1, g2]])
       end
     end
 
     # Min known neighbors rule.
     all_tables.each do |t|
-#       model.add(
-#         model.sum(
-# #           all_tables.map { |t|  }
-
-# # same_table[(g1, g2, t)]
-# #               for g1 in range(num_guests - 1)
-# #               for g2 in range(g1 + 1, num_guests) for t in all_tables
-# #               if C[g1][g2] > 0) >= min_known_neighbors
-
-#         ) >= min_known_neighbors
-#       )
+      model.add(
+        model.sum(
+          (num_guests - 1).times.flat_map { |g1|
+            (g1 + 1).upto(num_guests - 1).select { |g2| c[g1][g2] > 0 }.flat_map { |g2|
+              all_tables.map { |t2| same_table[[g1, g2, t2]] }
+            }
+          }
+        ) >= min_known_neighbors
+      )
     end
 
     # Symmetry breaking. First guest seats on the first table.
     model.add(seats[[0, 0]] == 1)
 
+    skip "Not completed yet"
+
     ### Solve model
     solver = ORTools::CpSolver.new
     solution_printer = WeddingChartPrinter.new(seats, names, num_tables, num_guests)
-    solver.solve_with_solution_callback(model, solution_printer)
+    solver.search_for_all_solutions(model, solution_printer)
 
     puts "Statistics"
     puts "  - conflicts    : %i" % solver.num_conflicts

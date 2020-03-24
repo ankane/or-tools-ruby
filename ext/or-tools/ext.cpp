@@ -125,7 +125,12 @@ operations_research::sat::LinearExpr from_ruby<operations_research::sat::LinearE
       }
     }
   } else {
-    expr = from_ruby<operations_research::sat::IntVar>(x);
+    std::string type = ((String) x.call("class").call("name")).str();
+    if (type == "ORTools::BoolVar") {
+      expr = from_ruby<operations_research::sat::BoolVar>(x);
+    } else {
+      expr = from_ruby<operations_research::sat::IntVar>(x);
+    }
   }
 
   return expr;
@@ -259,6 +264,28 @@ inline
 IntervalVarSpan from_ruby<IntervalVarSpan>(Object x)
 {
   return IntervalVarSpan(x);
+}
+
+// need a wrapper class since absl::Span doesn't own
+class BoolVarSpan {
+  std::vector<operations_research::sat::BoolVar> vec;
+  public:
+    BoolVarSpan(Object x) {
+      Array a = Array(x);
+      for (std::size_t i = 0; i < a.size(); ++i) {
+        vec.push_back(from_ruby<operations_research::sat::BoolVar>(a[i]));
+      }
+    }
+    operator absl::Span<const operations_research::sat::BoolVar>() {
+      return absl::Span<const operations_research::sat::BoolVar>(vec);
+    }
+};
+
+template<>
+inline
+BoolVarSpan from_ruby<BoolVarSpan>(Object x)
+{
+  return BoolVarSpan(x);
 }
 
 extern "C"
@@ -515,6 +542,7 @@ void Init_ext()
   define_class_under<BoolVar>(rb_mORTools, "BoolVar")
     .define_method("name", &BoolVar::Name)
     .define_method("index", &BoolVar::index)
+    .define_method("not", &BoolVar::Not)
     .define_method(
       "inspect",
       *[](BoolVar& self) {
@@ -584,6 +612,11 @@ void Init_ext()
       "add_no_overlap",
       *[](CpModelBuilder& self, IntervalVarSpan vars) {
         self.AddNoOverlap(vars);
+      })
+    .define_method(
+      "add_bool_or",
+      *[](CpModelBuilder& self, BoolVarSpan literals) {
+        self.AddBoolOr(literals);
       })
     .define_method("add_implication", &CpModelBuilder::AddImplication)
     .define_method(
