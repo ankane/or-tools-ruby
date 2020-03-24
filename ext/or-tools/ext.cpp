@@ -157,6 +157,7 @@ Class rb_cMPConstraint;
 Class rb_cMPObjective;
 Class rb_cIntVar;
 Class rb_cRoutingDimension;
+Class rb_cSolver2;
 
 template<>
 inline
@@ -191,6 +192,13 @@ inline
 Object to_ruby<RoutingDimension*>(RoutingDimension* const &x)
 {
   return Rice::Data_Object<RoutingDimension>(x, rb_cRoutingDimension, nullptr, nullptr);
+}
+
+template<>
+inline
+Object to_ruby<operations_research::Solver*>(operations_research::Solver* const &x)
+{
+  return Rice::Data_Object<operations_research::Solver>(x, rb_cSolver2, nullptr, nullptr);
 }
 
 // need a wrapper class since absl::Span doesn't own
@@ -594,7 +602,7 @@ void Init_ext()
     .define_method("global_span_cost_coefficient=", &RoutingDimension::SetGlobalSpanCostCoefficient)
     .define_method("cumul_var", &RoutingDimension::CumulVar);
 
-  define_class_under<operations_research::Solver>(rb_mORTools, "Solver2")
+  rb_cSolver2 = define_class_under<operations_research::Solver>(rb_mORTools, "Solver2")
     .define_method(
       "add",
       *[](operations_research::Solver& self, Object o) {

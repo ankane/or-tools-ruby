@@ -271,8 +271,6 @@ class RoutingTest < Minitest::Test
     distance_dimension = routing.mutable_dimension(dimension_name)
     distance_dimension.global_span_cost_coefficient = 100
 
-    skip "Need to fix failed assertion"
-
     data[:pickups_deliveries].each do |request|
       pickup_index = manager.node_to_index(request[0])
       delivery_index = manager.node_to_index(request[1])
