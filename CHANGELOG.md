@@ -1,4 +1,4 @@
-## 0.1.4 (unreleased)
+## 0.1.4 (2020-04-19)
 
 - Added support for the Job Shop Problem
 
