@@ -1,3 +1,7 @@
+## 0.1.5 (unreleased)
+
+- Added support for OR-Tools 7.6
+
 ## 0.1.4 (2020-04-19)
 
 - Added support for the Job Shop Problem
