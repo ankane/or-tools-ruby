@@ -1,4 +1,4 @@
-## 0.1.5 (unreleased)
+## 0.1.5 (2020-04-23)
 
 - Added support for OR-Tools 7.6
 
