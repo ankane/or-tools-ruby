@@ -15,14 +15,14 @@ class WeddingChartPrinter < ORTools::CpSolverSolutionCallback
 
   def on_solution_callback
     current_time = Time.now
-    puts "Solution %i, time = %f s, objective = %i" % [@num_solutions, current_time - @start_time, objective_value]
+    # puts "Solution %i, time = %f s, objective = %i" % [@num_solutions, current_time - @start_time, objective_value]
     @num_solutions += 1
 
     @num_tables.times do |t|
-      puts "Table %d: " % t
+      # puts "Table %d: " % t
       @num_guests.times do |g|
         if value(@seats[[t, g]])
-          puts "  " + @names[g]
+          # puts "  " + @names[g]
         end
       end
     end
@@ -284,12 +284,6 @@ class ORToolsTest < Minitest::Test
     solver = ORTools::CpSolver.new
     solution_printer = WeddingChartPrinter.new(seats, names, num_tables, num_guests)
     solver.solve_with_solution_callback(model, solution_printer)
-
-    puts "Statistics"
-    puts "  - conflicts    : %i" % solver.num_conflicts
-    puts "  - branches     : %i" % solver.num_branches
-    puts "  - wall time    : %f s" % solver.wall_time
-    puts "  - num solutions: %i" % solution_printer.num_solutions
 
     assert_equal 8, solution_printer.num_solutions
   end
