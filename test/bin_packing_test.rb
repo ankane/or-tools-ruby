@@ -138,11 +138,12 @@ class BinPackingTest < Minitest::Test
       total_weight += bin_weight
     end
 
-    skip if ENV["TRAVIS"] # TODO debug
+    unless ENV["TRAVIS"] # TODO debug
+      assert_equal [[3, 5], [2, 7], [12, 13], [4, 8, 9], [1, 10, 14]], bins
+      assert_equal [84, 84, 78, 96, 96], bin_weights
+      assert_equal [80, 65, 50, 100, 100], bin_values
+    end
 
-    assert_equal [[5, 7], [1, 4, 10], [3, 8, 9], [2, 12], [13, 14]], bins
-    assert_equal [90, 96, 96, 84, 72], bin_weights
-    assert_equal [70, 110, 115, 45, 55], bin_values
     assert_equal 438, total_weight
   end
 
