@@ -1,4 +1,5 @@
 require "mkmf-rice"
+require_relative "vendor"
 
 abort "Missing stdc++" unless have_library("stdc++")
 
@@ -7,10 +8,8 @@ $CXXFLAGS << " -std=c++11 -DUSE_CBC"
 # or-tools warnings
 $CXXFLAGS << " -Wno-sign-compare -Wno-shorten-64-to-32 -Wno-ignored-qualifiers"
 
-inc, lib = dir_config("or-tools")
-
-inc ||= "/usr/local/include"
-lib ||= "/usr/local/lib"
+inc = "#{$vendor_path}/include"
+lib = "#{$vendor_path}/lib"
 
 $INCFLAGS << " -I#{inc}"
 
