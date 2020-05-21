@@ -16,7 +16,7 @@ $INCFLAGS << " -I#{inc}"
 
 $LDFLAGS << " -Wl,-rpath,#{lib}"
 $LDFLAGS << " -L#{lib}"
-$LDFLAGS << " -lortools"
+abort "OR-Tools not found" unless have_library("ortools")
 
 Dir["#{lib}/libabsl_*.a"].each do |lib|
   $LDFLAGS << " #{lib}"

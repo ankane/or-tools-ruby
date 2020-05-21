@@ -1,3 +1,7 @@
+## 0.1.6 (unreleased)
+
+- Improved error message when OR-Tools not found
+
 ## 0.1.5 (2020-04-23)
 
 - Added support for OR-Tools 7.6
