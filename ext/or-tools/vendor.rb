@@ -84,7 +84,7 @@ $vendor_path = "#{path}/#{dirname}"
   "absl/time/internal/cctz/include/cctz/civil_time_detail" => "absl/time/internal/cctz/include/cctz/civil_time_detail.h",
   "absl/time/internal/cctz/include/cctz/zone_info_source." => "absl/time/internal/cctz/include/cctz/zone_info_source.h",
 }.each do |src, dest|
-  src = "#{vendor_path}/include/#{src}"
-  dest = "#{vendor_path}/include/#{dest}"
+  src = "#{$vendor_path}/include/#{src}"
+  dest = "#{$vendor_path}/include/#{dest}"
   FileUtils.mv(src, dest) if File.exist?(src)
 end
