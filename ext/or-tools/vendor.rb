@@ -11,8 +11,8 @@ elsif RbConfig::CONFIG["host_os"] =~ /darwin/i
   filename = "or-tools_MacOsX-10.15.4_v#{version}.tar.gz"
   checksum = "39e26ba27b4d3a1c194c1478e864cd016d62cf516cd9227a9f23e6143e131572"
 else
-  os = %x[lsb_release -is].chomp
-  os_version = %x[lsb_release -rs].chomp
+  os = %x[lsb_release -is].chomp rescue nil
+  os_version = %x[lsb_release -rs].chomp rescue nil
   if os == "Ubuntu" && os_version == "18.04"
     filename = "or-tools_ubuntu-18.04_v#{version}.tar.gz"
     checksum = "79ef61dfc63b98133ed637f02e837f714a95987424332e511a3a87edd5ce17dc"
@@ -26,7 +26,13 @@ else
     filename = "or-tools_centos-8_v#{version}.tar.gz"
     checksum = "a2b800d4e498561e5b1fe95ee1e64c867be496038883f4f7b199499bf71a0eed"
   else
-    abort "Unsupported OS: #{os} #{os_version}"
+    abort <<~MSG
+
+      Unsupported OS: #{os} #{os_version}
+      Build the OR-Tools C++ library from source, then run:
+      bundle config build.or-tools --with-or-tools-dir=/path/to/or-tools
+
+    MSG
   end
 end
 
