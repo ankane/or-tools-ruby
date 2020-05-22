@@ -78,7 +78,7 @@ unless File.exist?(download_path)
   download_file(url, download_path)
 end
 
-# check integrity
+# check integrity - do this regardless of if just downloaded
 download_checksum = Digest::SHA256.file(download_path).hexdigest
 raise "Bad checksum: #{download_checksum}" if download_checksum != checksum
 
