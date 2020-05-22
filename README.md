@@ -18,6 +18,16 @@ Add this line to your application’s Gemfile:
 gem 'or-tools'
 ```
 
+### OR-Tools Installation
+
+There’s an experimental branch that includes OR-Tools with the gem for easiest installation.
+
+```ruby
+gem 'or-tools', github: 'ankane/or-tools', branch: 'vendor'
+```
+
+Please file an issue if it doesn’t work for you.
+
 ## Getting Started
 
 Linear Optimization
