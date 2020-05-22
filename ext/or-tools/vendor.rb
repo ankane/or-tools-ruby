@@ -46,8 +46,6 @@ def download_file(url, download_path)
       when Net::HTTPRedirection
         location = response["location"]
       when Net::HTTPSuccess
-        digest = Digest::SHA2.new
-
         i = 0
         File.open(download_path, "wb") do |f|
           response.read_body do |chunk|

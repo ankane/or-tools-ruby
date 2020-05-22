@@ -16,7 +16,7 @@ lib = "#{$vendor_path}/lib"
 $INCFLAGS << " -I#{inc}"
 
 # make rpath relative
-# use double dollar sign to escape
+# use double dollar sign and single quotes to escape properly
 rpath_prefix = RbConfig::CONFIG["host_os"] =~ /darwin/ ? "@loader_path" : "$$ORIGIN"
 $LDFLAGS << " -Wl,-rpath,'#{rpath_prefix}/../../tmp/or-tools/lib'"
 
