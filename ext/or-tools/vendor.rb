@@ -5,9 +5,7 @@ require "tmpdir"
 
 version = "7.6.7691"
 
-if Gem.win_platform?
-  abort "Not supported yet"
-elsif RbConfig::CONFIG["host_os"] =~ /darwin/i
+if RbConfig::CONFIG["host_os"] =~ /darwin/i
   filename = "or-tools_MacOsX-10.15.4_v#{version}.tar.gz"
   checksum = "39e26ba27b4d3a1c194c1478e864cd016d62cf516cd9227a9f23e6143e131572"
 else
@@ -28,7 +26,7 @@ else
   else
     abort <<~MSG
 
-      Unsupported OS: #{os} #{os_version}
+      Binary installation not available for this platform.
       Build the OR-Tools C++ library from source, then run:
       bundle config build.or-tools --with-or-tools-dir=/path/to/or-tools
 
