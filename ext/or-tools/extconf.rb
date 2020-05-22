@@ -1,6 +1,6 @@
 require "mkmf-rice"
 
-abort "Missing stdc++" unless have_library("stdc++")
+raise "Missing stdc++" unless have_library("stdc++")
 
 $CXXFLAGS << " -std=c++11 -DUSE_CBC"
 
@@ -29,7 +29,7 @@ $INCFLAGS << " -I#{inc}"
 
 $LDFLAGS << " -Wl,-rpath,#{rpath}"
 $LDFLAGS << " -L#{lib}"
-abort "OR-Tools not found" unless have_library("ortools")
+raise "OR-Tools not found" unless have_library("ortools")
 
 Dir["#{lib}/libabsl_*.a"].each do |lib|
   $LDFLAGS << " #{lib}"
