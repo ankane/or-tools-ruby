@@ -24,10 +24,12 @@ else
     filename = "or-tools_centos-8_v#{version}.tar.gz"
     checksum = "a2b800d4e498561e5b1fe95ee1e64c867be496038883f4f7b199499bf71a0eed"
   else
-    raise <<~MSG
+    abort <<~MSG
+
       Binary installation not available for this platform.
       Build the OR-Tools C++ library from source, then run:
       bundle config build.or-tools --with-or-tools-dir=/path/to/or-tools
+
     MSG
   end
 end
@@ -60,7 +62,7 @@ def download_file(url, download_path)
         end
         puts # newline
       else
-        raise "Bad response"
+        abort "Bad response"
       end
     end
   end
@@ -78,7 +80,7 @@ end
 
 # check integrity
 download_checksum = Digest::SHA256.file(download_path).hexdigest
-raise "Bad checksum: #{download_checksum}" if download_checksum != checksum
+abort "Bad checksum: #{download_checksum}" if download_checksum != checksum
 
 # extract - can't use Gem::Package#extract_tar_gz from RubyGems since it limits path to 100 characters
 path = File.expand_path("../../tmp/or-tools", __dir__)
