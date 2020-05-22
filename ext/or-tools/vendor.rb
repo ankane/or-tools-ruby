@@ -82,7 +82,8 @@ end
 download_checksum = Digest::SHA256.file(download_path).hexdigest
 raise "Bad checksum: #{download_checksum}" if download_checksum != checksum
 
-# extract - can't use Gem::Package#extract_tar_gz from RubyGems since it limits path to 100 characters
+# extract - can't use Gem::Package#extract_tar_gz from RubyGems
+# since it limits filenames to 100 characters (doesn't support UStar format)
 path = File.expand_path("../../tmp/or-tools", __dir__)
 FileUtils.mkdir_p(path)
 tar_args = Gem.win_platform? ? ["--force-local"] : []
