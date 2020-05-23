@@ -24,6 +24,8 @@ else
     filename = "or-tools_centos-8_v#{version}.tar.gz"
     checksum = "a2b800d4e498561e5b1fe95ee1e64c867be496038883f4f7b199499bf71a0eed"
   else
+    # there is a binary download for Windows
+    # however, it's compiled with Visual Studio rather than MinGW (which RubyInstaller uses)
     raise <<~MSG
       Binary installation not available for this platform.
 
