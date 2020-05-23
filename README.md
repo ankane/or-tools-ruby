@@ -6,27 +6,13 @@
 
 ## Installation
 
-Download the [OR-Tools C++ library](https://developers.google.com/optimization/install/cpp). Then run:
-
-```sh
-bundle config build.or-tools --with-or-tools-dir=/path/to/or-tools
-```
-
 Add this line to your application’s Gemfile:
 
 ```ruby
 gem 'or-tools'
 ```
 
-### OR-Tools Installation
-
-There’s an experimental branch that downloads OR-Tools with the gem for easiest installation.
-
-```ruby
-gem 'or-tools', github: 'ankane/or-tools', branch: 'vendor'
-```
-
-Please file an issue if it doesn’t work for you.
+Installation can take a few minutes as OR-Tools downloads and builds.
 
 ## Getting Started
 
@@ -1961,7 +1947,7 @@ To get started with development:
 git clone https://github.com/ankane/or-tools.git
 cd or-tools
 bundle install
-bundle exec rake compile -- --with-or-tools-dir=/path/to/or-tools
+bundle exec rake compile
 bundle exec rake test
 ```
 

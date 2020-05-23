@@ -1,6 +1,6 @@
-## 0.1.6 (unreleased)
+## 0.2.0 (unreleased)
 
-- Improved error message when OR-Tools not found
+- No longer need to download the OR-Tools C++ library separately on Mac, Ubuntu 16.04, Ubuntu 18.04, Debian 10, and CentOS 8
 
 ## 0.1.5 (2020-04-23)
 
