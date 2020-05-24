@@ -17,6 +17,9 @@ require "or_tools/sat_int_var"
 require "or_tools/solver"
 require "or_tools/version"
 
+# higher level interfaces
+require "or_tools/sudoku"
+
 module ORTools
   class Error < StandardError; end
 end

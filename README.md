@@ -14,7 +14,37 @@ gem 'or-tools'
 
 Installation can take a few minutes as OR-Tools downloads and builds.
 
-## Getting Started
+## Higher Level Interfaces
+
+- [Sudoku](#sudoku) [master]
+
+### Sudoku
+
+Create a puzzle with zeros in empty cells
+
+```ruby
+grid = [
+  [0, 6, 0, 0, 5, 0, 0, 2, 0],
+  [0, 0, 0, 3, 0, 0, 0, 9, 0],
+  [7, 0, 0, 6, 0, 0, 0, 1, 0],
+  [0, 0, 6, 0, 3, 0, 4, 0, 0],
+  [0, 0, 4, 0, 7, 0, 1, 0, 0],
+  [0, 0, 5, 0, 9, 0, 8, 0, 0],
+  [0, 4, 0, 0, 0, 1, 0, 0, 6],
+  [0, 3, 0, 0, 0, 8, 0, 0, 0],
+  [0, 2, 0, 0, 4, 0, 0, 5, 0]
+]
+sudoku = ORTools::Sudoku.new(grid)
+sudoku.solution
+```
+
+For Sudoku X (diagonals must have unique digits), use:
+
+```ruby
+ORTools::Sudoku.new(grid, x: true)
+```
+
+## Guides
 
 Linear Optimization
 
