@@ -87,7 +87,7 @@ class ORToolsTest < Minitest::Test
 
     solver = ORTools::CpSolver.new
     status = solver.solve(model)
-    assert_equal :feasible, status
+    assert_equal :optimal, status
 
     expected = [
       [8, 6, 1, 4, 5, 9, 7, 2, 3],

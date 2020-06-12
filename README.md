@@ -136,7 +136,7 @@ solver = ORTools::CpSolver.new
 status = solver.solve(model)
 
 # display the first solution
-if status == :feasible
+if status == :optimal
   puts "x = #{solver.value(x)}"
   puts "y = #{solver.value(y)}"
   puts "z = #{solver.value(z)}"
@@ -1710,7 +1710,7 @@ end
 # solve and print solution
 solver = ORTools::CpSolver.new
 status = solver.solve(model)
-if status == :feasible
+if status == :optimal
   line.each do |i|
     p line.map { |j| solver.value(grid[[i, j]]) }
   end

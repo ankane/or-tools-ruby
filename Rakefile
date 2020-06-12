@@ -20,3 +20,21 @@ task :remove_ext do
 end
 
 Rake::Task["build"].enhance [:remove_ext]
+
+task :update do
+  require "digest"
+  require "open-uri"
+  require "tmpdir"
+
+  version = "7.7.7810"
+  distributions = ["MacOsX-10.15.5", "ubuntu-18.04", "ubuntu-16.04", "debian-10", "centos-8"]
+
+  short_version = version.split(".").first(2).join(".")
+  distributions.each do |dist|
+    filename = "or-tools_#{dist}_v#{version}.tar.gz"
+    url = "https://github.com/google/or-tools/releases/download/v#{short_version}/#{filename}"
+    dest = "#{Dir.tmpdir}/#{filename}"
+    system "wget", "-O", dest, url unless File.exist?(dest)
+    puts "#{dist}: #{Digest::SHA256.file(dest).hexdigest}"
+  end
+end

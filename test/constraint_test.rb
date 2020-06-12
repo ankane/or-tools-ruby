@@ -62,9 +62,9 @@ class ConstraintTest < Minitest::Test
     solver = ORTools::CpSolver.new
     status = solver.solve(model)
 
-    assert_equal :feasible, status
+    assert_equal :optimal, status
     assert_equal 1, solver.value(x)
-    assert_equal 2, solver.value(y)
+    assert_equal 0, solver.value(y)
     assert_equal 0, solver.value(z)
   end
 

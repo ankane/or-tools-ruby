@@ -1,3 +1,7 @@
+## 0.2.1 (unreleased)
+
+- Updated OR-Tools to 7.7
+
 ## 0.2.0 (2020-05-22)
 
 - No longer need to download the OR-Tools C++ library separately on Mac, Ubuntu 18.04, Ubuntu 16.04, Debian 10, and CentOS 8
