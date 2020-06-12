@@ -13,16 +13,16 @@ else
   os_version = %x[lsb_release -rs].chomp rescue nil
   if os == "Ubuntu" && os_version == "18.04"
     filename = "or-tools_ubuntu-18.04_v#{version}.tar.gz"
-    checksum = "309cad8a88cd86898d96821fa2049850481cbec420dfd85b65ad29e2bb5165b1"
+    checksum = "12bdac29144b077b3f9ba602f947e4b9b9ce63ed3df4e325cda1333827edbcf8"
   elsif os == "Ubuntu" && os_version == "16.04"
     filename = "or-tools_ubuntu-16.04_v#{version}.tar.gz"
-    checksum = "90430a4f4848d67cf97f457256feeca8990ce6f5277abfd53c51ce6df0e214ae"
+    checksum = "cc696d342b97aa6cf7c62b6ae2cae95dfc665f2483d147c4117fdba434b13a53"
   elsif os == "Debian" && os_version == "10"
     filename = "or-tools_debian-10_v#{version}.tar.gz "
-    checksum = "b2dde80f4991b70e2a440f27508b10df20b1709efaa11205e85c327089cf8fdd"
+    checksum = "3dd0299e9ad8d12fe6d186bfd59e63080c8e9f3c6b0489af9900c389cf7e4224"
   elsif os == "CentOS" && os_version == "8"
     filename = "or-tools_centos-8_v#{version}.tar.gz"
-    checksum = "1481b2e0963cbfde02010e177be797aba8a2cb5fbc118037817e48c97a9e30e6"
+    checksum = "1f7d8bce56807c4283374e05024ffac8afd81ff99063217418d02d626cf03088"
   else
     # there is a binary download for Windows
     # however, it's compiled with Visual Studio rather than MinGW (which RubyInstaller uses)
