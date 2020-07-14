@@ -16,7 +16,7 @@ Installation can take a few minutes as OR-Tools downloads and builds.
 
 ## Higher Level Interfaces
 
-- [Traveling Salesperson Problem (TSP)](#tsp) [master]
+- [Traveling Salesperson Problem (TSP)](#traveling-salesperson-problem-tsp) [master]
 - [Sudoku](#sudoku) [master]
 
 ### Traveling Salesperson Problem (TSP)
