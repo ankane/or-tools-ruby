@@ -41,6 +41,8 @@ locations = [
 ]
 ```
 
+Locations can have any fields - only `latitude` and `longitude` are required
+
 Get route
 
 ```ruby
