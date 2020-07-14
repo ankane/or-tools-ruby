@@ -9,6 +9,7 @@ module ORTools
       raise ArgumentError, "Locations must have latitude and longitude" unless locations.all? { |l| l[:latitude] && l[:longitude] }
       raise ArgumentError, "Latitude must be between -90 and 90" unless locations.all? { |l| l[:latitude] >= -90 && l[:latitude] <= 90 }
       raise ArgumentError, "Longitude must be between -180 and 180" unless locations.all? { |l| l[:longitude] >= -180 && l[:longitude] <= 180 }
+      raise ArgumentError, "Must be at least two locations" unless locations.size >= 2
 
       distance_matrix =
         locations.map do |from|

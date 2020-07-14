@@ -33,6 +33,20 @@ class TSPTest < Minitest::Test
     assert tsp.distances.sum
   end
 
+  def test_no_locations
+    error = assert_raises(ArgumentError) do
+      ORTools::TSP.new([])
+    end
+    assert_equal "Must be at least two locations", error.message
+  end
+
+  def test_single_location
+    error = assert_raises(ArgumentError) do
+      ORTools::TSP.new([])
+    end
+    assert_equal "Must be at least two locations", error.message
+  end
+
   def test_invalid_location
     error = assert_raises(ArgumentError) do
       ORTools::TSP.new([{name: "Tokyo"}])
