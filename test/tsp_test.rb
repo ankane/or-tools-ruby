@@ -15,10 +15,19 @@ class TSPTest < Minitest::Test
       {name: "Osaka", latitude: 34.6937, longitude: 135.5023},
       {name: "New York City", latitude: 40.7128, longitude: -74.0060},
       {name: "Karachi", latitude: 24.8607, longitude: 67.0011},
-      {name: "Buenos Aires", latitude: -34.6037, longitude: -58.3816}
+      {name: "Buenos Aires", latitude: -34.6037, longitude: -58.3816},
+      {name: "Chongqing", latitude: 29.4316, longitude: 106.9123},
+      {name: "Istanbul", latitude: 41.0082, longitude: 28.9784},
+      {name: "Kolkata", latitude: 22.5726, longitude: 88.3639},
+      {name: "Manila", latitude: 14.5995, longitude: 120.9842},
+      {name: "Lagos", latitude: 6.5244, longitude: 3.3792},
+      {name: "Rio de Janeiro", latitude: -22.9068, longitude: -43.1729},
+      {name: "Tianjin", latitude: 39.3434, longitude: 117.3616},
+      {name: "Kinshasa", latitude: -4.4419, longitude: 15.2663},
+      {name: "Guangzhou", latitude: 23.1291, longitude: 113.2644}
     ]
     tsp = ORTools::TSP.new(locations)
-    expected_route = ["Tokyo", "Osaka", "Shanghai", "Beijing", "Dhaka", "Delhi", "Mumbai", "Karachi", "Cairo", "São Paulo", "Buenos Aires", "Mexico City", "New York City", "Tokyo"]
+    expected_route = ["Tokyo", "Osaka", "Tianjin", "Beijing", "Shanghai", "Manila", "Guangzhou", "Chongqing", "Dhaka", "Kolkata", "Delhi", "Mumbai", "Karachi", "Istanbul", "Cairo", "Kinshasa", "Lagos", "Rio de Janeiro", "São Paulo", "Buenos Aires", "Mexico City", "New York City", "Tokyo"]
     assert_equal expected_route, tsp.route.map { |r| r[:name] }
     assert tsp.distances
     assert tsp.distances.sum
