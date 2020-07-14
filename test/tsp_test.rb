@@ -32,4 +32,25 @@ class TSPTest < Minitest::Test
     assert tsp.distances
     assert tsp.distances.sum
   end
+
+  def test_invalid_location
+    error = assert_raises(ArgumentError) do
+      ORTools::TSP.new([{name: "Tokyo"}])
+    end
+    assert_equal "Locations must have latitude and longitude", error.message
+  end
+
+  def test_invalid_latitude
+    error = assert_raises(ArgumentError) do
+      ORTools::TSP.new([{latitude: 91, longitude: 0}])
+    end
+    assert_equal "Latitude must be between -90 and 90", error.message
+  end
+
+  def test_invalid_longitude
+    error = assert_raises(ArgumentError) do
+      ORTools::TSP.new([{latitude: 0, longitude: 181}])
+    end
+    assert_equal "Longitude must be between -180 and 180", error.message
+  end
 end
