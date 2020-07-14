@@ -32,12 +32,12 @@ module ORTools
 
       index = routing.start(0)
       while !routing.end?(index)
-        @route << locations[manager.index_to_node(index)][:id]
+        @route << locations[manager.index_to_node(index)]
         previous_index = index
         index = assignment.value(routing.next_var(index))
         @distances << routing.arc_cost_for_vehicle(previous_index, index, 0) / DISTANCE_SCALE.to_f
       end
-      @route << locations[manager.index_to_node(index)][:id]
+      @route << locations[manager.index_to_node(index)]
     end
 
     private
