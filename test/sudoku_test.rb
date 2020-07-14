@@ -44,7 +44,7 @@ class SudokuTest < Minitest::Test
   end
 
   def test_invalid_grid_values
-    grid = 9.times.map { 9.times.map { -1 } }
+    grid = 9.times.map { 9.times.map { "a" } }
     error = assert_raises(ArgumentError) do
       ORTools::Sudoku.new(grid)
     end
