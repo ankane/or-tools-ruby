@@ -1,4 +1,4 @@
-## 0.2.1 (unreleased)
+## 0.3.0 (unreleased)
 
 - Updated OR-Tools to 7.7
 - Added `TSP` class

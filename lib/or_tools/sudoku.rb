@@ -52,7 +52,7 @@ module ORTools
 
       solver = ORTools::CpSolver.new
       status = solver.solve(model)
-      raise Error, "No solution found" if status != :feasible
+      raise Error, "No solution found" unless [:feasible, :optimal].include?(status)
 
       solution = []
       line.each do |i|
