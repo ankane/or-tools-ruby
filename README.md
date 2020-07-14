@@ -57,7 +57,7 @@ tsp.distances # [392.441, 1362.926, 1067.31, ...]
 tsp.distances.sum # total distance
 ```
 
-Distances are in kilometers - multiply by `0.6213712` for miles
+Distances are in kilometers - multiply by `0.6214` for miles
 
 ### Sudoku
 
