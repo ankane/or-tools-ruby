@@ -19,6 +19,7 @@ require "or_tools/version"
 
 # higher level interfaces
 require "or_tools/sudoku"
+require "or_tools/tsp"
 
 module ORTools
   class Error < StandardError; end

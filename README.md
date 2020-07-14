@@ -16,7 +16,46 @@ Installation can take a few minutes as OR-Tools downloads and builds.
 
 ## Higher Level Interfaces
 
+- [Traveling Salesperson Problem (TSP)](#tsp) [master]
 - [Sudoku](#sudoku) [master]
+
+### Traveling Salesperson Problem (TSP)
+
+Create locations - the first location will be the starting and ending point
+
+```ruby
+locations = [
+  {id: "Tokyo", latitude: 35.6762, longitude: 139.6503},
+  {id: "Delhi", latitude: 28.7041, longitude: 77.1025},
+  {id: "Shanghai", latitude: 31.2304, longitude: 121.4737},
+  {id: "São Paulo", latitude: -23.5505, longitude: -46.6333},
+  {id: "Mexico City", latitude: 19.4326, longitude: -99.1332},
+  {id: "Cairo", latitude: 30.0444, longitude: 31.2357},
+  {id: "Mumbai", latitude: 19.0760, longitude: 72.8777},
+  {id: "Beijing", latitude: 39.9042, longitude: 116.4074},
+  {id: "Dhaka", latitude: 23.8103, longitude: 90.4125},
+  {id: "Osaka", latitude: 34.6937, longitude: 135.5023},
+  {id: "New York City", latitude: 40.7128, longitude: -74.0060},
+  {id: "Karachi", latitude: 24.8607, longitude: 67.0011},
+  {id: "Buenos Aires", latitude: -34.6037, longitude: -58.3816}
+]
+```
+
+Get route
+
+```ruby
+tsp = ORTools::TSP.new(locations)
+tsp.route # ["Tokyo", "Osaka", "Shanghai", ...]
+```
+
+Get distances between locations on route
+
+```ruby
+tsp.distances # [392.441, 1362.926, 1067.31, ...]
+tsp.distances.sum # total distance
+```
+
+Distances are in kilometers - multiply by `0.6213712` for miles
 
 ### Sudoku
 
@@ -63,7 +102,7 @@ Integer Optimization
 
 Routing
 
-- [Traveling Salesperson Problem (TSP)](#traveling-salesperson-problem-tsp)
+- [Traveling Salesperson Problem (TSP)](#traveling-salesperson-problem-tsp-1)
 - [Vehicle Routing Problem (VRP)](#vehicle-routing-problem-vrp)
 - [Capacity Constraints](#capacity-constraints)
 - [Pickups and Deliveries](#pickups-and-deliveries)
@@ -96,7 +135,7 @@ Scheduling
 
 Other Examples
 
-- [Sudoku](#sudoku)
+- [Sudoku](#sudoku-1)
 - [Wedding Seating Chart](#wedding-seating-chart)
 - [Set Partitioning](#set-partitioning)
 
@@ -410,7 +449,7 @@ transit_callback_index = routing.register_transit_callback(distance_callback)
 routing.set_arc_cost_evaluator_of_all_vehicles(transit_callback_index)
 
 # run the solver
-assignment = routing.solve(first_solution_strategy: :path_cheaper_arc)
+assignment = routing.solve(first_solution_strategy: :path_cheapest_arc)
 
 # print the solution
 puts "Objective: #{assignment.objective_value} miles"

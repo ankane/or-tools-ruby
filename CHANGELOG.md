@@ -1,6 +1,7 @@
 ## 0.2.1 (unreleased)
 
 - Updated OR-Tools to 7.7
+- Added `TSP` class
 - Added `Sudoku` class
 
 ## 0.2.0 (2020-05-22)
