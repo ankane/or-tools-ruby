@@ -36,6 +36,21 @@ class SudokuTest < Minitest::Test
     assert_equal "No solution found", error.message
   end
 
+  def test_invalid_grid_size
+    error = assert_raises(ArgumentError) do
+      ORTools::Sudoku.new([])
+    end
+    assert_equal "Grid must be 9x9", error.message
+  end
+
+  def test_invalid_grid_values
+    grid = 9.times.map { 9.times.map { -1 } }
+    error = assert_raises(ArgumentError) do
+      ORTools::Sudoku.new(grid)
+    end
+    assert_equal "Grid must contain values between 0 and 9", error.message
+  end
+
   # TODO add method for retrieving all solutions
   # def test_multiple_solutions
   #   grid = 9.times.map { 9.times.map { 0 } }
