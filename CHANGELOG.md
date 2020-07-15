@@ -1,6 +1,7 @@
 ## 0.3.0 (unreleased)
 
 - Updated OR-Tools to 7.7
+- Added `BasicScheduler` class
 - Added `TSP` class
 - Added `Sudoku` class
 

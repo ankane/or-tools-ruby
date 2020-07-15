@@ -661,6 +661,11 @@ void Init_ext()
       "_solution_integer_value",
       *[](Object self, CpSolverResponse& response, operations_research::sat::IntVar& x) {
         return SolutionIntegerValue(response, x);
+      })
+    .define_method(
+      "_solution_boolean_value",
+      *[](Object self, CpSolverResponse& response, operations_research::sat::BoolVar& x) {
+        return SolutionBooleanValue(response, x);
       });
 
   define_class_under<CpSolverResponse>(rb_mORTools, "CpSolverResponse")

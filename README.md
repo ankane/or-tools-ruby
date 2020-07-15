@@ -16,8 +16,70 @@ Installation can take a few minutes as OR-Tools downloads and builds.
 
 ## Higher Level Interfaces
 
+- [Employee Scheduling](#employee-scheduling) [master]
 - [Traveling Salesperson Problem (TSP)](#traveling-salesperson-problem-tsp) [master]
 - [Sudoku](#sudoku) [master]
+
+### Employee Scheduling
+
+Specify people and their availabililty
+
+```ruby
+people = [
+  {
+    availability: [
+      {starts_at: Time.parse("2020-01-01 08:00:00"), ends_at: Time.parse("2020-01-01 16:00:00")},
+      {starts_at: Time.parse("2020-01-02 08:00:00"), ends_at: Time.parse("2020-01-02 16:00:00")}
+    ],
+    max_hours: 40 # optional, applies to entire scheduling period
+  },
+  {
+    availability: [
+      {starts_at: Time.parse("2020-01-01 08:00:00"), ends_at: Time.parse("2020-01-01 16:00:00")},
+      {starts_at: Time.parse("2020-01-03 08:00:00"), ends_at: Time.parse("2020-01-03 16:00:00")}
+    ],
+    max_hours: 20
+  }
+]
+```
+
+Specify shifts
+
+```ruby
+shifts = [
+  {starts_at: Time.parse("2020-01-01 08:00:00"), ends_at: Time.parse("2020-01-01 16:00:00")},
+  {starts_at: Time.parse("2020-01-02 08:00:00"), ends_at: Time.parse("2020-01-02 16:00:00")},
+  {starts_at: Time.parse("2020-01-03 08:00:00"), ends_at: Time.parse("2020-01-03 16:00:00")}
+]
+```
+
+Run the scheduler
+
+```ruby
+scheduler = ORTools::BasicScheduler.new(people: people, shifts: shifts)
+```
+
+The scheduler maximizes the number of assigned hours. A person must be available for the entire shift to be considered for it.
+
+Get assignments (returns indexes of people and shifts)
+
+```ruby
+scheduler.assignments
+# [
+#   {person: 2, shift: 0},
+#   {person: 0, shift: 1},
+#   {person: 1, shift: 2}
+# ]
+```
+
+Get assigned hours and total hours
+
+```ruby
+scheduler.assigned_hours
+scheduler.total_hours
+```
+
+Feel free to create an issue if you have a scheduling use case that’s not covered.
 
 ### Traveling Salesperson Problem (TSP)
 
@@ -137,7 +199,7 @@ Assignment
 
 Scheduling
 
-- [Employee Scheduling](#employee-scheduling)
+- [Employee Scheduling](#employee-scheduling-1)
 - [The Job Shop Problem](#the-job-shop-problem)
 
 Other Examples

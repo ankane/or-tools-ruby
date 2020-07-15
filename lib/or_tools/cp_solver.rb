@@ -12,7 +12,11 @@ module ORTools
     end
 
     def value(var)
-      _solution_integer_value(@response, var)
+      if var.is_a?(BoolVar)
+        _solution_boolean_value(@response, var)
+      else
+        _solution_integer_value(@response, var)
+      end
     end
 
     def solve_with_solution_callback(model, observer)

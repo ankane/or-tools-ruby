@@ -18,6 +18,7 @@ require "or_tools/solver"
 require "or_tools/version"
 
 # higher level interfaces
+require "or_tools/basic_scheduler"
 require "or_tools/sudoku"
 require "or_tools/tsp"
 
