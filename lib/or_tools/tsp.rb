@@ -3,7 +3,7 @@ module ORTools
     attr_reader :route, :route_indexes, :distances
 
     DISTANCE_SCALE = 1000
-    DEGREE_TO_RADIANS = Math::PI / 180
+    DEGREES_TO_RADIANS = Math::PI / 180
 
     def initialize(locations)
       raise ArgumentError, "Locations must have latitude and longitude" unless locations.all? { |l| l[:latitude] && l[:longitude] }
@@ -49,10 +49,10 @@ module ORTools
     private
 
     def distance(from, to)
-      from_lat = from[:latitude] * DEGREE_TO_RADIANS
-      from_lng = from[:longitude] * DEGREE_TO_RADIANS
-      to_lat = to[:latitude] * DEGREE_TO_RADIANS
-      to_lng = to[:longitude] * DEGREE_TO_RADIANS
+      from_lat = from[:latitude] * DEGREES_TO_RADIANS
+      from_lng = from[:longitude] * DEGREES_TO_RADIANS
+      to_lat = to[:latitude] * DEGREES_TO_RADIANS
+      to_lng = to[:longitude] * DEGREES_TO_RADIANS
       2 * 6371 * Math.asin(Math.sqrt(Math.sin((to_lat - from_lat) / 2.0)**2 + Math.cos(from_lat) * Math.cos(to_lat) * Math.sin((from_lng - to_lng) / 2.0)**2))
     end
   end
