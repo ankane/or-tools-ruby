@@ -15,6 +15,7 @@ module ORTools
           others.delete_at(i)
           others.each do |other|
             @connection_map[person][other] ||= 0
+            # currently additive, but could use max
             @connection_map[person][other] += c[:strength]
           end
         end
