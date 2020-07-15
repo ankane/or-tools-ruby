@@ -2,6 +2,7 @@
 
 - Updated OR-Tools to 7.7
 - Added `BasicScheduler` class
+- Added `Seating` class
 - Added `TSP` class
 - Added `Sudoku` class
 

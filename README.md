@@ -90,14 +90,15 @@ Specify connections
 
 ```ruby
 connections = [
-
+  {people: ["A", "B", "C"], strength: 1},
+  {people: ["D", "E", "F"], strength: 1}
 ]
 ```
 
 Specify tables and their capacity
 
 ```ruby
-tables = [8, 8, 8, 8]
+tables = [3, 3]
 ```
 
 Assign seats
@@ -115,7 +116,7 @@ seating.assignments
 Get connections for a person
 
 ```ruby
-seating.connections(person)
+seating.connections_for(person)
 ```
 
 ### Traveling Salesperson Problem (TSP)
