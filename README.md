@@ -16,11 +16,11 @@ Installation can take a few minutes as OR-Tools downloads and builds.
 
 ## Higher Level Interfaces
 
-- [Employee Scheduling](#employee-scheduling) [master]
+- [Scheduling](#scheduling) [master]
 - [Traveling Salesperson Problem (TSP)](#traveling-salesperson-problem-tsp) [master]
 - [Sudoku](#sudoku) [master]
 
-### Employee Scheduling
+### Scheduling
 
 Specify people and their availabililty
 
@@ -199,7 +199,7 @@ Assignment
 
 Scheduling
 
-- [Employee Scheduling](#employee-scheduling-1)
+- [Employee Scheduling](#employee-scheduling)
 - [The Job Shop Problem](#the-job-shop-problem)
 
 Other Examples
