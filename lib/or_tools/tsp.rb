@@ -1,6 +1,6 @@
 module ORTools
   class TSP
-    attr_reader :route, :distances
+    attr_reader :route, :route_indexes, :distances
 
     DISTANCE_SCALE = 1000
     DEGREE_TO_RADIANS = Math::PI / 180
@@ -32,17 +32,18 @@ module ORTools
       routing.set_arc_cost_evaluator_of_all_vehicles(transit_callback_index)
       assignment = routing.solve(first_solution_strategy: :path_cheapest_arc)
 
-      @route = []
+      @route_indexes = []
       @distances = []
 
       index = routing.start(0)
       while !routing.end?(index)
-        @route << locations[manager.index_to_node(index)]
+        @route_indexes << manager.index_to_node(index)
         previous_index = index
         index = assignment.value(routing.next_var(index))
         @distances << routing.arc_cost_for_vehicle(previous_index, index, 0) / DISTANCE_SCALE.to_f
       end
-      @route << locations[manager.index_to_node(index)]
+      @route_indexes << manager.index_to_node(index)
+      @route = locations.values_at(*@route_indexes)
     end
 
     private
