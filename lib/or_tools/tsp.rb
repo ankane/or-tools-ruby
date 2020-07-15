@@ -1,6 +1,6 @@
 module ORTools
   class TSP
-    attr_reader :route, :route_indexes, :distances
+    attr_reader :route, :route_indexes, :distances, :total_distance
 
     DISTANCE_SCALE = 1000
     DEGREES_TO_RADIANS = Math::PI / 180
@@ -44,6 +44,7 @@ module ORTools
       end
       @route_indexes << manager.index_to_node(index)
       @route = locations.values_at(*@route_indexes)
+      @total_distance = @distances.sum
     end
 
     private

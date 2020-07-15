@@ -30,8 +30,7 @@ class TSPTest < Minitest::Test
     expected_route = ["Tokyo", "Osaka", "Tianjin", "Beijing", "Shanghai", "Manila", "Guangzhou", "Chongqing", "Dhaka", "Kolkata", "Delhi", "Mumbai", "Karachi", "Istanbul", "Cairo", "Kinshasa", "Lagos", "Rio de Janeiro", "São Paulo", "Buenos Aires", "Mexico City", "New York City", "Tokyo"]
     assert_equal expected_route, tsp.route.map { |r| r[:name] }
     assert_equal expected_route, locations.values_at(*tsp.route_indexes).map { |r| r[:name] }
-    assert tsp.distances
-    assert tsp.distances.sum
+    assert_equal tsp.distances.sum, tsp.total_distance
   end
 
   def test_no_locations
