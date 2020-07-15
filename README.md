@@ -17,6 +17,7 @@ Installation can take a few minutes as OR-Tools downloads and builds.
 ## Higher Level Interfaces
 
 - [Scheduling](#scheduling) [master]
+- [Seating](#seating) [master]
 - [Traveling Salesperson Problem (TSP)](#traveling-salesperson-problem-tsp) [master]
 - [Sudoku](#sudoku) [master]
 
@@ -80,6 +81,42 @@ scheduler.total_hours
 ```
 
 Feel free to create an issue if you have a scheduling use case that’s not covered.
+
+### Seating
+
+Create a seating chart based on personal connections
+
+Specify connections
+
+```ruby
+connections = [
+
+]
+```
+
+Specify tables and their capacity
+
+```ruby
+tables = [8, 8, 8, 8]
+```
+
+Assign seats
+
+```ruby
+seating = ORTools::Seating.new(connections: connections, tables: tables)
+```
+
+Get assignments
+
+```ruby
+seating.assignments
+```
+
+Get connections for a person
+
+```ruby
+seating.connections(person)
+```
 
 ### Traveling Salesperson Problem (TSP)
 
