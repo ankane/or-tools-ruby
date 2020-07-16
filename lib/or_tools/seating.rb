@@ -5,18 +5,18 @@ module ORTools
     def initialize(connections:, tables:)
       @people = connections.flat_map { |c| c[:people] }.uniq
 
-      @connection_for = {}
+      @connections_for = {}
       @people.each do |person|
-        @connection_for[person] = {}
+        @connections_for[person] = {}
       end
       connections.each do |c|
         c[:people].each_with_index do |person, i|
           others = c[:people].dup
           others.delete_at(i)
           others.each do |other|
-            w = @connection_for[person][other]
+            w = @connections_for[person][other]
             # use max
-            @connection_for[person][other] = c[:weight] if !w || c[:weight] > w
+            @connections_for[person][other] = c[:weight] if !w || c[:weight] > w
           end
         end
       end
@@ -50,7 +50,7 @@ module ORTools
       # objective
       objective = []
       pairs.each do |g1, g2|
-        weight = @connection_for[g1][g2]
+        weight = @connections_for[g1][g2]
         objective << colocated[[g1, g2]] * weight if weight
       end
       model.maximize(model.sum(objective))
@@ -80,7 +80,7 @@ module ORTools
 
       # min known neighbors rule
       all_tables.each do
-        vars = people.combination(2).flat_map { |g1, g2| all_tables.map { |t2| same_table[[g1, g2, t2]] } }
+        vars = pairs.flat_map { |g1, g2| all_tables.map { |t2| same_table[[g1, g2, t2]] } }
         model.add(model.sum(vars) >= min_known_neighbors)
       end
 
@@ -90,20 +90,21 @@ module ORTools
       raise Error, "No solution found" unless [:feasible, :optimal].include?(status)
 
       # read solution
-      @assignments = []
+      @assignments = {}
       seats.each do |k, v|
         if solver.value(v)
-          @assignments << {
-            person: k[1],
-            table: k[0]
-          }
+          @assignments[k[1]] = k[0]
         end
       end
       @total_weight = solver.objective_value
     end
 
     def connections_for(person)
-      @connection_for[person]
+      @connections_for[person]
+    end
+
+    def table_connections(person)
+      connections_for(person).select { |k, _| @assignments[k] == @assignments[person] }
     end
   end
 end

@@ -128,10 +128,16 @@ Get assignments
 seating.assignments
 ```
 
-Get connections for a person
+Get all connections for a person
 
 ```ruby
 seating.connections_for(person)
+```
+
+Get connections for a person at their table
+
+```ruby
+seating.table_connections(person)
 ```
 
 ### Traveling Salesperson Problem (TSP)
