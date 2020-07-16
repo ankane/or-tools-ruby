@@ -16,7 +16,7 @@ module ORTools
           others.each do |other|
             @connection_for[person][other] ||= 0
             # currently additive, but could use max
-            @connection_for[person][other] += c[:strength]
+            @connection_for[person][other] += c[:weight]
           end
         end
       end

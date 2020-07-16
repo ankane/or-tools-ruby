@@ -3,8 +3,8 @@ require_relative "test_helper"
 class SeatingTest < Minitest::Test
   def test_works
     connections = [
-      {people: ["A", "B", "C"], strength: 2},
-      {people: ["B", "C", "D", "E"], strength: 1}
+      {people: ["A", "B", "C"], weight: 2},
+      {people: ["B", "C", "D", "E"], weight: 1}
     ]
     tables = [3, 2]
     seating = ORTools::Seating.new(connections: connections, tables: tables)

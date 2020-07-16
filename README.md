@@ -90,8 +90,8 @@ Specify connections
 
 ```ruby
 connections = [
-  {people: ["A", "B", "C"], strength: 1},
-  {people: ["D", "E", "F"], strength: 1}
+  {people: ["A", "B", "C"], weight: 1},
+  {people: ["D", "E", "F"], weight: 1}
 ]
 ```
 
