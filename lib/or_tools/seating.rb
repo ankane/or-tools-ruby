@@ -21,7 +21,84 @@ module ORTools
         end
       end
 
+      min_known_neighbors = 1
+      model = ORTools::CpModel.new
+      all_tables = tables.size.times.to_a
+
+      # decision variables
+      seats = {}
+      all_tables.each do |t|
+        people.each do |g|
+          seats[[t, g]] = model.new_bool_var("guest %s seats on table %i" % [g, t])
+        end
+      end
+
+      pairs = people.combination(2)
+
+      colocated = {}
+      pairs.each do |g1, g2|
+        colocated[[g1, g2]] = model.new_bool_var("guest %s seats with guest %s" % [g1, g2])
+      end
+
+      same_table = {}
+      pairs.each do |g1, g2|
+        all_tables.each do |t|
+          same_table[[g1, g2, t]] = model.new_bool_var("guest %s seats with guest %s on table %i" % [g1, g2, t])
+        end
+      end
+
+      # objective
+      objective = []
+      pairs.each do |g1, g2|
+        weight = @connection_for[g1][g2]
+        objective << colocated[[g1, g2]] * weight if weight
+      end
+      model.maximize(model.sum(objective))
+
+      # everybody seats at one table
+      people.each do |g|
+        model.add(model.sum(all_tables.map { |t| seats[[t, g]] }) == 1)
+      end
+
+      # tables have a max capacity
+      all_tables.each do |t|
+        model.add(model.sum(@people.map { |g| seats[[t, g]] }) <= tables[t])
+      end
+
+      # link colocated with seats
+      pairs.each do |g1, g2|
+        all_tables.each do |t|
+          # link same_table and seats
+          model.add_bool_or([seats[[t, g1]].not, seats[[t, g2]].not, same_table[[g1, g2, t]]])
+          model.add_implication(same_table[[g1, g2, t]], seats[[t, g1]])
+          model.add_implication(same_table[[g1, g2, t]], seats[[t, g2]])
+        end
+
+        # link colocated and same_table
+        model.add(model.sum(all_tables.map { |t| same_table[[g1, g2, t]] }) == colocated[[g1, g2]])
+      end
+
+      # min known neighbors rule
+      all_tables.each do
+        vars = people.combination(2).flat_map { |g1, g2| all_tables.map { |t2| same_table[[g1, g2, t2]] } }
+        model.add(model.sum(vars) >= min_known_neighbors)
+      end
+
+      # solve
+      solver = ORTools::CpSolver.new
+      status = solver.solve(model)
+      raise Error, "No solution found" unless [:feasible, :optimal].include?(status)
+
+      # read solution
       @assignments = []
+      seats.each do |k, v|
+        if solver.value(v)
+          @assignments << {
+            person: k[1],
+            table: k[0]
+          }
+        end
+      end
     end
 
     def connections_for(person)

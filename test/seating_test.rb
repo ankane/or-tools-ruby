@@ -18,7 +18,6 @@ class SeatingTest < Minitest::Test
       {person: "D", table: 1},
       {person: "E", table: 1}
     ]
-    p seating.assignments
-    # assert_equal expected, seating.assignments
+    assert_equal expected, seating.assignments
   end
 end
