@@ -53,7 +53,7 @@ class SeatingTest < Minitest::Test
     ]
     tables = [3, 3]
     error = assert_raises(ORTools::Error) do
-      ORTools::Seating.new(connections: connections, tables: tables, min_connections: 3)
+      ORTools::Seating.new(connections: connections, tables: tables, min_connections: 2)
     end
     assert_equal "No solution found", error.message
   end
