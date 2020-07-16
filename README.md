@@ -17,6 +17,7 @@ Installation can take a few minutes as OR-Tools downloads and builds.
 ## Higher Level Interfaces
 
 - [Scheduling](#scheduling) [master]
+- [Seating](#seating) [master]
 - [Traveling Salesperson Problem (TSP)](#traveling-salesperson-problem-tsp) [master]
 - [Sudoku](#sudoku) [master]
 
@@ -80,6 +81,74 @@ scheduler.total_hours
 ```
 
 Feel free to create an issue if you have a scheduling use case that’s not covered.
+
+### Seating
+
+Create a seating chart based on personal connections. Uses [this approach](https://www.improbable.com/news/2012/Optimal-seating-chart.pdf).
+
+Specify connections
+
+```ruby
+connections = [
+  {people: ["A", "B", "C"], weight: 2},
+  {people: ["C", "D", "E", "F"], weight: 1}
+]
+```
+
+Use different weights to prioritize seating. For a wedding, it may look like:
+
+```ruby
+connections = [
+  {people: knows_partner1, weight: 1},
+  {people: knows_partner2, weight: 1},
+  {people: relationship1, weight: 100},
+  {people: relationship2, weight: 100},
+  {people: relationship3, weight: 100},
+  {people: friend_group1, weight: 10},
+  {people: friend_group2, weight: 10},
+  # ...
+]
+```
+
+The max weight between two people is used if they have multiple connections.
+
+Specify tables and their capacity
+
+```ruby
+tables = [3, 3]
+```
+
+Assign seats
+
+```ruby
+seating = ORTools::Seating.new(connections: connections, tables: tables)
+```
+
+Each person will have a connection with at least one other person at their table.
+
+Get tables
+
+```ruby
+seating.assigned_tables
+```
+
+Get assignments by person
+
+```ruby
+seating.assignments
+```
+
+Get all connections for a person
+
+```ruby
+seating.connections_for(person)
+```
+
+Get connections for a person at their table
+
+```ruby
+seating.connections_for(person, same_table: true)
+```
 
 ### Traveling Salesperson Problem (TSP)
 
@@ -1863,8 +1932,8 @@ end
 # From
 # Meghan L. Bellows and J. D. Luc Peterson
 # "Finding an optimal seating chart for a wedding"
-# http://www.improbable.com/news/2012/Optimal-seating-chart.pdf
-# http://www.improbable.com/2012/02/12/finding-an-optimal-seating-chart-for-a-wedding
+# https://www.improbable.com/news/2012/Optimal-seating-chart.pdf
+# https://www.improbable.com/2012/02/12/finding-an-optimal-seating-chart-for-a-wedding
 #
 # Every year, millions of brides (not to mention their mothers, future
 # mothers-in-law, and occasionally grooms) struggle with one of the
@@ -1937,19 +2006,17 @@ all_tables.each do |t|
   end
 end
 
+pairs = all_guests.combination(2)
+
 colocated = {}
-(num_guests - 1).times do |g1|
-  (g1 + 1).upto(num_guests - 1) do |g2|
-    colocated[[g1, g2]] = model.new_bool_var("guest %i seats with guest %i" % [g1, g2])
-  end
+pairs.each do |g1, g2|
+  colocated[[g1, g2]] = model.new_bool_var("guest %i seats with guest %i" % [g1, g2])
 end
 
 same_table = {}
-(num_guests - 1).times do |g1|
-  (g1 + 1).upto(num_guests - 1) do |g2|
-    all_tables.each do |t|
-      same_table[[g1, g2, t]] = model.new_bool_var("guest %i seats with guest %i on table %i" % [g1, g2, t])
-    end
+pairs.each do |g1, g2|
+  all_tables.each do |t|
+    same_table[[g1, g2, t]] = model.new_bool_var("guest %i seats with guest %i on table %i" % [g1, g2, t])
   end
 end
 
@@ -1971,28 +2038,24 @@ all_tables.each do |t|
 end
 
 # Link colocated with seats
-(num_guests - 1).times do |g1|
-  (g1 + 1).upto(num_guests - 1) do |g2|
-    all_tables.each do |t|
-      # Link same_table and seats.
-      model.add_bool_or([seats[[t, g1]].not, seats[[t, g2]].not, same_table[[g1, g2, t]]])
-      model.add_implication(same_table[[g1, g2, t]], seats[[t, g1]])
-      model.add_implication(same_table[[g1, g2, t]], seats[[t, g2]])
-    end
-
-    # Link colocated and same_table.
-    model.add(model.sum(all_tables.map { |t| same_table[[g1, g2, t]] }) == colocated[[g1, g2]])
+pairs.each do |g1, g2|
+  all_tables.each do |t|
+    # Link same_table and seats.
+    model.add_bool_or([seats[[t, g1]].not, seats[[t, g2]].not, same_table[[g1, g2, t]]])
+    model.add_implication(same_table[[g1, g2, t]], seats[[t, g1]])
+    model.add_implication(same_table[[g1, g2, t]], seats[[t, g2]])
   end
+
+  # Link colocated and same_table.
+  model.add(model.sum(all_tables.map { |t| same_table[[g1, g2, t]] }) == colocated[[g1, g2]])
 end
 
 # Min known neighbors rule.
 all_tables.each do |t|
   model.add(
     model.sum(
-      (num_guests - 1).times.flat_map { |g1|
-        (g1 + 1).upto(num_guests - 1).select { |g2| c[g1][g2] > 0 }.flat_map { |g2|
-          all_tables.map { |t2| same_table[[g1, g2, t2]] }
-        }
+      pairs.select { |g1, g2| c[g1][g2] > 0 }.flat_map { |g1, g2|
+        all_tables.map { |t2| same_table[[g1, g2, t2]] }
       }
     ) >= min_known_neighbors
   )
