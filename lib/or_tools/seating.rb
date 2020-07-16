@@ -2,7 +2,7 @@ module ORTools
   class Seating
     attr_reader :assignments, :people, :total_weight
 
-    def initialize(connections:, tables:)
+    def initialize(connections:, tables:, min_connections: 1)
       @people = connections.flat_map { |c| c[:people] }.uniq
 
       @connections_for = {}
@@ -21,7 +21,6 @@ module ORTools
         end
       end
 
-      min_known_neighbors = 1
       model = ORTools::CpModel.new
       all_tables = tables.size.times.to_a
 
@@ -79,9 +78,9 @@ module ORTools
       end
 
       # min known neighbors rule
-      all_tables.each do
-        vars = pairs.flat_map { |g1, g2| all_tables.map { |t2| same_table[[g1, g2, t2]] } }
-        model.add(model.sum(vars) >= min_known_neighbors)
+      all_tables.each do |t|
+        vars = pairs.select { |g1, g2| @connections_for[g1][g2] }.flat_map { |g1, g2| same_table[[g1, g2, t]] }
+        model.add(model.sum(vars) >= min_connections)
       end
 
       # solve

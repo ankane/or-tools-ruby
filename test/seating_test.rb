@@ -35,4 +35,26 @@ class SeatingTest < Minitest::Test
     end
     assert_equal "No solution found", error.message
   end
+
+  def test_min_connections
+    connections = [
+      {people: ["A", "B", "C"], weight: 2},
+      {people: ["C", "D"], weight: 1}
+    ]
+    tables = [3, 3]
+    seating = ORTools::Seating.new(connections: connections, tables: tables)
+    assert_equal [["A", "B"], ["C", "D"]], seating.assigned_tables
+  end
+
+  def test_min_connections_too_high
+    connections = [
+      {people: ["A", "B", "C"], weight: 2},
+      {people: ["C", "D"], weight: 1}
+    ]
+    tables = [3, 3]
+    error = assert_raises(ORTools::Error) do
+      ORTools::Seating.new(connections: connections, tables: tables, min_connections: 3)
+    end
+    assert_equal "No solution found", error.message
+  end
 end
