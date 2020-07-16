@@ -38,13 +38,12 @@ class SeatingTest < Minitest::Test
 
   def test_min_connections
     connections = [
-      {people: ["A", "B", "C", "E"], weight: 2},
+      {people: ["A", "B", "C"], weight: 2},
       {people: ["C", "D"], weight: 1},
-      {people: ["A", "F"], weight: 1}
     ]
-    tables = [3, 3, 3]
+    tables = [3, 3]
     seating = ORTools::Seating.new(connections: connections, tables: tables)
-    assert_equal [["A", "F"], ["B", "E"], ["C", "D"]], seating.assigned_tables.sort
+    assert_equal [["A", "B"], ["C", "D"]], seating.assigned_tables.sort
   end
 
   def test_min_connections_too_high

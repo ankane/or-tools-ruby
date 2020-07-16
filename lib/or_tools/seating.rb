@@ -78,8 +78,14 @@ module ORTools
       end
 
       # min known neighbors rule
-      all_tables.each do |t|
-        vars = pairs.select { |g1, g2| @connections_for[g1][g2] }.flat_map { |g1, g2| same_table[[g1, g2, t]] }
+      # TODO see why ORTools example uses different rule
+      same_table_by_person = Hash.new { |hash, key| hash[key] = [] }
+      same_table.each do |(g1, g2, t), v|
+        next unless @connections_for[g1][g2]
+        same_table_by_person[g1] << v
+        same_table_by_person[g2] << v
+      end
+      same_table_by_person.each do |_, vars|
         model.add(model.sum(vars) >= min_connections)
       end
 
