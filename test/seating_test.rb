@@ -22,6 +22,7 @@ class SeatingTest < Minitest::Test
     assert_equal expected, seating.assignments
     # A + B = 2, A + C = 2, B + C = 2, D + E = 1
     assert_equal 7, seating.total_weight
+    assert_equal({0 => ["A", "B", "C"], 1 => ["D", "E"]}, seating.by_table)
   end
 
   def test_too_few_seats

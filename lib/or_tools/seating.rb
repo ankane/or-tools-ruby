@@ -99,6 +99,10 @@ module ORTools
       @total_weight = solver.objective_value
     end
 
+    def by_table
+      assignments.group_by { |_, v| v }.map { |k, v| [k, v.map(&:first)] }.sort_by { |v| v[0] }.to_h
+    end
+
     def connections_for(person)
       @connections_for[person]
     end
