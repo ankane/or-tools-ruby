@@ -84,7 +84,7 @@ Feel free to create an issue if you have a scheduling use case that’s not cove
 
 ### Seating
 
-Create a seating chart based on personal connections
+Create a seating chart based on personal connections.
 
 Specify connections
 

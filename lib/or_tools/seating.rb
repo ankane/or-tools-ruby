@@ -1,6 +1,6 @@
 module ORTools
   class Seating
-    attr_reader :assignments, :people
+    attr_reader :assignments, :people, :total_weight
 
     def initialize(connections:, tables:)
       @people = connections.flat_map { |c| c[:people] }.uniq
@@ -14,9 +14,9 @@ module ORTools
           others = c[:people].dup
           others.delete_at(i)
           others.each do |other|
-            @connection_for[person][other] ||= 0
-            # currently additive, but could use max
-            @connection_for[person][other] += c[:weight]
+            w = @connection_for[person][other]
+            # use max
+            @connection_for[person][other] = c[:weight] if !w || c[:weight] > w
           end
         end
       end
@@ -99,6 +99,7 @@ module ORTools
           }
         end
       end
+      @total_weight = solver.objective_value
     end
 
     def connections_for(person)
