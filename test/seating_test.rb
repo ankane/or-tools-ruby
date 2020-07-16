@@ -20,4 +20,15 @@ class SeatingTest < Minitest::Test
     ]
     assert_equal expected, seating.assignments
   end
+
+  def test_too_few_seats
+    connections = [
+      {people: ["A", "B", "C"], weight: 1},
+    ]
+    tables = [2]
+    error = assert_raises(ORTools::Error) do
+      ORTools::Seating.new(connections: connections, tables: tables)
+    end
+    assert_equal "No solution found", error.message
+  end
 end
