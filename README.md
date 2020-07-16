@@ -122,16 +122,16 @@ Assign seats
 seating = ORTools::Seating.new(connections: connections, tables: tables)
 ```
 
+Get tables
+
+```ruby
+seating.assigned_tables
+```
+
 Get assignments by person
 
 ```ruby
 seating.assignments
-```
-
-Get assignments by table
-
-```ruby
-seating.by_table
 ```
 
 Get all connections for a person
