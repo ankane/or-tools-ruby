@@ -84,7 +84,7 @@ Feel free to create an issue if you have a scheduling use case that’s not cove
 
 ### Seating
 
-Create a seating chart based on personal connections.
+Create a seating chart based on personal connections. Uses [this approach](https://www.improbable.com/news/2012/Optimal-seating-chart.pdf).
 
 Specify connections
 
@@ -1932,8 +1932,8 @@ end
 # From
 # Meghan L. Bellows and J. D. Luc Peterson
 # "Finding an optimal seating chart for a wedding"
-# http://www.improbable.com/news/2012/Optimal-seating-chart.pdf
-# http://www.improbable.com/2012/02/12/finding-an-optimal-seating-chart-for-a-wedding
+# https://www.improbable.com/news/2012/Optimal-seating-chart.pdf
+# https://www.improbable.com/2012/02/12/finding-an-optimal-seating-chart-for-a-wedding
 #
 # Every year, millions of brides (not to mention their mothers, future
 # mothers-in-law, and occasionally grooms) struggle with one of the
