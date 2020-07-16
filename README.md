@@ -2006,19 +2006,17 @@ all_tables.each do |t|
   end
 end
 
+pairs = all_guests.combination(2)
+
 colocated = {}
-(num_guests - 1).times do |g1|
-  (g1 + 1).upto(num_guests - 1) do |g2|
-    colocated[[g1, g2]] = model.new_bool_var("guest %i seats with guest %i" % [g1, g2])
-  end
+pairs.each do |g1, g2|
+  colocated[[g1, g2]] = model.new_bool_var("guest %i seats with guest %i" % [g1, g2])
 end
 
 same_table = {}
-(num_guests - 1).times do |g1|
-  (g1 + 1).upto(num_guests - 1) do |g2|
-    all_tables.each do |t|
-      same_table[[g1, g2, t]] = model.new_bool_var("guest %i seats with guest %i on table %i" % [g1, g2, t])
-    end
+pairs.each do |g1, g2|
+  all_tables.each do |t|
+    same_table[[g1, g2, t]] = model.new_bool_var("guest %i seats with guest %i on table %i" % [g1, g2, t])
   end
 end
 
@@ -2040,28 +2038,24 @@ all_tables.each do |t|
 end
 
 # Link colocated with seats
-(num_guests - 1).times do |g1|
-  (g1 + 1).upto(num_guests - 1) do |g2|
-    all_tables.each do |t|
-      # Link same_table and seats.
-      model.add_bool_or([seats[[t, g1]].not, seats[[t, g2]].not, same_table[[g1, g2, t]]])
-      model.add_implication(same_table[[g1, g2, t]], seats[[t, g1]])
-      model.add_implication(same_table[[g1, g2, t]], seats[[t, g2]])
-    end
-
-    # Link colocated and same_table.
-    model.add(model.sum(all_tables.map { |t| same_table[[g1, g2, t]] }) == colocated[[g1, g2]])
+pairs.each do |g1, g2|
+  all_tables.each do |t|
+    # Link same_table and seats.
+    model.add_bool_or([seats[[t, g1]].not, seats[[t, g2]].not, same_table[[g1, g2, t]]])
+    model.add_implication(same_table[[g1, g2, t]], seats[[t, g1]])
+    model.add_implication(same_table[[g1, g2, t]], seats[[t, g2]])
   end
+
+  # Link colocated and same_table.
+  model.add(model.sum(all_tables.map { |t| same_table[[g1, g2, t]] }) == colocated[[g1, g2]])
 end
 
 # Min known neighbors rule.
 all_tables.each do |t|
   model.add(
     model.sum(
-      (num_guests - 1).times.flat_map { |g1|
-        (g1 + 1).upto(num_guests - 1).select { |g2| c[g1][g2] > 0 }.flat_map { |g2|
-          all_tables.map { |t2| same_table[[g1, g2, t2]] }
-        }
+      pairs.select { |g1, g2| c[g1][g2] > 0 }.flat_map { |g1, g2|
+        all_tables.map { |t2| same_table[[g1, g2, t2]] }
       }
     ) >= min_known_neighbors
   )
