@@ -11,7 +11,7 @@ class SeatingTest < Minitest::Test
     assert_equal ["A", "B", "C", "D", "E"], seating.people
     assert_equal({"B" => 2, "C" => 2}, seating.connections_for("A"))
     assert_equal({"A" => 2, "B" => 2, "D" => 1, "E" => 1}, seating.connections_for("C"))
-    assert_equal({"A" => 2, "B" => 2}, seating.table_connections("C"))
+    assert_equal({"A" => 2, "B" => 2}, seating.connections_for("C", same_table: true))
     expected = {
       "A" => 0,
       "B" => 0,

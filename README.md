@@ -110,6 +110,8 @@ connections = [
 ]
 ```
 
+The max weight between two people is used if they have multiple connections.
+
 Specify tables and their capacity
 
 ```ruby
@@ -121,6 +123,8 @@ Assign seats
 ```ruby
 seating = ORTools::Seating.new(connections: connections, tables: tables)
 ```
+
+Each person will have a connection with at least one other person at their table.
 
 Get tables
 
@@ -143,7 +147,7 @@ seating.connections_for(person)
 Get connections for a person at their table
 
 ```ruby
-seating.table_connections(person)
+seating.connections_for(person, same_table: true)
 ```
 
 ### Traveling Salesperson Problem (TSP)

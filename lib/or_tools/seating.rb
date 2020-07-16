@@ -103,12 +103,10 @@ module ORTools
       assignments.group_by { |_, v| v }.map { |k, v| [k, v.map(&:first)] }.sort_by(&:first).map(&:last)
     end
 
-    def connections_for(person)
-      @connections_for[person]
-    end
-
-    def table_connections(person)
-      connections_for(person).select { |k, _| @assignments[k] == @assignments[person] }
+    def connections_for(person, same_table: false)
+      result = @connections_for[person]
+      result = result.select { |k, _| @assignments[k] == @assignments[person] } if same_table
+      result
     end
   end
 end
