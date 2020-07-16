@@ -2051,12 +2051,19 @@ pairs.each do |g1, g2|
 end
 
 # Min known neighbors rule.
-all_tables.each do |t|
+all_guests.each do |g|
   model.add(
     model.sum(
-      pairs.select { |g1, g2| c[g1][g2] > 0 }.flat_map { |g1, g2|
-        all_tables.map { |t2| same_table[[g1, g2, t2]] }
-      }
+      (g + 1).upto(num_guests - 1).
+      select { |g2| c[g][g2] > 0 }.
+      product(all_tables).
+      map { |g2, t| same_table[[g, g2, t]] }
+    ) +
+    model.sum(
+      g.times.
+      select { |g1| c[g1][g] > 0 }.
+      product(all_tables).
+      map { |g1, t| same_table[[g1, g, t]] }
     ) >= min_known_neighbors
   )
 end
