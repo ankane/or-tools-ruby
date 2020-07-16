@@ -23,7 +23,7 @@ class SeatingTest < Minitest::Test
 
   def test_too_few_seats
     connections = [
-      {people: ["A", "B", "C"], weight: 1},
+      {people: ["A", "B", "C"], weight: 1}
     ]
     tables = [2]
     error = assert_raises(ORTools::Error) do

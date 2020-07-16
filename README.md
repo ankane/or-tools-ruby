@@ -90,8 +90,23 @@ Specify connections
 
 ```ruby
 connections = [
-  {people: ["A", "B", "C"], weight: 1},
-  {people: ["D", "E", "F"], weight: 1}
+  {people: ["A", "B", "C"], weight: 2},
+  {people: ["C", "D", "E", "F"], weight: 1}
+]
+```
+
+Use different weights to prioritize seating. For a wedding, it may look like:
+
+```ruby
+connections = [
+  {people: knows_partner1, weight: 1},
+  {people: knows_partner2, weight: 1},
+  {people: relationship1, weight: 100},
+  {people: relationship2, weight: 100},
+  {people: relationship3, weight: 100},
+  {people: friend_group1, weight: 10},
+  {people: friend_group2, weight: 10},
+  # ...
 ]
 ```
 
