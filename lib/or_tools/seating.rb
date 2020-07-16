@@ -78,7 +78,6 @@ module ORTools
       end
 
       # min known neighbors rule
-      # TODO see why ORTools example uses different rule
       same_table_by_person = Hash.new { |hash, key| hash[key] = [] }
       same_table.each do |(g1, g2, t), v|
         next unless @connections_for[g1][g2]
