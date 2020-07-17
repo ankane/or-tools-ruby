@@ -65,6 +65,7 @@ class SeatingTest < Minitest::Test
     ]
     tables = [3, 3]
     seating = ORTools::Seating.new(connections: connections, tables: tables)
+    assert_equal [2, 2], seating.assigned_tables.map(&:size)
     refute_includes ["A", "D"], seating.assigned_tables
   end
 end
