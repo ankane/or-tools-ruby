@@ -227,7 +227,7 @@ grid = [
   [0, 0, 0, 0, 0, 0, 2, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0]
 ]
 sudoku = ORTools::Sudoku.new(grid, anti_knight: true, anti_king: true, non_consecutive: true)
 sudoku.solution
@@ -245,7 +245,7 @@ grid = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 2],
+  [0, 0, 0, 0, 0, 0, 0, 0, 2]
 ]
 sudoku = ORTools::Sudoku.new(grid, x: true, anti_knight: true, magic_square: true)
 sudoku.solution
