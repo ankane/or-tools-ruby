@@ -110,7 +110,7 @@ connections = [
 ]
 ```
 
-The max weight between two people is used if they have multiple connections.
+If two people have multiple connections, weights are added.
 
 Specify tables and their capacity
 

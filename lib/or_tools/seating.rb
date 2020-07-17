@@ -14,9 +14,8 @@ module ORTools
           others = c[:people].dup
           others.delete_at(i)
           others.each do |other|
-            w = @connections_for[person][other]
-            # use max
-            @connections_for[person][other] = c[:weight] if !w || c[:weight] > w
+            @connections_for[person][other] ||= 0
+            @connections_for[person][other] += c[:weight]
           end
         end
       end
