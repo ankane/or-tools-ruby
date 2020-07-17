@@ -215,10 +215,40 @@ sudoku = ORTools::Sudoku.new(grid)
 sudoku.solution
 ```
 
-For Sudoku X (diagonals must have unique digits), use:
+It can also solve more advanced puzzles like [The Miracle](https://www.youtube.com/watch?v=yKf9aUIxdb4)
 
 ```ruby
-ORTools::Sudoku.new(grid, x: true)
+grid = [
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 1, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 2, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+]
+sudoku = ORTools::Sudoku.new(grid, anti_knight: true, anti_king: true, non_consecutive: true)
+sudoku.solution
+```
+
+And [this 4-digit puzzle](https://www.youtube.com/watch?v=hAyZ9K2EBF0)
+
+```ruby
+grid = [
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [3, 8, 4, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 2],
+]
+sudoku = ORTools::Sudoku.new(grid, x: true, anti_knight: true, magic_square: true)
+sudoku.solution
 ```
 
 ## Guides
