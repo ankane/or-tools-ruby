@@ -257,6 +257,10 @@ Linear Optimization
 
 - [The Glop Linear Solver](#the-glop-linear-solver)
 
+Integer Optimization
+
+- [Mixed-Integer Programming](#mixed-integer-programming)
+
 Constraint Optimization
 
 - [CP-SAT Solver](#cp-sat-solver)
@@ -264,9 +268,10 @@ Constraint Optimization
 - [Cryptarithmetic](#cryptarithmetic)
 - [The N-queens Problem](#the-n-queens-problem)
 
-Integer Optimization
+Assignment
 
-- [Mixed-Integer Programming](#mixed-integer-programming)
+- [Assignment](#assignment)
+- [Assignment with Teams](#assignment-with-teams)
 
 Routing
 
@@ -289,12 +294,7 @@ Network Flows
 
 - [Maximum Flows](#maximum-flows)
 - [Minimum Cost Flows](#minimum-cost-flows)
-
-Assignment
-
-- [Assignment](#assignment)
-- [Assignment as a Min Cost Problem](#assignment-as-a-min-cost-problem)
-- [Assignment as a MIP Problem](#assignment-as-a-mip-problem)
+- [Assignment as a Min Cost Flow Problem](#assignment-as-a-min-cost-flow-problem)
 
 Scheduling
 
@@ -349,6 +349,52 @@ puts "Solution:"
 puts "x = #{x.solution_value}"
 puts "y = #{y.solution_value}"
 puts "Optimal objective value = #{opt_solution}"
+```
+
+### Mixed-Integer Programming
+
+[Guide](https://developers.google.com/optimization/mip/integer_opt)
+
+```ruby
+# declare the MIP solver
+solver = ORTools::Solver.new("simple_mip_program", :cbc)
+
+# define the variables
+infinity = solver.infinity
+x = solver.int_var(0.0, infinity, "x")
+y = solver.int_var(0.0, infinity, "y")
+
+puts "Number of variables = #{solver.num_variables}"
+
+# define the constraints
+c0 = solver.constraint(-infinity, 17.5)
+c0.set_coefficient(x, 1)
+c0.set_coefficient(y, 7)
+
+c1 = solver.constraint(-infinity, 3.5)
+c1.set_coefficient(x, 1);
+c1.set_coefficient(y, 0);
+
+puts "Number of constraints = #{solver.num_constraints}"
+
+# define the objective
+objective = solver.objective
+objective.set_coefficient(x, 1)
+objective.set_coefficient(y, 10)
+objective.set_maximization
+
+# call the solver
+status = solver.solve
+
+# display the solution
+if status == :optimal
+  puts "Solution:"
+  puts "Objective value = #{solver.objective.value}"
+  puts "x = #{x.solution_value}"
+  puts "y = #{y.solution_value}"
+else
+  puts "The problem does not have an optimal solution."
+end
 ```
 
 ### CP-SAT Solver
@@ -532,50 +578,119 @@ puts
 puts "Solutions found : %i" % solution_printer.solution_count
 ```
 
-### Mixed-Integer Programming
 
-[Guide](https://developers.google.com/optimization/mip/integer_opt)
+### Assignment
+
+[Guide](https://developers.google.com/optimization/assignment/assignment_example)
 
 ```ruby
-# declare the MIP solver
-solver = ORTools::Solver.new("simple_mip_program", :cbc)
+# create the data
+cost = [[ 90,  76, 75,  70],
+        [ 35,  85, 55,  65],
+        [125,  95, 90, 105],
+        [ 45, 110, 95, 115]]
 
-# define the variables
-infinity = solver.infinity
-x = solver.int_var(0.0, infinity, "x")
-y = solver.int_var(0.0, infinity, "y")
+rows = cost.length
+cols = cost[0].length
 
-puts "Number of variables = #{solver.num_variables}"
+# create the solver
+assignment = ORTools::LinearSumAssignment.new
 
-# define the constraints
-c0 = solver.constraint(-infinity, 17.5)
-c0.set_coefficient(x, 1)
-c0.set_coefficient(y, 7)
-
-c1 = solver.constraint(-infinity, 3.5)
-c1.set_coefficient(x, 1);
-c1.set_coefficient(y, 0);
-
-puts "Number of constraints = #{solver.num_constraints}"
-
-# define the objective
-objective = solver.objective
-objective.set_coefficient(x, 1)
-objective.set_coefficient(y, 10)
-objective.set_maximization
-
-# call the solver
-status = solver.solve
-
-# display the solution
-if status == :optimal
-  puts "Solution:"
-  puts "Objective value = #{solver.objective.value}"
-  puts "x = #{x.solution_value}"
-  puts "y = #{y.solution_value}"
-else
-  puts "The problem does not have an optimal solution."
+# add the costs to the solver
+rows.times do |worker|
+  cols.times do |task|
+    if cost[worker][task]
+      assignment.add_arc_with_cost(worker, task, cost[worker][task])
+    end
+  end
 end
+
+# invoke the solver
+solve_status = assignment.solve
+if solve_status == :optimal
+  puts "Total cost = #{assignment.optimal_cost}"
+  puts
+  assignment.num_nodes.times do |i|
+    puts "Worker %d assigned to task %d.  Cost = %d" % [
+      i,
+      assignment.right_mate(i),
+      assignment.assignment_cost(i)
+    ]
+  end
+elsif solve_status == :infeasible
+  puts "No assignment is possible."
+elsif solve_status == :possible_overflow
+  puts "Some input costs are too large and may cause an integer overflow."
+end
+```
+
+### Assignment with Teams
+
+[Guide](https://developers.google.com/optimization/assignment/assignment_teams)
+
+```ruby
+# create the solver
+solver = ORTools::Solver.new("SolveAssignmentProblemMIP", :cbc)
+
+# create the data
+cost = [[90, 76, 75, 70],
+        [35, 85, 55, 65],
+        [125, 95, 90, 105],
+        [45, 110, 95, 115],
+        [60, 105, 80, 75],
+        [45, 65, 110, 95]]
+
+team1 = [0, 2, 4]
+team2 = [1, 3, 5]
+team_max = 2
+
+# create the variables
+num_workers = cost.length
+num_tasks = cost[1].length
+x = {}
+
+num_workers.times do |i|
+  num_tasks.times do |j|
+    x[[i, j]] = solver.bool_var("x[#{i},#{j}]")
+  end
+end
+
+# create the objective function
+solver.minimize(solver.sum(
+  num_workers.times.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] * cost[i][j] } }
+))
+
+# create the constraints
+num_workers.times do |i|
+  solver.add(solver.sum(num_tasks.times.map { |j| x[[i, j]] }) <= 1)
+end
+
+num_tasks.times do |j|
+  solver.add(solver.sum(num_workers.times.map { |i| x[[i, j]] }) == 1)
+end
+
+solver.add(solver.sum(team1.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] } }) <= team_max)
+solver.add(solver.sum(team2.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] } }) <= team_max)
+
+# invoke the solver
+sol = solver.solve
+
+puts "Total cost = #{solver.objective.value}"
+puts
+num_workers.times do |i|
+  num_tasks.times do |j|
+    if x[[i, j]].solution_value > 0
+      puts "Worker %d assigned to task %d.  Cost = %d" % [
+        i,
+        j,
+        cost[i][j]
+      ]
+    end
+  end
+end
+
+puts
+puts "Time = #{solver.wall_time} milliseconds"
 ```
 
 ### Traveling Salesperson Problem (TSP)
@@ -1513,52 +1628,7 @@ else
 end
 ```
 
-### Assignment
-
-[Guide](https://developers.google.com/optimization/assignment/simple_assignment)
-
-```ruby
-# create the data
-cost = [[ 90,  76, 75,  70],
-        [ 35,  85, 55,  65],
-        [125,  95, 90, 105],
-        [ 45, 110, 95, 115]]
-
-rows = cost.length
-cols = cost[0].length
-
-# create the solver
-assignment = ORTools::LinearSumAssignment.new
-
-# add the costs to the solver
-rows.times do |worker|
-  cols.times do |task|
-    if cost[worker][task]
-      assignment.add_arc_with_cost(worker, task, cost[worker][task])
-    end
-  end
-end
-
-# invoke the solver
-solve_status = assignment.solve
-if solve_status == :optimal
-  puts "Total cost = #{assignment.optimal_cost}"
-  puts
-  assignment.num_nodes.times do |i|
-    puts "Worker %d assigned to task %d.  Cost = %d" % [
-      i,
-      assignment.right_mate(i),
-      assignment.assignment_cost(i)
-    ]
-  end
-elsif solve_status == :infeasible
-  puts "No assignment is possible."
-elsif solve_status == :possible_overflow
-  puts "Some input costs are too large and may cause an integer overflow."
-end
-```
-
-### Assignment as a Min Cost Problem
+### Assignment as a Min Cost Flow Problem
 
 [Guide](https://developers.google.com/optimization/assignment/assignment_min_cost_flow)
 
@@ -1605,75 +1675,6 @@ if min_cost_flow.solve == :optimal
 else
   puts "There was an issue with the min cost flow input."
 end
-```
-
-### Assignment as a MIP Problem
-
-[Guide](https://developers.google.com/optimization/assignment/assignment_mip)
-
-```ruby
-# create the solver
-solver = ORTools::Solver.new("SolveAssignmentProblemMIP", :cbc)
-
-# create the data
-cost = [[90, 76, 75, 70],
-        [35, 85, 55, 65],
-        [125, 95, 90, 105],
-        [45, 110, 95, 115],
-        [60, 105, 80, 75],
-        [45, 65, 110, 95]]
-
-team1 = [0, 2, 4]
-team2 = [1, 3, 5]
-team_max = 2
-
-# create the variables
-num_workers = cost.length
-num_tasks = cost[1].length
-x = {}
-
-num_workers.times do |i|
-  num_tasks.times do |j|
-    x[[i, j]] = solver.bool_var("x[#{i},#{j}]")
-  end
-end
-
-# create the objective function
-solver.minimize(solver.sum(
-  num_workers.times.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] * cost[i][j] } }
-))
-
-# create the constraints
-num_workers.times do |i|
-  solver.add(solver.sum(num_tasks.times.map { |j| x[[i, j]] }) <= 1)
-end
-
-num_tasks.times do |j|
-  solver.add(solver.sum(num_workers.times.map { |i| x[[i, j]] }) == 1)
-end
-
-solver.add(solver.sum(team1.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] } }) <= team_max)
-solver.add(solver.sum(team2.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] } }) <= team_max)
-
-# invoke the solver
-sol = solver.solve
-
-puts "Total cost = #{solver.objective.value}"
-puts
-num_workers.times do |i|
-  num_tasks.times do |j|
-    if x[[i, j]].solution_value > 0
-      puts "Worker %d assigned to task %d.  Cost = %d" % [
-        i,
-        j,
-        cost[i][j]
-      ]
-    end
-  end
-end
-
-puts
-puts "Time = #{solver.wall_time} milliseconds"
 ```
 
 ### Employee Scheduling
