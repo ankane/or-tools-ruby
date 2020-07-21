@@ -15,7 +15,7 @@ Rake::ExtensionTask.new("or-tools") do |ext|
 end
 
 task :remove_ext do
-  path = "lib/or-tools/ext.bundle"
+  path = "lib/or_tools/ext.bundle"
   File.unlink(path) if File.exist?(path)
 end
 
