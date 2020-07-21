@@ -1,3 +1,7 @@
+## 0.3.1 (2020-07-21)
+
+- Reduced gem size
+
 ## 0.3.0 (2020-07-21)
 
 - Updated OR-Tools to 7.7
