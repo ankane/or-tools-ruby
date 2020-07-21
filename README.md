@@ -16,10 +16,10 @@ Installation can take a few minutes as OR-Tools downloads and builds.
 
 ## Higher Level Interfaces
 
-- [Scheduling](#scheduling) [master]
-- [Seating](#seating) [master]
-- [Traveling Salesperson Problem (TSP)](#traveling-salesperson-problem-tsp) [master]
-- [Sudoku](#sudoku) [master]
+- [Scheduling](#scheduling)
+- [Seating](#seating)
+- [Traveling Salesperson Problem (TSP)](#traveling-salesperson-problem-tsp)
+- [Sudoku](#sudoku)
 
 ### Scheduling
 
