@@ -8,3 +8,4 @@
 /tmp/
 *.lock
 *.bundle
+*.so
