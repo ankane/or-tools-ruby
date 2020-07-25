@@ -26,7 +26,7 @@ class VRPTest < Minitest::Test
       {:reference=>"HEETS01752", :latitude=>51.559565, :longitude=>-0.098628},
       {:reference=>"160620LON02D", :latitude=>51.523957, :longitude=>-0.127069}
     ]
-    vrp = ORTools::VRP.new(locations, 2)
+    vrp = ORTools::VRP.new(locations, 2).add_dimension("Distance")
     assert_equal 2, vrp.routes.count
   end
 end
