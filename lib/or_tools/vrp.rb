@@ -1,6 +1,6 @@
 module ORTools
   class VRP
-    attr_reader :routes, :manager, :routing, :locations, :vehicle_count
+    attr_reader :manager, :routing, :locations, :vehicle_count
 
     DISTANCE_SCALE = 1
     DEGREES_TO_RADIANS = Math::PI / 180
