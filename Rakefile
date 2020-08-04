@@ -34,7 +34,12 @@ task :update do
     filename = "or-tools_#{dist}_v#{version}.tar.gz"
     url = "https://github.com/google/or-tools/releases/download/v#{short_version}/#{filename}"
     dest = "#{Dir.tmpdir}/#{filename}"
-    system "wget", "-O", dest, url unless File.exist?(dest)
+    unless File.exist?(dest)
+      temp_dest = "#{dest}.tmp"
+      success = system("wget", "-O", temp_dest, url)
+      raise "Download failed" unless success
+      File.rename(temp_dest, dest)
+    end
     puts "#{dist}: #{Digest::SHA256.file(dest).hexdigest}"
   end
 end
