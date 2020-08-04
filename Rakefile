@@ -26,8 +26,8 @@ task :update do
   require "open-uri"
   require "tmpdir"
 
-  version = "7.7.7810"
-  distributions = ["MacOsX-10.15.5", "ubuntu-18.04", "ubuntu-16.04", "debian-10", "centos-8"]
+  version = "7.8.7959"
+  distributions = ["MacOsX-10.15.6", "ubuntu-20.04", "ubuntu-18.04", "ubuntu-16.04", "debian-10", "centos-8"]
 
   short_version = version.split(".").first(2).join(".")
   distributions.each do |dist|
