@@ -1,6 +1,7 @@
-## 0.3.2 (unreleased)
+## 0.3.2 (2020-08-04)
 
 - Updated OR-Tools to 7.8
+- Added binary installation for Ubuntu 20.04
 
 ## 0.3.1 (2020-07-21)
 
