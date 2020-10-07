@@ -101,6 +101,15 @@ Object to_ruby<RoutingNodeIndex>(RoutingNodeIndex const &x)
   return to_ruby<int>(x.value());
 }
 
+std::vector<RoutingNodeIndex> nodeIndexVector(Object x) {
+  auto a = Array(x);
+  std::vector<RoutingNodeIndex> res;
+  for (auto const& v : a) {
+    res.push_back(from_ruby<RoutingNodeIndex>(v));
+  }
+  return res;
+}
+
 template<>
 inline
 operations_research::sat::LinearExpr from_ruby<operations_research::sat::LinearExpr>(Object x)
@@ -699,7 +708,18 @@ void Init_ext()
       });
 
   define_class_under<RoutingIndexManager>(rb_mORTools, "RoutingIndexManager")
-    .define_constructor(Constructor<RoutingIndexManager, int, int, RoutingNodeIndex>())
+    .define_singleton_method(
+      "_new_depot",
+      *[](int num_nodes, int num_vehicles, RoutingNodeIndex depot) {
+        auto r = RoutingIndexManager(num_nodes, num_vehicles, depot);
+        return r;
+      })
+    .define_singleton_method(
+      "_new_starts_ends",
+      *[](int num_nodes, int num_vehicles, Object starts, Object ends) {
+        auto r = RoutingIndexManager(num_nodes, num_vehicles, nodeIndexVector(starts), nodeIndexVector(ends));
+        return r;
+      })
     .define_method("index_to_node", &RoutingIndexManager::IndexToNode)
     .define_method("node_to_index", &RoutingIndexManager::NodeToIndex);
 
