@@ -101,10 +101,9 @@ Object to_ruby<RoutingNodeIndex>(RoutingNodeIndex const &x)
   return to_ruby<int>(x.value());
 }
 
-std::vector<RoutingNodeIndex> nodeIndexVector(Object x) {
-  auto a = Array(x);
+std::vector<RoutingNodeIndex> nodeIndexVector(Array x) {
   std::vector<RoutingNodeIndex> res;
-  for (auto const& v : a) {
+  for (auto const& v : x) {
     res.push_back(from_ruby<RoutingNodeIndex>(v));
   }
   return res;
@@ -715,7 +714,7 @@ void Init_ext()
       })
     .define_singleton_method(
       "_new_starts_ends",
-      *[](int num_nodes, int num_vehicles, Object starts, Object ends) {
+      *[](int num_nodes, int num_vehicles, Array starts, Array ends) {
         return RoutingIndexManager(num_nodes, num_vehicles, nodeIndexVector(starts), nodeIndexVector(ends));
       })
     .define_method("index_to_node", &RoutingIndexManager::IndexToNode)
