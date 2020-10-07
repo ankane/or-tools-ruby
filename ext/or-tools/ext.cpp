@@ -711,14 +711,12 @@ void Init_ext()
     .define_singleton_method(
       "_new_depot",
       *[](int num_nodes, int num_vehicles, RoutingNodeIndex depot) {
-        auto r = RoutingIndexManager(num_nodes, num_vehicles, depot);
-        return r;
+        return RoutingIndexManager(num_nodes, num_vehicles, depot);
       })
     .define_singleton_method(
       "_new_starts_ends",
       *[](int num_nodes, int num_vehicles, Object starts, Object ends) {
-        auto r = RoutingIndexManager(num_nodes, num_vehicles, nodeIndexVector(starts), nodeIndexVector(ends));
-        return r;
+        return RoutingIndexManager(num_nodes, num_vehicles, nodeIndexVector(starts), nodeIndexVector(ends));
       })
     .define_method("index_to_node", &RoutingIndexManager::IndexToNode)
     .define_method("node_to_index", &RoutingIndexManager::NodeToIndex);
