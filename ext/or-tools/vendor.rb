@@ -3,29 +3,26 @@ require "fileutils"
 require "net/http"
 require "tmpdir"
 
-version = "7.8.7959"
+version = "8.0.8283"
 
 if RbConfig::CONFIG["host_os"] =~ /darwin/i
-  filename = "or-tools_MacOsX-10.15.6_v#{version}.tar.gz"
-  checksum = "8d1d92105e962fab2fd7bde5843b711334a9f246dc22c51d41281898dbc1f69d"
+  filename = "or-tools_MacOsX-10.15.7_v#{version}.tar.gz"
+  checksum = "3c921c16c8162b337744dc45819dd5cf0c7a43382615edb8f599320bcf31773a"
 else
   os = %x[lsb_release -is].chomp rescue nil
   os_version = %x[lsb_release -rs].chomp rescue nil
   if os == "Ubuntu" && os_version == "20.04"
     filename = "or-tools_ubuntu-20.04_v#{version}.tar.gz"
-    checksum = "40018cd573305cec76e12ff87e84d4ec18ce0823f265e4d75625bf3aefdea7c9"
+    checksum = "4151b549492e1270a1c469a0f486282035661db7fb7e27f338d5e32457a8dc23"
   elsif os == "Ubuntu" && os_version == "18.04"
     filename = "or-tools_ubuntu-18.04_v#{version}.tar.gz"
-    checksum = "6e53e1a7b82b65b928617b9dce663778c5200de9366ad948948597dc763b1943"
-  elsif os == "Ubuntu" && os_version == "16.04"
-    filename = "or-tools_ubuntu-16.04_v#{version}.tar.gz"
-    checksum = "182cd4e2a1d2f29a9a81f2f90cb3e05cf1c0731c1a1e94c471d79a74dc09fff0"
+    checksum = "2af6bf7d08df13a114260d2ca1e27b1f10a93949463b2c068b5a263d8dd05b3d"
   elsif os == "Debian" && os_version == "10"
     filename = "or-tools_debian-10_v#{version}.tar.gz "
-    checksum = "87dd294237095a7fea466c47789802b0a66c664fa1f79e6bbb2cd36323b409ca"
+    checksum = "7a15decbb983e4045b3d22dbfd82ccaaacfe1afbb2be9587bef64c9440e3cb99"
   elsif os == "CentOS" && os_version == "8"
     filename = "or-tools_centos-8_v#{version}.tar.gz"
-    checksum = "4e61bf2994fc767da1b4fd073f554c944d2c811609df4bc1afa6a2d876c05bb4"
+    checksum = "51159204b29df2e4d900bb7bfbf36e4165eddb45d3518ef616d508b643167659"
   else
     # there is a binary download for Windows
     # however, it's compiled with Visual Studio rather than MinGW (which RubyInstaller uses)

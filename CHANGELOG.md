@@ -1,3 +1,7 @@
+## 0.4.0 (unreleased)
+
+- Updated OR-Tools to 8.0
+
 ## 0.3.3 (unreleased)
 
 - Added support for start and end points for routing
