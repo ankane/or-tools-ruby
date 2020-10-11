@@ -1,6 +1,7 @@
 ## 0.4.0 (unreleased)
 
 - Updated OR-Tools to 8.0
+- OR-Tools no longer provides binary installation for Ubuntu 16.04
 
 ## 0.3.3 (unreleased)
 
