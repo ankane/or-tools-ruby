@@ -6,7 +6,7 @@ jobs:
     - rvm: 2.6
       dist: bionic
     - rvm: 2.5
-      dist: xenial
+      dist: bionic
 cache:
   bundler: true
 before_script: bundle exec rake compile

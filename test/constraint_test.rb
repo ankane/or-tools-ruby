@@ -120,8 +120,8 @@ class ConstraintTest < Minitest::Test
     solution_printer = VarArraySolutionPrinter.new(letters)
     status = solver.search_for_all_solutions(model, solution_printer)
 
-    assert_equal 116, solver.num_conflicts
-    assert_equal 457, solver.num_branches
+    assert_equal 179, solver.num_conflicts
+    assert_equal 828, solver.num_branches
     assert_equal 72, solution_printer.solution_count
   end
 
