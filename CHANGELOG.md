@@ -1,4 +1,4 @@
-## 0.3.3 (unreleased)
+## 0.3.3 (2020-10-12)
 
 - Added support for start and end points for routing
 
