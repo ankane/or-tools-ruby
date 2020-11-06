@@ -1,3 +1,7 @@
+## 0.3.4 (unreleased)
+
+- Added support for time limit for `CpSolver`
+
 ## 0.3.3 (2020-10-12)
 
 - Added support for start and end points for routing

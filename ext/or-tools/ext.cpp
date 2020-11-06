@@ -638,18 +638,24 @@ void Init_ext()
         self.Minimize(expr);
       });
 
+  define_class_under<SatParameters>(rb_mORTools, "SatParameters")
+    .define_constructor(Constructor<SatParameters>())
+    .define_method("max_time_in_seconds=",
+    *[](SatParameters& self, double value) {
+      self.set_max_time_in_seconds(value);
+    });
+
   define_class_under(rb_mORTools, "CpSolver")
     .define_method(
       "_solve_with_observer",
-      *[](Object self, CpModelBuilder& model, Object callback, bool all_solutions) {
+      *[](Object self, CpModelBuilder& model, SatParameters& parameters, Object callback, bool all_solutions) {
         operations_research::sat::Model m;
 
         if (all_solutions) {
           // set parameters for SearchForAllSolutions
-          SatParameters parameters;
           parameters.set_enumerate_all_solutions(true);
-          m.Add(NewSatParameters(parameters));
         }
+        m.Add(NewSatParameters(parameters));
 
         m.Add(NewFeasibleSolutionObserver(
           [callback](const CpSolverResponse& r) {
@@ -662,8 +668,10 @@ void Init_ext()
       })
     .define_method(
       "_solve",
-      *[](Object self, CpModelBuilder& model) {
-        return Solve(model.Build());
+      *[](Object self, CpModelBuilder& model, SatParameters& parameters) {
+        operations_research::sat::Model m;
+        m.Add(NewSatParameters(parameters));
+        return SolveCpModel(model.Build(), &m);
       })
     .define_method(
       "_solution_integer_value",
@@ -701,6 +709,8 @@ void Init_ext()
           return Symbol("infeasible");
         } else if (status == CpSolverStatus::MODEL_INVALID) {
           return Symbol("model_invalid");
+        } else if (status == CpSolverStatus::UNKNOWN) {
+          return Symbol("unknown");
         } else {
           throw std::runtime_error("Unknown solver status");
         }

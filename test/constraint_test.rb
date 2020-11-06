@@ -154,4 +154,19 @@ class ConstraintTest < Minitest::Test
     status = solver.search_for_all_solutions(model, solution_printer)
     assert_equal 92, solution_printer.solution_count
   end
+
+  def test_limits
+    model = ORTools::CpModel.new
+    num_vals = 3
+    x = model.new_int_var(0, num_vals - 1, "x")
+    y = model.new_int_var(0, num_vals - 1, "y")
+    z = model.new_int_var(0, num_vals - 1, "z")
+    model.add(x != y)
+
+    solver = ORTools::CpSolver.new
+    solver.parameters.max_time_in_seconds = 0
+
+    status = solver.solve(model)
+    assert_equal :unknown, status
+  end
 end

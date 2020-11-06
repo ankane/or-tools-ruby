@@ -267,6 +267,7 @@ Constraint Optimization
 - [Solving an Optimization Problem](#solving-an-optimization-problem)
 - [Cryptarithmetic](#cryptarithmetic)
 - [The N-queens Problem](#the-n-queens-problem)
+- [Setting Solver Limits](#setting-solver-limits) [master]
 
 Assignment
 
@@ -578,6 +579,39 @@ puts
 puts "Solutions found : %i" % solution_printer.solution_count
 ```
 
+### Setting Solver Limits
+
+[Guide](https://developers.google.com/optimization/cp/cp_tasks)
+
+```ruby
+# create the model
+model = ORTools::CpModel.new
+
+# create the variables
+num_vals = 3
+x = model.new_int_var(0, num_vals - 1, "x")
+y = model.new_int_var(0, num_vals - 1, "y")
+z = model.new_int_var(0, num_vals - 1, "z")
+
+# add an all-different constraint
+model.add(x != y)
+
+# create the solver
+solver = ORTools::CpSolver.new
+
+# set a time limit of 10 seconds.
+solver.parameters.max_time_in_seconds = 10
+
+# solve the model
+status = solver.solve(model)
+
+# display the first solution
+if status == :optimal
+  puts "x = #{solver.value(x)}"
+  puts "y = #{solver.value(y)}"
+  puts "z = #{solver.value(z)}"
+end
+```
 
 ### Assignment
 

@@ -7,7 +7,7 @@ module ORTools
     def_delegators :@response, :objective_value, :num_conflicts, :num_branches, :wall_time
 
     def solve(model)
-      @response = _solve(model)
+      @response = _solve(model, parameters)
       @response.status
     end
 
@@ -20,13 +20,17 @@ module ORTools
     end
 
     def solve_with_solution_callback(model, observer)
-      @response = _solve_with_observer(model, observer, false)
+      @response = _solve_with_observer(model, parameters, observer, false)
       @response.status
     end
 
     def search_for_all_solutions(model, observer)
-      @response = _solve_with_observer(model, observer, true)
+      @response = _solve_with_observer(model, parameters, observer, true)
       @response.status
+    end
+
+    def parameters
+      @parameters ||= SatParameters.new
     end
   end
 end
