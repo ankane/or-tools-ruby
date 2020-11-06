@@ -155,7 +155,7 @@ class ConstraintTest < Minitest::Test
     assert_equal 92, solution_printer.solution_count
   end
 
-  def test_limits
+  def test_time_limit
     model = ORTools::CpModel.new
     num_vals = 3
     x = model.new_int_var(0, num_vals - 1, "x")
