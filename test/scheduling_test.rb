@@ -89,7 +89,7 @@ class SchedulingTest < Minitest::Test
 
     assert_equal 5184, solution_printer.solution_count
 
-    skip if ENV["TRAVIS"]
+    skip if ci?
 
     expected = [
       [[nil, 2, 0, 1], [1, 0, 2, nil], [0, 1, nil, 2]],

@@ -286,7 +286,7 @@ class ORToolsTest < Minitest::Test
     solution_printer = WeddingChartPrinter.new(seats, names, num_tables, num_guests)
     solver.solve_with_solution_callback(model, solution_printer)
 
-    skip "Figure out why 7 solutions on Travis" if ENV["TRAVIS"]
+    skip "Figure out why 7 solutions on Linux" if ci?
 
     assert_equal 6, solution_printer.num_solutions
   end
