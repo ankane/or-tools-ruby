@@ -833,6 +833,15 @@ void Init_ext()
         self.AddDimensionWithVehicleCapacity(evaluator_index, slack_max, vehicle_capacities, fix_start_cumul_to_zero, name);
       })
     .define_method(
+      "add_dimension_with_vehicle_transits",
+      *[](RoutingModel& self, Array rb_indices, int64 slack_max, int64 capacity, bool fix_start_cumul_to_zero, const std::string& name) {
+        std::vector<int> evaluator_indices;
+        for (std::size_t i = 0; i < rb_indices.size(); ++i) {
+          evaluator_indices.push_back(from_ruby<int>(rb_indices[i]));
+        }
+        self.AddDimensionWithVehicleTransits(evaluator_indices, slack_max, capacity, fix_start_cumul_to_zero, name);
+      })
+    .define_method(
       "add_disjunction",
       *[](RoutingModel& self, Array rb_indices, int64 penalty) {
         std::vector<int64> indices;
