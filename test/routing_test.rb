@@ -48,9 +48,11 @@ class RoutingTest < Minitest::Test
       route_distance += routing.arc_cost_for_vehicle(previous_index, index, 0)
     end
     route << manager.index_to_node(index)
+    status = routing.status
 
     assert_equal [0, 7, 2, 3, 4, 12, 6, 8, 1, 11, 10, 5, 9, 0], route
     assert_equal 7293, route_distance
+    assert_equal :routing_success, status
   end
 
   # https://developers.google.com/optimization/routing/vrp
@@ -724,6 +726,89 @@ class RoutingTest < Minitest::Test
     assert_equal [[0, 9, 14, 16, 0], [0, 12, 11, 4, 3, 1, 0], [0, 7, 13, 0], [0, 8, 10, 2, 5, 0]], routes
     assert_equal 5936, total_distance
     assert_equal 56, total_load
+  end
+
+  def test_vrps
+    data = {}
+    data[:distance_matrix] = [
+      [0, 548, 776, 696, 582, 274, 502, 194, 308, 194, 536, 502, 388, 354, 468, 776, 662],
+      [548, 0, 684, 308, 194, 502, 730, 354, 696, 742, 1084, 594, 480, 674, 1016, 868, 1210],
+      [776, 684, 0, 992, 878, 502, 274, 810, 468, 742, 400, 1278, 1164, 1130, 788, 1552, 754],
+      [696, 308, 992, 0, 114, 650, 878, 502, 844, 890, 1232, 514, 628, 822, 1164, 560, 1358],
+      [582, 194, 878, 114, 0, 536, 764, 388, 730, 776, 1118, 400, 514, 708, 1050, 674, 1244],
+      [274, 502, 502, 650, 536, 0, 228, 308, 194, 240, 582, 776, 662, 628, 514, 1050, 708],
+      [502, 730, 274, 878, 764, 228, 0, 536, 194, 468, 354, 1004, 890, 856, 514, 1278, 480],
+      [194, 354, 810, 502, 388, 308, 536, 0, 342, 388, 730, 468, 354, 320, 662, 742, 856],
+      [308, 696, 468, 844, 730, 194, 194, 342, 0, 274, 388, 810, 696, 662, 320, 1084, 514],
+      [194, 742, 742, 890, 776, 240, 468, 388, 274, 0, 342, 536, 422, 388, 274, 810, 468],
+      [536, 1084, 400, 1232, 1118, 582, 354, 730, 388, 342, 0, 878, 764, 730, 388, 1152, 354],
+      [502, 594, 1278, 514, 400, 776, 1004, 468, 810, 536, 878, 0, 114, 308, 650, 274, 844],
+      [388, 480, 1164, 628, 514, 662, 890, 354, 696, 422, 764, 114, 0, 194, 536, 388, 730],
+      [354, 674, 1130, 822, 708, 628, 856, 320, 662, 388, 730, 308, 194, 0, 342, 422, 536],
+      [468, 1016, 788, 1164, 1050, 514, 514, 662, 320, 274, 388, 650, 536, 342, 0, 764, 194],
+      [776, 868, 1552, 560, 674, 1050, 1278, 742, 1084, 810, 1152, 274, 388, 422, 764, 0, 798],
+      [662, 1210, 754, 1358, 1244, 708, 480, 856, 514, 468, 354, 844, 730, 536, 194, 798, 0]
+    ]
+    
+    data[:vehicle_speeds] = [15, 15, 15, 15]
+    data[:num_vehicles] = 4
+    data[:depot] = 0
+
+    manager = ORTools::RoutingIndexManager.new(data[:distance_matrix].size, data[:num_vehicles], data[:depot])
+    routing = ORTools::RoutingModel.new(manager)
+
+    transit_callback_indecies = []
+    data[:num_vehicles].times do |vehicle_id|
+      distance_callback = lambda do |from_index, to_index|
+        from_node = manager.index_to_node(from_index)
+        to_node = manager.index_to_node(to_index)
+        data[:distance_matrix][from_node][to_node]*data[:vehicle_speeds][vehicle_id]
+      end
+      transit_callback_index = routing.register_transit_callback(distance_callback)
+      transit_callback_indecies << transit_callback_index
+      routing.set_arc_cost_evaluator_of_vehicle(transit_callback_indecies[vehicle_id], vehicle_id)
+    end
+
+    dimension_name = "Running Time"
+    routing.add_dimension_with_vehicle_transits(transit_callback_indecies, 0, 300000, true, dimension_name)
+    running_time_dimension = routing.mutable_dimension(dimension_name)
+    running_time_dimension.global_span_cost_coefficient = 100
+    
+    solution = routing.solve(first_solution_strategy: :path_cheapest_arc)
+
+    routes = []
+    running_times = []
+
+    max_route_running_time = 0
+    data[:num_vehicles].times do |vehicle_id|
+      index = routing.start(vehicle_id)
+      route = []
+      route_running_time = 0
+      while !routing.end?(index)
+        route << manager.index_to_node(index)
+        previous_index = index
+        index = solution.value(routing.next_var(index))
+        route_running_time += routing.arc_cost_for_vehicle(previous_index, index, vehicle_id)
+      end
+      route << manager.index_to_node(index)
+      routes << route
+      running_times << route_running_time
+      max_route_running_time = [route_running_time, max_route_running_time].max
+    end
+
+    assert_equal [0, 9, 10, 2, 6, 5, 0], routes[0]
+    assert_equal 25680, running_times[0]
+
+    assert_equal [0, 14, 16, 8, 0], routes[1]
+    assert_equal 22260, running_times[1]
+
+    assert_equal [0, 12, 11, 15, 13, 0], routes[2]
+    assert_equal 23280, running_times[2]
+
+    assert_equal [0, 3, 4, 1, 7, 0], routes[3]
+    assert_equal 23280, running_times[3]
+
+    assert_equal 25680, max_route_running_time
   end
 
   # https://developers.google.com/optimization/routing/routing_options
