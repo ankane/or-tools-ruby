@@ -816,6 +816,23 @@ void Init_ext()
       })
     .define_method("depot", &RoutingModel::GetDepot)
     .define_method("size", &RoutingModel::Size)
+    .define_method("status", *[](RoutingModel& self) {
+        auto status = self.status();
+
+        if (status == RoutingModel::ROUTING_NOT_SOLVED ) {
+          return Symbol("routing_not_solved");
+        } else if (status == RoutingModel::ROUTING_SUCCESS ) {
+          return Symbol("routing_success");
+        } else if (status == RoutingModel::ROUTING_FAIL ) {
+          return Symbol("routing_fail");
+        } else if (status == RoutingModel::ROUTING_FAIL_TIMEOUT ) {
+          return Symbol("routing_fail_timeout");
+        } else if (status == RoutingModel::ROUTING_INVALID ) {
+          return Symbol("unknown");
+        } else {
+          throw std::runtime_error("Unknown solver status");
+        }
+      })
     .define_method("vehicle_var", &RoutingModel::VehicleVar)
     .define_method("set_arc_cost_evaluator_of_all_vehicles", &RoutingModel::SetArcCostEvaluatorOfAllVehicles)
     .define_method("set_arc_cost_evaluator_of_vehicle", &RoutingModel::SetArcCostEvaluatorOfVehicle)
