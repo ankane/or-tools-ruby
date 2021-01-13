@@ -828,7 +828,7 @@ void Init_ext()
         } else if (status == RoutingModel::ROUTING_FAIL_TIMEOUT ) {
           return Symbol("routing_fail_timeout");
         } else if (status == RoutingModel::ROUTING_INVALID ) {
-          return Symbol("unknown");
+          return Symbol("routing_invalid");
         } else {
           throw std::runtime_error("Unknown solver status");
         }
