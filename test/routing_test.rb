@@ -52,7 +52,7 @@ class RoutingTest < Minitest::Test
 
     assert_equal [0, 7, 2, 3, 4, 12, 6, 8, 1, 11, 10, 5, 9, 0], route
     assert_equal 7293, route_distance
-    assert_equal :routing_success, status
+    assert_equal :success, status
   end
 
   # https://developers.google.com/optimization/routing/vrp
@@ -757,7 +757,7 @@ class RoutingTest < Minitest::Test
     manager = ORTools::RoutingIndexManager.new(data[:distance_matrix].size, data[:num_vehicles], data[:depot])
     routing = ORTools::RoutingModel.new(manager)
 
-    transit_callback_indecies = []
+    transit_callback_indices = []
     data[:num_vehicles].times do |vehicle_id|
       distance_callback = lambda do |from_index, to_index|
         from_node = manager.index_to_node(from_index)
@@ -765,12 +765,12 @@ class RoutingTest < Minitest::Test
         data[:distance_matrix][from_node][to_node]*data[:vehicle_speeds][vehicle_id]
       end
       transit_callback_index = routing.register_transit_callback(distance_callback)
-      transit_callback_indecies << transit_callback_index
-      routing.set_arc_cost_evaluator_of_vehicle(transit_callback_indecies[vehicle_id], vehicle_id)
+      transit_callback_indices << transit_callback_index
+      routing.set_arc_cost_evaluator_of_vehicle(transit_callback_indices[vehicle_id], vehicle_id)
     end
 
     dimension_name = "Running Time"
-    routing.add_dimension_with_vehicle_transits(transit_callback_indecies, 0, 300000, true, dimension_name)
+    routing.add_dimension_with_vehicle_transits(transit_callback_indices, 0, 300000, true, dimension_name)
     running_time_dimension = routing.mutable_dimension(dimension_name)
     running_time_dimension.global_span_cost_coefficient = 100
     
