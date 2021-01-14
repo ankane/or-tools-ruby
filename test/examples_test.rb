@@ -286,8 +286,6 @@ class ExamplesTest < Minitest::Test
     solution_printer = WeddingChartPrinter.new(seats, names, num_tables, num_guests)
     solver.solve_with_solution_callback(model, solution_printer)
 
-    skip "Figure out why 7 solutions on Linux" if ci?
-
     assert_equal 4, solution_printer.num_solutions
   end
 end
