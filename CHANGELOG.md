@@ -1,3 +1,7 @@
+## 0.4.0 (unreleased)
+
+- Updated OR-Tools to 8.1
+
 ## 0.3.4 (2021-01-14)
 
 - Added support for time limit for `CpSolver`

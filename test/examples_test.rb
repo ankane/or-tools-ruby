@@ -29,7 +29,7 @@ class WeddingChartPrinter < ORTools::CpSolverSolutionCallback
   end
 end
 
-class ORToolsTest < Minitest::Test
+class ExamplesTest < Minitest::Test
   def test_sudoku
     model = ORTools::CpModel.new
 
@@ -288,6 +288,6 @@ class ORToolsTest < Minitest::Test
 
     skip "Figure out why 7 solutions on Linux" if ci?
 
-    assert_equal 6, solution_printer.num_solutions
+    assert_equal 4, solution_printer.num_solutions
   end
 end

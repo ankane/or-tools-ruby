@@ -8,12 +8,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
+        - ruby: 3.0
+          os: ubuntu-20.04
         - ruby: 2.7
           os: ubuntu-20.04
         - ruby: 2.6
           os: ubuntu-18.04
-        - ruby: 2.5
-          os: ubuntu-16.04
     steps:
     - uses: actions/checkout@v2
     - uses: ruby/setup-ruby@v1

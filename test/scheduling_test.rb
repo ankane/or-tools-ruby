@@ -97,8 +97,8 @@ class SchedulingTest < Minitest::Test
     ]
     assert_equal expected, solutions
 
-    assert_equal 895, solver.num_conflicts
-    assert_equal 63883, solver.num_branches
+    assert_equal 847, solver.num_conflicts
+    assert_equal 62821, solver.num_branches
   end
 
   def test_job_shop
