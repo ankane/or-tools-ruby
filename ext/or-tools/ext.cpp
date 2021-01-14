@@ -816,6 +816,23 @@ void Init_ext()
       })
     .define_method("depot", &RoutingModel::GetDepot)
     .define_method("size", &RoutingModel::Size)
+    .define_method("status", *[](RoutingModel& self) {
+        auto status = self.status();
+
+        if (status == RoutingModel::ROUTING_NOT_SOLVED ) {
+          return Symbol("not_solved");
+        } else if (status == RoutingModel::ROUTING_SUCCESS ) {
+          return Symbol("success");
+        } else if (status == RoutingModel::ROUTING_FAIL ) {
+          return Symbol("fail");
+        } else if (status == RoutingModel::ROUTING_FAIL_TIMEOUT ) {
+          return Symbol("fail_timeout");
+        } else if (status == RoutingModel::ROUTING_INVALID ) {
+          return Symbol("invalid");
+        } else {
+          throw std::runtime_error("Unknown solver status");
+        }
+      })
     .define_method("vehicle_var", &RoutingModel::VehicleVar)
     .define_method("set_arc_cost_evaluator_of_all_vehicles", &RoutingModel::SetArcCostEvaluatorOfAllVehicles)
     .define_method("set_arc_cost_evaluator_of_vehicle", &RoutingModel::SetArcCostEvaluatorOfVehicle)
@@ -831,6 +848,15 @@ void Init_ext()
           vehicle_capacities.push_back(from_ruby<int64>(vc[i]));
         }
         self.AddDimensionWithVehicleCapacity(evaluator_index, slack_max, vehicle_capacities, fix_start_cumul_to_zero, name);
+      })
+    .define_method(
+      "add_dimension_with_vehicle_transits",
+      *[](RoutingModel& self, Array rb_indices, int64 slack_max, int64 capacity, bool fix_start_cumul_to_zero, const std::string& name) {
+        std::vector<int> evaluator_indices;
+        for (std::size_t i = 0; i < rb_indices.size(); ++i) {
+          evaluator_indices.push_back(from_ruby<int>(rb_indices[i]));
+        }
+        self.AddDimensionWithVehicleTransits(evaluator_indices, slack_max, capacity, fix_start_cumul_to_zero, name);
       })
     .define_method(
       "add_disjunction",
