@@ -119,6 +119,7 @@ class ConstraintTest < Minitest::Test
     solver = ORTools::CpSolver.new
     solution_printer = VarArraySolutionPrinter.new(letters)
     status = solver.search_for_all_solutions(model, solution_printer)
+    assert_equal :optimal, status
 
     assert_equal 179, solver.num_conflicts
     assert_equal 828, solver.num_branches
@@ -152,6 +153,7 @@ class ConstraintTest < Minitest::Test
     solver = ORTools::CpSolver.new
     solution_printer = DiagramPrinter.new(queens)
     status = solver.search_for_all_solutions(model, solution_printer)
+    assert_equal :optimal, status
     assert_equal 92, solution_printer.solution_count
   end
 
@@ -160,7 +162,6 @@ class ConstraintTest < Minitest::Test
     num_vals = 3
     x = model.new_int_var(0, num_vals - 1, "x")
     y = model.new_int_var(0, num_vals - 1, "y")
-    z = model.new_int_var(0, num_vals - 1, "z")
     model.add(x != y)
 
     solver = ORTools::CpSolver.new

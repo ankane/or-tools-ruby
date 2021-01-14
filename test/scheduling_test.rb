@@ -155,6 +155,7 @@ class SchedulingTest < Minitest::Test
     # solve model
     solver = ORTools::CpSolver.new
     status = solver.solve(model)
+    assert_equal :optimal, status
 
     # create one list of assigned tasks per machine
     assigned_jobs = Hash.new { |hash, key| hash[key] = [] }

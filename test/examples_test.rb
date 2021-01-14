@@ -14,7 +14,7 @@ class WeddingChartPrinter < ORTools::CpSolverSolutionCallback
   end
 
   def on_solution_callback
-    current_time = Time.now
+    # current_time = Time.now
     # puts "Solution %i, time = %f s, objective = %i" % [@num_solutions, current_time - @start_time, objective_value]
     @num_solutions += 1
 
@@ -150,6 +150,7 @@ class ExamplesTest < Minitest::Test
     end
 
     status = solver.solve
+    assert_equal :optimal, status
 
     assert_equal 3213, possible_tables.size
 

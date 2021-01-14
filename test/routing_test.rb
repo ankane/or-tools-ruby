@@ -705,7 +705,6 @@ class RoutingTest < Minitest::Test
     routes = []
     data[:num_vehicles].times do |vehicle_id|
       index = routing.start(vehicle_id)
-      plan_output = "Route for vehicle #{vehicle_id}:\n"
       route_distance = 0
       route_load = 0
       route = []
@@ -749,7 +748,7 @@ class RoutingTest < Minitest::Test
       [776, 868, 1552, 560, 674, 1050, 1278, 742, 1084, 810, 1152, 274, 388, 422, 764, 0, 798],
       [662, 1210, 754, 1358, 1244, 708, 480, 856, 514, 468, 354, 844, 730, 536, 194, 798, 0]
     ]
-    
+
     data[:vehicle_speeds] = [15, 15, 15, 15]
     data[:num_vehicles] = 4
     data[:depot] = 0
@@ -773,7 +772,7 @@ class RoutingTest < Minitest::Test
     routing.add_dimension_with_vehicle_transits(transit_callback_indices, 0, 300000, true, dimension_name)
     running_time_dimension = routing.mutable_dimension(dimension_name)
     running_time_dimension.global_span_cost_coefficient = 100
-    
+
     solution = routing.solve(first_solution_strategy: :path_cheapest_arc)
 
     routes = []

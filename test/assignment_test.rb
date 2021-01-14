@@ -39,7 +39,7 @@ class AssignmentTest < Minitest::Test
     supplies = [4, 0, 0, 0, 0, 0, 0, 0, 0, -4]
     source = 0
     sink = 9
-    tasks = 4
+    # tasks = 4
 
     start_nodes.length.times do |i|
       min_cost_flow.add_arc_with_capacity_and_unit_cost(
@@ -103,6 +103,7 @@ class AssignmentTest < Minitest::Test
     solver.add(solver.sum(team1.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] } }) <= team_max)
     solver.add(solver.sum(team2.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] } }) <= team_max)
     sol = solver.solve
+    assert_equal :optimal, sol
 
     assert_equal 250, solver.objective.value
 
