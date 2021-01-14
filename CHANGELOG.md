@@ -1,6 +1,7 @@
 ## 0.3.4 (unreleased)
 
 - Added support for time limit for `CpSolver`
+- Added `add_dimension_with_vehicle_transits` and `status` methods to `RoutingModel`
 
 ## 0.3.3 (2020-10-12)
 

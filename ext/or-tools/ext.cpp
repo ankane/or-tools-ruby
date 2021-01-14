@@ -819,15 +819,15 @@ void Init_ext()
     .define_method("status", *[](RoutingModel& self) {
         auto status = self.status();
 
-        if (status == RoutingModel::ROUTING_NOT_SOLVED ) {
+        if (status == RoutingModel::ROUTING_NOT_SOLVED) {
           return Symbol("not_solved");
-        } else if (status == RoutingModel::ROUTING_SUCCESS ) {
+        } else if (status == RoutingModel::ROUTING_SUCCESS) {
           return Symbol("success");
-        } else if (status == RoutingModel::ROUTING_FAIL ) {
+        } else if (status == RoutingModel::ROUTING_FAIL) {
           return Symbol("fail");
-        } else if (status == RoutingModel::ROUTING_FAIL_TIMEOUT ) {
+        } else if (status == RoutingModel::ROUTING_FAIL_TIMEOUT) {
           return Symbol("fail_timeout");
-        } else if (status == RoutingModel::ROUTING_INVALID ) {
+        } else if (status == RoutingModel::ROUTING_INVALID) {
           return Symbol("invalid");
         } else {
           throw std::runtime_error("Unknown solver status");
