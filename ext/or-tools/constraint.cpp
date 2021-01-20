@@ -4,14 +4,18 @@
 #include <rice/Constructor.hpp>
 #include <rice/Module.hpp>
 
-using operations_research::Domain;
-
 using operations_research::sat::BoolVar;
+using operations_research::sat::Constraint;
 using operations_research::sat::CpModelBuilder;
 using operations_research::sat::CpSolverResponse;
 using operations_research::sat::CpSolverStatus;
+using operations_research::sat::LinearExpr;
+using operations_research::sat::IntVar;
+using operations_research::sat::IntervalVar;
+using operations_research::sat::Model;
 using operations_research::sat::NewFeasibleSolutionObserver;
 using operations_research::sat::SatParameters;
+using operations_research::sat::SolutionBooleanValue;
 using operations_research::sat::SolutionIntegerValue;
 
 using Rice::Array;
@@ -21,9 +25,9 @@ using Rice::Symbol;
 
 template<>
 inline
-operations_research::sat::LinearExpr from_ruby<operations_research::sat::LinearExpr>(Object x)
+LinearExpr from_ruby<LinearExpr>(Object x)
 {
-  operations_research::sat::LinearExpr expr;
+  LinearExpr expr;
 
   if (x.respond_to("to_i")) {
     expr = from_ruby<int64>(x.call("to_i"));
@@ -35,19 +39,19 @@ operations_research::sat::LinearExpr from_ruby<operations_research::sat::LinearE
       Object o = cvar[0];
       std::string type = ((String) o.call("class").call("name")).str();
       if (type == "ORTools::BoolVar") {
-        expr.AddTerm(from_ruby<operations_research::sat::BoolVar>(cvar[0]), from_ruby<int64>(cvar[1]));
+        expr.AddTerm(from_ruby<BoolVar>(cvar[0]), from_ruby<int64>(cvar[1]));
       } else if (type == "Integer") {
         expr.AddConstant(from_ruby<int64>(cvar[0]));
       } else {
-        expr.AddTerm(from_ruby<operations_research::sat::IntVar>(cvar[0]), from_ruby<int64>(cvar[1]));
+        expr.AddTerm(from_ruby<IntVar>(cvar[0]), from_ruby<int64>(cvar[1]));
       }
     }
   } else {
     std::string type = ((String) x.call("class").call("name")).str();
     if (type == "ORTools::BoolVar") {
-      expr = from_ruby<operations_research::sat::BoolVar>(x);
+      expr = from_ruby<BoolVar>(x);
     } else {
-      expr = from_ruby<operations_research::sat::IntVar>(x);
+      expr = from_ruby<IntVar>(x);
     }
   }
 
@@ -56,16 +60,16 @@ operations_research::sat::LinearExpr from_ruby<operations_research::sat::LinearE
 
 // need a wrapper class since absl::Span doesn't own
 class IntVarSpan {
-  std::vector<operations_research::sat::IntVar> vec;
+  std::vector<IntVar> vec;
   public:
     IntVarSpan(Object x) {
       Array a = Array(x);
       for (std::size_t i = 0; i < a.size(); ++i) {
-        vec.push_back(from_ruby<operations_research::sat::IntVar>(a[i]));
+        vec.push_back(from_ruby<IntVar>(a[i]));
       }
     }
-    operator absl::Span<const operations_research::sat::IntVar>() {
-      return absl::Span<const operations_research::sat::IntVar>(vec);
+    operator absl::Span<const IntVar>() {
+      return absl::Span<const IntVar>(vec);
     }
 };
 
@@ -78,16 +82,16 @@ IntVarSpan from_ruby<IntVarSpan>(Object x)
 
 // need a wrapper class since absl::Span doesn't own
 class IntervalVarSpan {
-  std::vector<operations_research::sat::IntervalVar> vec;
+  std::vector<IntervalVar> vec;
   public:
     IntervalVarSpan(Object x) {
       Array a = Array(x);
       for (std::size_t i = 0; i < a.size(); ++i) {
-        vec.push_back(from_ruby<operations_research::sat::IntervalVar>(a[i]));
+        vec.push_back(from_ruby<IntervalVar>(a[i]));
       }
     }
-    operator absl::Span<const operations_research::sat::IntervalVar>() {
-      return absl::Span<const operations_research::sat::IntervalVar>(vec);
+    operator absl::Span<const IntervalVar>() {
+      return absl::Span<const IntervalVar>(vec);
     }
 };
 
@@ -100,16 +104,16 @@ IntervalVarSpan from_ruby<IntervalVarSpan>(Object x)
 
 // need a wrapper class since absl::Span doesn't own
 class BoolVarSpan {
-  std::vector<operations_research::sat::BoolVar> vec;
+  std::vector<BoolVar> vec;
   public:
     BoolVarSpan(Object x) {
       Array a = Array(x);
       for (std::size_t i = 0; i < a.size(); ++i) {
-        vec.push_back(from_ruby<operations_research::sat::BoolVar>(a[i]));
+        vec.push_back(from_ruby<BoolVar>(a[i]));
       }
     }
-    operator absl::Span<const operations_research::sat::BoolVar>() {
-      return absl::Span<const operations_research::sat::BoolVar>(vec);
+    operator absl::Span<const BoolVar>() {
+      return absl::Span<const BoolVar>(vec);
     }
 };
 
@@ -121,13 +125,13 @@ BoolVarSpan from_ruby<BoolVarSpan>(Object x)
 }
 
 void init_constraint(Rice::Module& m) {
-  Rice::define_class_under<operations_research::sat::IntVar>(m, "SatIntVar")
-    .define_method("name", &operations_research::sat::IntVar::Name);
+  Rice::define_class_under<IntVar>(m, "SatIntVar")
+    .define_method("name", &IntVar::Name);
 
-  Rice::define_class_under<operations_research::sat::IntervalVar>(m, "SatIntervalVar")
-    .define_method("name", &operations_research::sat::IntervalVar::Name);
+  Rice::define_class_under<IntervalVar>(m, "SatIntervalVar")
+    .define_method("name", &IntervalVar::Name);
 
-  Rice::define_class_under<operations_research::sat::Constraint>(m, "SatConstraint");
+  Rice::define_class_under<Constraint>(m, "SatConstraint");
 
   Rice::define_class_under<BoolVar>(m, "BoolVar")
     .define_method("name", &BoolVar::Name)
@@ -152,7 +156,7 @@ void init_constraint(Rice::Module& m) {
     .define_method(
       "new_int_var",
       *[](CpModelBuilder& self, int64 start, int64 end, std::string name) {
-        const Domain domain(start, end);
+        const operations_research::Domain domain(start, end);
         return self.NewIntVar(domain).WithName(name);
       })
     .define_method(
@@ -162,37 +166,37 @@ void init_constraint(Rice::Module& m) {
       })
     .define_method(
       "new_interval_var",
-      *[](CpModelBuilder& self, operations_research::sat::IntVar start, operations_research::sat::IntVar size, operations_research::sat::IntVar end, std::string name) {
+      *[](CpModelBuilder& self, IntVar start, IntVar size, IntVar end, std::string name) {
         return self.NewIntervalVar(start, size, end).WithName(name);
       })
     .define_method(
       "add_equality",
-      *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, operations_research::sat::LinearExpr y) {
+      *[](CpModelBuilder& self, LinearExpr x, LinearExpr y) {
         self.AddEquality(x, y);
       })
     .define_method(
       "add_not_equal",
-      *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, operations_research::sat::LinearExpr y) {
+      *[](CpModelBuilder& self, LinearExpr x, LinearExpr y) {
         self.AddNotEqual(x, y);
       })
     .define_method(
       "add_greater_than",
-      *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, operations_research::sat::LinearExpr y) {
+      *[](CpModelBuilder& self, LinearExpr x, LinearExpr y) {
         self.AddGreaterThan(x, y);
       })
     .define_method(
       "add_greater_or_equal",
-      *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, operations_research::sat::LinearExpr y) {
+      *[](CpModelBuilder& self, LinearExpr x, LinearExpr y) {
         self.AddGreaterOrEqual(x, y);
       })
     .define_method(
       "add_less_than",
-      *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, operations_research::sat::LinearExpr y) {
+      *[](CpModelBuilder& self, LinearExpr x, LinearExpr y) {
         self.AddLessThan(x, y);
       })
     .define_method(
       "add_less_or_equal",
-      *[](CpModelBuilder& self, operations_research::sat::LinearExpr x, operations_research::sat::LinearExpr y) {
+      *[](CpModelBuilder& self, LinearExpr x, LinearExpr y) {
         self.AddLessOrEqual(x, y);
       })
     .define_method(
@@ -202,7 +206,7 @@ void init_constraint(Rice::Module& m) {
       })
     .define_method(
       "add_max_equality",
-      *[](CpModelBuilder& self, operations_research::sat::IntVar target, IntVarSpan vars) {
+      *[](CpModelBuilder& self, IntVar target, IntVarSpan vars) {
         self.AddMaxEquality(target, vars);
       })
     .define_method(
@@ -218,12 +222,12 @@ void init_constraint(Rice::Module& m) {
     .define_method("add_implication", &CpModelBuilder::AddImplication)
     .define_method(
       "maximize",
-      *[](CpModelBuilder& self, operations_research::sat::LinearExpr expr) {
+      *[](CpModelBuilder& self, LinearExpr expr) {
         self.Maximize(expr);
       })
     .define_method(
       "minimize",
-      *[](CpModelBuilder& self, operations_research::sat::LinearExpr expr) {
+      *[](CpModelBuilder& self, LinearExpr expr) {
         self.Minimize(expr);
       });
 
@@ -231,7 +235,7 @@ void init_constraint(Rice::Module& m) {
     .define_method(
       "_solve_with_observer",
       *[](Object self, CpModelBuilder& model, SatParameters& parameters, Object callback, bool all_solutions) {
-        operations_research::sat::Model m;
+        Model m;
 
         if (all_solutions) {
           // set parameters for SearchForAllSolutions
@@ -251,18 +255,18 @@ void init_constraint(Rice::Module& m) {
     .define_method(
       "_solve",
       *[](Object self, CpModelBuilder& model, SatParameters& parameters) {
-        operations_research::sat::Model m;
+        Model m;
         m.Add(NewSatParameters(parameters));
         return SolveCpModel(model.Build(), &m);
       })
     .define_method(
       "_solution_integer_value",
-      *[](Object self, CpSolverResponse& response, operations_research::sat::IntVar& x) {
+      *[](Object self, CpSolverResponse& response, IntVar& x) {
         return SolutionIntegerValue(response, x);
       })
     .define_method(
       "_solution_boolean_value",
-      *[](Object self, CpSolverResponse& response, operations_research::sat::BoolVar& x) {
+      *[](Object self, CpSolverResponse& response, BoolVar& x) {
         return SolutionBooleanValue(response, x);
       });
 
@@ -273,11 +277,11 @@ void init_constraint(Rice::Module& m) {
     .define_method("wall_time", &CpSolverResponse::wall_time)
     .define_method(
       "solution_integer_value",
-      *[](CpSolverResponse& self, operations_research::sat::IntVar& x) {
-        operations_research::sat::LinearExpr expr(x);
+      *[](CpSolverResponse& self, IntVar& x) {
+        LinearExpr expr(x);
         return SolutionIntegerValue(self, expr);
       })
-    .define_method("solution_boolean_value", &operations_research::sat::SolutionBooleanValue)
+    .define_method("solution_boolean_value", &SolutionBooleanValue)
     .define_method(
       "status",
       *[](CpSolverResponse& self) {
