@@ -12,7 +12,7 @@ void init_routing(Rice::Module& m);
 extern "C"
 void Init_ext()
 {
-  Rice::Module m = Rice::define_module("ORTools");
+  auto m = Rice::define_module("ORTools");
 
   m.define_singleton_method(
     "lib_version",
