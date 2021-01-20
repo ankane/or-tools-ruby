@@ -1,5 +1,4 @@
 // or-tools
-#include <ortools/algorithms/knapsack_solver.h>
 #include <ortools/base/version.h>
 #include <ortools/constraint_solver/routing.h>
 #include <ortools/constraint_solver/routing_parameters.h>
@@ -18,7 +17,6 @@
 using operations_research::DefaultRoutingSearchParameters;
 using operations_research::Domain;
 using operations_research::FirstSolutionStrategy;
-using operations_research::KnapsackSolver;
 using operations_research::LinearExpr;
 using operations_research::LinearRange;
 using operations_research::LocalSearchMetaheuristic;
@@ -50,18 +48,6 @@ using Rice::String;
 using Rice::Symbol;
 using Rice::define_module;
 using Rice::define_class_under;
-
-template<>
-inline
-KnapsackSolver::SolverType from_ruby<KnapsackSolver::SolverType>(Object x)
-{
-  std::string s = Symbol(x).str();
-  if (s == "branch_and_bound") {
-    return KnapsackSolver::KNAPSACK_MULTIDIMENSION_BRANCH_AND_BOUND_SOLVER;
-  } else {
-    throw std::runtime_error("Unknown solver type: " + s);
-  }
-}
 
 template<>
 inline
@@ -288,6 +274,7 @@ BoolVarSpan from_ruby<BoolVarSpan>(Object x)
 }
 
 void init_assignment(Rice::Module& m);
+void init_bin_packing(Rice::Module& m);
 
 extern "C"
 void Init_ext()
@@ -881,35 +868,6 @@ void Init_ext()
         return (Assignment) assignment;
       });
 
-  define_class_under<KnapsackSolver>(rb_mORTools, "KnapsackSolver")
-    .define_constructor(Constructor<KnapsackSolver, KnapsackSolver::SolverType, std::string>())
-    .define_method("_solve", &KnapsackSolver::Solve)
-    .define_method("best_solution_contains?", &KnapsackSolver::BestSolutionContains)
-    .define_method(
-      "init",
-      *[](KnapsackSolver& self, Array rb_values, Array rb_weights, Array rb_capacities) {
-        std::vector<int64> values;
-        for (std::size_t i = 0; i < rb_values.size(); ++i) {
-          values.push_back(from_ruby<int64>(rb_values[i]));
-        }
-
-        std::vector<std::vector<int64>> weights;
-        for (std::size_t i = 0; i < rb_weights.size(); ++i) {
-          Array rb_w = Array(rb_weights[i]);
-          std::vector<int64> w;
-          for (std::size_t j = 0; j < rb_w.size(); ++j) {
-            w.push_back(from_ruby<int64>(rb_w[j]));
-          }
-          weights.push_back(w);
-        }
-
-        std::vector<int64> capacities;
-        for (std::size_t i = 0; i < rb_capacities.size(); ++i) {
-          capacities.push_back(from_ruby<int64>(rb_capacities[i]));
-        }
-
-        self.Init(values, weights, capacities);
-      });
-
   init_assignment(rb_mORTools);
+  init_bin_packing(rb_mORTools);
 }
