@@ -267,7 +267,7 @@ Constraint Optimization
 - [Solving an Optimization Problem](#solving-an-optimization-problem)
 - [Cryptarithmetic](#cryptarithmetic)
 - [The N-queens Problem](#the-n-queens-problem)
-- [Setting Solver Limits](#setting-solver-limits) [master]
+- [Setting Solver Limits](#setting-solver-limits)
 
 Assignment
 
