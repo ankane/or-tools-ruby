@@ -6,6 +6,7 @@ class ExpressionTest < Minitest::Test
     x = model.new_int_var(0, 1, "x")
     y = model.new_int_var(0, 1, "y")
     model.add(y == -x + 1)
+    model.add(y == -x + 2 - 1)
 
     solver = ORTools::CpSolver.new
     assert_equal :optimal, solver.solve(model)
