@@ -170,6 +170,11 @@ void init_constraint(Rice::Module& m) {
         return self.NewIntervalVar(start, size, end).WithName(name);
       })
     .define_method(
+      "new_constant",
+      *[](CpModelBuilder& self, int64 value) {
+        return self.NewConstant(value);
+      })
+    .define_method(
       "add_equality",
       *[](CpModelBuilder& self, LinearExpr x, LinearExpr y) {
         self.AddEquality(x, y);

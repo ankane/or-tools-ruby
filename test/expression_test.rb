@@ -29,7 +29,7 @@ class ExpressionTest < Minitest::Test
     model = ORTools::CpModel.new
     x = model.new_int_var(-7, 7, "x")
     y = model.new_int_var(0, 7, "y")
-    model.add_max_equality(y, [x, model.new_int_var(0, 0, "z")])
+    model.add_max_equality(y, [x, model.new_constant(0)])
     # TODO support
     # model.add_max_equality(y, [x, 0])
 
