@@ -1,6 +1,6 @@
 ## 0.4.1 (unreleased)
 
-- Improved expression construction
+- Improved constaint construction
 
 ## 0.4.0 (2021-01-14)
 

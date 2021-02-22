@@ -210,9 +210,46 @@ void init_constraint(Rice::Module& m) {
         self.AddAllDifferent(vars);
       })
     .define_method(
+      "add_min_equality",
+      *[](CpModelBuilder& self, IntVar target, IntVarSpan vars) {
+        self.AddMinEquality(target, vars);
+      })
+    // TODO add LinearExprSpan
+    // .define_method(
+    //   "add_lin_min_equality",
+    //   *[](CpModelBuilder& self, LinearExpr target, LinearExprSpan exprs) {
+    //     self.AddLinMinEquality(target, exprs);
+    //   })
+    .define_method(
       "add_max_equality",
       *[](CpModelBuilder& self, IntVar target, IntVarSpan vars) {
         self.AddMaxEquality(target, vars);
+      })
+    // TODO add LinearExprSpan
+    // .define_method(
+    //   "add_lin_max_equality",
+    //   *[](CpModelBuilder& self, LinearExpr target, LinearExprSpan exprs) {
+    //     self.AddLinMaxEquality(target, exprs);
+    //   })
+    .define_method(
+      "add_division_equality",
+      *[](CpModelBuilder& self, IntVar target, IntVar numerator, IntVar denominator) {
+        self.AddDivisionEquality(target, numerator, denominator);
+      })
+    .define_method(
+      "add_abs_equality",
+      *[](CpModelBuilder& self, IntVar target, IntVar var) {
+        self.AddAbsEquality(target, var);
+      })
+    .define_method(
+      "add_modulo_equality",
+      *[](CpModelBuilder& self, IntVar target, IntVar var, IntVar mod) {
+        self.AddModuloEquality(target, var, mod);
+      })
+    .define_method(
+      "add_product_equality",
+      *[](CpModelBuilder& self, IntVar target, IntVarSpan vars) {
+        self.AddProductEquality(target, vars);
       })
     .define_method(
       "add_no_overlap",
