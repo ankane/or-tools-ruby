@@ -41,7 +41,7 @@ LinearExpr from_ruby<LinearExpr>(Object x)
       if (type == "ORTools::BoolVar") {
         expr.AddTerm(from_ruby<BoolVar>(cvar[0]), from_ruby<int64>(cvar[1]));
       } else if (type == "Integer") {
-        expr.AddConstant(from_ruby<int64>(cvar[0]));
+        expr.AddConstant(from_ruby<int64>(cvar[0]) * from_ruby<int64>(cvar[1]));
       } else {
         expr.AddTerm(from_ruby<IntVar>(cvar[0]), from_ruby<int64>(cvar[1]));
       }
