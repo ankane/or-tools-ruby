@@ -14,6 +14,10 @@ module ORTools
       SatLinearExpr.new([[self, 1], [-other, 1]])
     end
 
+    def -@
+      SatLinearExpr.new([[self, -1]])
+    end
+
     # for now
     def inspect
       name

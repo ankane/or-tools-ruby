@@ -46,7 +46,7 @@ module ORTools
         when BoolVar, SatIntVar
           [[other, 1]]
         else
-          raise ArgumentError, "Unsupported type"
+          raise ArgumentError, "Unsupported type: #{other.class.name}"
         end
 
       self.class.new(vars + other_vars.map { |a, b| [a, sign * b] })

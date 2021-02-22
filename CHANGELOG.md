@@ -1,3 +1,7 @@
+## 0.4.1 (unreleased)
+
+- Added negation for `SatIntVar`
+
 ## 0.4.0 (2021-01-14)
 
 - Updated OR-Tools to 8.1
