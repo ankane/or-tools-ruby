@@ -24,4 +24,18 @@ class ExpressionTest < Minitest::Test
     solver = ORTools::CpSolver.new
     assert_equal :infeasible, solver.solve(model)
   end
+
+  def test_add_max_equality
+    model = ORTools::CpModel.new
+    x = model.new_int_var(0, 1, "x")
+    y = model.new_int_var(0, 2, "y")
+    model.add_max_equality(y, [x, model.new_int_var(2, 2, "z")])
+    # TODO support
+    # model.add_max_equality(y, [x, 2])
+
+    solver = ORTools::CpSolver.new
+    assert_equal :optimal, solver.solve(model)
+    assert_equal 0, solver.value(x)
+    assert_equal 2, solver.value(y)
+  end
 end
