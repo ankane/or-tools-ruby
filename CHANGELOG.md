@@ -1,6 +1,6 @@
 ## 0.4.1 (unreleased)
 
-- Added negation for `SatIntVar`
+- Improved expression construction
 
 ## 0.4.0 (2021-01-14)
 
