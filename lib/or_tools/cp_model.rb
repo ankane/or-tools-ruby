@@ -25,5 +25,9 @@ module ORTools
     def sum(arr)
       arr.sum(SatLinearExpr.new)
     end
+
+    def inspect
+      to_s
+    end
   end
 end

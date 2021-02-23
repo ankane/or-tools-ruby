@@ -343,7 +343,7 @@ void init_constraint(Rice::Module& m) {
         self.ScaleObjectiveBy(scaling);
       })
     .define_method(
-      "inspect",
+      "to_s",
       *[](CpModelBuilder& self) {
         std::string proto_string;
         google::protobuf::TextFormat::PrintToString(self.Proto(), &proto_string);
