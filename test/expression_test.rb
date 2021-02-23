@@ -38,4 +38,19 @@ class ExpressionTest < Minitest::Test
     assert_equal(-7, solver.value(x))
     assert_equal 0, solver.value(y)
   end
+
+  def test_objective_solution_printer
+    model = ORTools::CpModel.new
+    x = model.new_int_var(-7, 7, "x")
+    y = model.new_int_var(0, 7, "y")
+    model.add_max_equality(y, [x, model.new_constant(0)])
+
+    solver = ORTools::CpSolver.new
+    solution_printer = ORTools::ObjectiveSolutionPrinter.new
+    stdout, _ = capture_io do
+      solver.search_for_all_solutions(model, solution_printer)
+    end
+    assert_match "Solution 14", stdout
+    refute_match "Solution 15", stdout
+  end
 end

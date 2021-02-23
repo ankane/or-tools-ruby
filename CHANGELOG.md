@@ -1,5 +1,6 @@
 ## 0.4.1 (unreleased)
 
+- Added `ObjectiveSolutionPrinter`
 - Improved constraint construction
 
 ## 0.4.0 (2021-01-14)
