@@ -1,6 +1,7 @@
 ## 0.4.1 (unreleased)
 
 - Added `ObjectiveSolutionPrinter`
+- Improved `inspect` for `CpModel`
 - Improved constraint construction
 
 ## 0.4.0 (2021-01-14)

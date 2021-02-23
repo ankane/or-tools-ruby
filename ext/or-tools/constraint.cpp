@@ -1,3 +1,4 @@
+#include <google/protobuf/text_format.h>
 #include <ortools/sat/cp_model.h>
 
 #include <rice/Array.hpp>
@@ -340,6 +341,13 @@ void init_constraint(Rice::Module& m) {
       "scale_objective_by",
       *[](CpModelBuilder& self, double scaling) {
         self.ScaleObjectiveBy(scaling);
+      })
+    .define_method(
+      "inspect",
+      *[](CpModelBuilder& self) {
+        std::string proto_string;
+        google::protobuf::TextFormat::PrintToString(self.Proto(), &proto_string);
+        return proto_string;
       });
 
   Rice::define_class_under(m, "CpSolver")
