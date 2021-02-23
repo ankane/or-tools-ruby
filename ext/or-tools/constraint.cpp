@@ -64,6 +64,7 @@ class IntVarSpan {
   public:
     IntVarSpan(Object x) {
       Array a = Array(x);
+      vec.reserve(a.size());
       for (std::size_t i = 0; i < a.size(); ++i) {
         vec.push_back(from_ruby<IntVar>(a[i]));
       }
@@ -86,6 +87,7 @@ class IntervalVarSpan {
   public:
     IntervalVarSpan(Object x) {
       Array a = Array(x);
+      vec.reserve(a.size());
       for (std::size_t i = 0; i < a.size(); ++i) {
         vec.push_back(from_ruby<IntervalVar>(a[i]));
       }
@@ -95,12 +97,20 @@ class IntervalVarSpan {
     }
 };
 
+template<>
+inline
+IntervalVarSpan from_ruby<IntervalVarSpan>(Object x)
+{
+  return IntervalVarSpan(x);
+}
+
 // need a wrapper class since absl::Span doesn't own
 class LinearExprSpan {
   std::vector<LinearExpr> vec;
   public:
     LinearExprSpan(Object x) {
       Array a = Array(x);
+      vec.reserve(a.size());
       for (std::size_t i = 0; i < a.size(); ++i) {
         vec.push_back(from_ruby<LinearExpr>(a[i]));
       }
@@ -117,19 +127,13 @@ LinearExprSpan from_ruby<LinearExprSpan>(Object x)
   return LinearExprSpan(x);
 }
 
-template<>
-inline
-IntervalVarSpan from_ruby<IntervalVarSpan>(Object x)
-{
-  return IntervalVarSpan(x);
-}
-
 // need a wrapper class since absl::Span doesn't own
 class BoolVarSpan {
   std::vector<BoolVar> vec;
   public:
     BoolVarSpan(Object x) {
       Array a = Array(x);
+      vec.reserve(a.size());
       for (std::size_t i = 0; i < a.size(); ++i) {
         vec.push_back(from_ruby<BoolVar>(a[i]));
       }
