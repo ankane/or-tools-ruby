@@ -1,6 +1,6 @@
 ## 0.4.1 (unreleased)
 
-- Improved constaint construction
+- Improved constraint construction
 
 ## 0.4.0 (2021-01-14)
 
