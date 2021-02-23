@@ -9,7 +9,7 @@ module ORTools
       when BoolVar
         @response.solution_boolean_value(expr)
       else
-        raise "Unsupported type"
+        raise "Unsupported type: #{expr.class.name}"
       end
     end
 
