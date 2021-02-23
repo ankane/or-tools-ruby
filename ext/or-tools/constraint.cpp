@@ -201,6 +201,16 @@ void init_constraint(Rice::Module& m) {
         return self.NewConstant(value);
       })
     .define_method(
+      "true_var",
+      *[](CpModelBuilder& self) {
+        return self.TrueVar();
+      })
+    .define_method(
+      "false_var",
+      *[](CpModelBuilder& self) {
+        return self.FalseVar();
+      })
+    .define_method(
       "add_equality",
       *[](CpModelBuilder& self, LinearExpr x, LinearExpr y) {
         self.AddEquality(x, y);
