@@ -95,6 +95,28 @@ class IntervalVarSpan {
     }
 };
 
+// need a wrapper class since absl::Span doesn't own
+class LinearExprSpan {
+  std::vector<LinearExpr> vec;
+  public:
+    LinearExprSpan(Object x) {
+      Array a = Array(x);
+      for (std::size_t i = 0; i < a.size(); ++i) {
+        vec.push_back(from_ruby<LinearExpr>(a[i]));
+      }
+    }
+    operator absl::Span<const LinearExpr>() {
+      return absl::Span<const LinearExpr>(vec);
+    }
+};
+
+template<>
+inline
+LinearExprSpan from_ruby<LinearExprSpan>(Object x)
+{
+  return LinearExprSpan(x);
+}
+
 template<>
 inline
 IntervalVarSpan from_ruby<IntervalVarSpan>(Object x)
@@ -214,23 +236,21 @@ void init_constraint(Rice::Module& m) {
       *[](CpModelBuilder& self, IntVar target, IntVarSpan vars) {
         self.AddMinEquality(target, vars);
       })
-    // TODO add LinearExprSpan
-    // .define_method(
-    //   "add_lin_min_equality",
-    //   *[](CpModelBuilder& self, LinearExpr target, LinearExprSpan exprs) {
-    //     self.AddLinMinEquality(target, exprs);
-    //   })
+    .define_method(
+      "add_lin_min_equality",
+      *[](CpModelBuilder& self, LinearExpr target, LinearExprSpan exprs) {
+        self.AddLinMinEquality(target, exprs);
+      })
     .define_method(
       "add_max_equality",
       *[](CpModelBuilder& self, IntVar target, IntVarSpan vars) {
         self.AddMaxEquality(target, vars);
       })
-    // TODO add LinearExprSpan
-    // .define_method(
-    //   "add_lin_max_equality",
-    //   *[](CpModelBuilder& self, LinearExpr target, LinearExprSpan exprs) {
-    //     self.AddLinMaxEquality(target, exprs);
-    //   })
+    .define_method(
+      "add_lin_max_equality",
+      *[](CpModelBuilder& self, LinearExpr target, LinearExprSpan exprs) {
+        self.AddLinMaxEquality(target, exprs);
+      })
     .define_method(
       "add_division_equality",
       *[](CpModelBuilder& self, IntVar target, IntVar numerator, IntVar denominator) {
