@@ -295,6 +295,11 @@ void init_constraint(Rice::Module& m) {
       "minimize",
       *[](CpModelBuilder& self, LinearExpr expr) {
         self.Minimize(expr);
+      })
+    .define_method(
+      "scale_objective_by",
+      *[](CpModelBuilder& self, double scaling) {
+        self.ScaleObjectiveBy(scaling);
       });
 
   Rice::define_class_under(m, "CpSolver")
