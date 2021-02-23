@@ -1,4 +1,4 @@
-## 0.4.1 (unreleased)
+## 0.4.1 (2021-02-23)
 
 - Added solution printers
 - Improved `inspect` and `to_s` for `CpModel`
