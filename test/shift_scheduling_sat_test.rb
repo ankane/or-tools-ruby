@@ -196,10 +196,8 @@ class ShiftSchedulingSatTest < Minitest::Test
 
     # Objective
     model.minimize(
-      model.sum([
-                  model.sum(obj_bool_vars.size.times.map { |i| obj_bool_vars[i] * obj_bool_coeffs[i] }),
-                  model.sum(obj_int_vars.size.times.map { |i| obj_int_vars[i] * obj_int_coeffs[i] })
-                ])
+      model.sum(obj_bool_vars.size.times.map { |i| obj_bool_vars[i] * obj_bool_coeffs[i] }) +
+      model.sum(obj_int_vars.size.times.map { |i| obj_int_vars[i] * obj_int_coeffs[i] })
     )
 
     # Solve the model.
@@ -208,6 +206,8 @@ class ShiftSchedulingSatTest < Minitest::Test
     status = solver.solve(model)
 
     assert_equal :feasible, status
+
+    skip if ci?
 
     assignments = num_employees.times.map do |e|
       num_days.times.map do |d|
