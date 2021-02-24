@@ -1,6 +1,4 @@
-# frozen_string_literal: true
-
-require_relative 'test_helper'
+require_relative "test_helper"
 
 class ShiftSchedulingSatTest < Minitest::Test
   def test_shift_scheduling_sat
@@ -91,9 +89,9 @@ class ShiftSchedulingSatTest < Minitest::Test
     model = ORTools::CpModel.new
 
     work = {}
-    num_employees.times.each do |e|
-      num_shifts.times.each do |s|
-        num_days.times.each do |d|
+    num_employees.times do |e|
+      num_shifts.times do |s|
+        num_days.times do |d|
           work[[e, s, d]] = model.new_bool_var(format('work%i_%i_%i', e, s, d))
         end
       end
@@ -106,8 +104,8 @@ class ShiftSchedulingSatTest < Minitest::Test
     obj_bool_coeffs = []
 
     # Exactly one shift per day.
-    num_employees.times.each do |e|
-      num_days.times.each do |d|
+    num_employees.times do |e|
+      num_days.times do |d|
         model.add(model.sum(num_shifts.times.map { |s| work[[e, s, d]] }) == 1)
       end
     end
@@ -125,7 +123,7 @@ class ShiftSchedulingSatTest < Minitest::Test
 
     # Shift constraints
     shift_constraints.each do |shift, hard_min, soft_min, min_cost, soft_max, hard_max, max_cost|
-      num_employees.times.each do |e|
+      num_employees.times do |e|
         works = num_days.times.map { |d| work[[e, shift, d]] }
         variables, coeffs = add_soft_sequence_constraint(
           model, works, hard_min, soft_min, min_cost, soft_max, hard_max,
@@ -139,8 +137,8 @@ class ShiftSchedulingSatTest < Minitest::Test
 
     # Weekly sum constraints
     weekly_sum_constraints.each do |shift, hard_min, soft_min, min_cost, soft_max, hard_max, max_cost|
-      num_employees.times.each do |e|
-        num_weeks.times.each do |w|
+      num_employees.times do |e|
+        num_weeks.times do |w|
           works = 7.times.map { |d| work[[e, shift, d + w * 7]] }
           variables, coeffs = add_soft_sum_constraint(
             model, works, hard_min, soft_min, min_cost, soft_max,
@@ -155,8 +153,8 @@ class ShiftSchedulingSatTest < Minitest::Test
 
     # Penalized transitions
     penalized_transitions.each do |previous_shift, next_shift, cost|
-      num_employees.times.each do |e|
-        (num_days - 1).times.each do |d|
+      num_employees.times do |e|
+        (num_days - 1).times do |d|
           transition = [
             work[[e, previous_shift, d]].not, work[[e, next_shift, d + 1]].not
           ]
@@ -175,8 +173,8 @@ class ShiftSchedulingSatTest < Minitest::Test
 
     # Cover constraints
     (1...num_shifts).each do |s|
-      num_weeks.times.each do |w|
-        7.times.each do |d|
+      num_weeks.times do |w|
+        7.times do |d|
           works = num_employees.times.map { |e| work[[e, s, w * 7 + d]] }
           # Ignore Off shift.
           min_demand = weekly_cover_demands[d][s - 1]
@@ -202,14 +200,15 @@ class ShiftSchedulingSatTest < Minitest::Test
 
     # Solve the model.
     solver = ORTools::CpSolver.new
-    solver.parameters.max_time_in_seconds = 5
+    solver.parameters.max_time_in_seconds = 1
+    # solution_printer = ORTools::ObjectiveSolutionPrinter.new
+    # status = solver.solve_with_solution_callback(model, solution_printer)
     status = solver.solve(model)
 
     assert_equal :feasible, status
+    assert_operator solver.objective_value, :<=, 253
 
-    skip if ci?
-
-    assignments = num_employees.times.map do |e|
+    _assignments = num_employees.times.map do |e|
       num_days.times.map do |d|
         num_shifts.times.detect do |s|
           break shifts[s] if solver.value(work[[e, s, d]])
@@ -217,16 +216,17 @@ class ShiftSchedulingSatTest < Minitest::Test
       end
     end
 
-    assert_equal [
-      %w[O M M M N N O M N N A A O O A O A O A M N],
-      %w[O M A O N N N N A A M O O A A A M N N A O],
-      %w[M A O A M A A M A A O N N A M N N A O O A],
-      %w[M A O M N N O A M M N O M O O A O A M N A],
-      %w[A A M O A O A A O M M N N O O A M M N N O],
-      %w[A O N N A M O N N O A A A A M M A O M N O],
-      %w[A O A A O A A A M N O M A M A M N A O O M],
-      %w[N N N A M O M O A O A M N N N O O M A A A]
-    ], assignments
+    # different based on solution found
+    # assert_equal [
+    #   %w[O M M M N N O M N N A A O O A O A O A M N],
+    #   %w[O M A O N N N N A A M O O A A A M N N A O],
+    #   %w[M A O A M A A M A A O N N A M N N A O O A],
+    #   %w[M A O M N N O A M M N O M O O A O A M N A],
+    #   %w[A A M O A O A A O M M N N O O A M M N N O],
+    #   %w[A O N N A M O N N O A A A A M M A O M N O],
+    #   %w[A O A A O A A A M N O M A M A M N A O O M],
+    #   %w[N N N A M O M O A O A M N N N O O M A A A]
+    # ], assignments
   end
 
   private
@@ -237,7 +237,7 @@ class ShiftSchedulingSatTest < Minitest::Test
 
     # Forbid sequences that are too short.
     (1...hard_min).each do |length|
-      (works.size - length - 1).times.each do |start|
+      (works.size - length - 1).times do |start|
         model.add_bool_or(negated_bounded_span(works, start, length))
       end
     end
@@ -245,7 +245,7 @@ class ShiftSchedulingSatTest < Minitest::Test
     # Penalize sequences that are below the soft limit.
     if min_cost.positive?
       (hard_min...soft_min).each do |length|
-        (works.size - length - 1).times.each do |start|
+        (works.size - length - 1).times do |start|
           span = negated_bounded_span(works, start, length)
           name = format(': under_span(start=%i, length=%i)', start, length)
           lit = model.new_bool_var(prefix + name)
@@ -262,7 +262,7 @@ class ShiftSchedulingSatTest < Minitest::Test
     # Penalize sequences that are above the soft limit.
     if max_cost.positive?
       ((soft_max + 1)...(hard_max + 1)).each do |length|
-        (works.size - length - 1).times.each do |start|
+        (works.size - length - 1).times do |start|
           span = negated_bounded_span(works, start, length)
           name = format(': over_span(start=%i, length=%i)', start, length)
           lit = model.new_bool_var(prefix + name)
@@ -276,7 +276,7 @@ class ShiftSchedulingSatTest < Minitest::Test
     end
 
     # Just forbid any sequence of true variables with length hard_max + 1
-    (works.size - hard_max).times.each do |start|
+    (works.size - hard_max - 1).times do |start|
       model.add_bool_or(
         (start...(start + hard_max + 1)).map { |i| works[i].not }
       )
@@ -307,7 +307,7 @@ class ShiftSchedulingSatTest < Minitest::Test
     # Penalize sums above the soft_max target.
     if soft_max < hard_max && max_cost.positive?
       delta = model.new_int_var(-7, 7, '')
-      model.add(delta + soft_max == sum_var)
+      model.add(delta == sum_var - soft_max)
       excess = model.new_int_var(0, 7, "#{prefix}: over_sum")
       model.add_max_equality(excess, [delta, model.new_constant(0)])
       cost_variables << excess
@@ -321,7 +321,7 @@ class ShiftSchedulingSatTest < Minitest::Test
     sequence = []
     # Left border (start of works, or works[start - 1])
     sequence << works[start - 1] if start.positive?
-    length.times.each do |i|
+    length.times do |i|
       sequence << works[start + i].not
     end
     # Right border (end of works or works[start + length])
