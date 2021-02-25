@@ -41,12 +41,17 @@ class ExpressionTest < Minitest::Test
 
   def test_to_s
     model = ORTools::CpModel.new
-    x = model.new_int_var(-7, 7, "x")
-    y = model.new_int_var(0, 7, "y")
-    model.add_max_equality(y, [x, model.new_constant(0)])
+    x = model.new_int_var(0, 1, "x")
+    y = model.new_int_var(0, 1, "y")
+    z = model.new_int_var(0, 1, "z")
+    # model.add(model.sum([x, y]) == z)
+    model.add(x + y == z)
 
     output = model.to_s
     assert_match "variables", output
     assert_match "constraints", output
+
+    # TODO
+    # assert_equal File.binread("test/support/proto.txt"), output
   end
 end
