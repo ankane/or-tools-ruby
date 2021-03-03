@@ -1,4 +1,4 @@
-## 0.4.2 (unreleased)
+## 0.4.2 (2021-03-03)
 
 - Updated OR-Tools to 8.2
 
