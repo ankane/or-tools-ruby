@@ -1,11 +1,6 @@
 #include <ortools/linear_solver/linear_solver.h>
 
-#include <rice/Array.hpp>
-#include <rice/Class.hpp>
-#include <rice/Constructor.hpp>
-#include <rice/Module.hpp>
-#include <rice/String.hpp>
-#include <rice/Symbol.hpp>
+#include <rice/rice.hpp>
 
 using operations_research::LinearExpr;
 using operations_research::LinearRange;
@@ -66,25 +61,25 @@ void init_linear(Rice::Module& m) {
     .define_method("solution_value", &MPVariable::solution_value)
     .define_method(
       "+",
-      *[](MPVariable& self, LinearExpr& other) {
+      [](MPVariable& self, LinearExpr& other) {
         LinearExpr s(&self);
         return s + other;
       })
     .define_method(
       "-",
-      *[](MPVariable& self, LinearExpr& other) {
+      [](MPVariable& self, LinearExpr& other) {
         LinearExpr s(&self);
         return s - other;
       })
     .define_method(
       "*",
-      *[](MPVariable& self, double other) {
+      [](MPVariable& self, double other) {
         LinearExpr s(&self);
         return s * other;
       })
     .define_method(
       "inspect",
-      *[](MPVariable& self) {
+      [](MPVariable& self) {
         return "#<ORTools::MPVariable @name=\"" + self.name() + "\">";
       });
 
@@ -92,51 +87,51 @@ void init_linear(Rice::Module& m) {
     .define_constructor(Rice::Constructor<LinearExpr>())
     .define_method(
       "_add_linear_expr",
-      *[](LinearExpr& self, LinearExpr& other) {
+      [](LinearExpr& self, LinearExpr& other) {
         return self + other;
       })
     .define_method(
       "_add_mp_variable",
-      *[](LinearExpr& self, MPVariable &other) {
+      [](LinearExpr& self, MPVariable &other) {
         LinearExpr o(&other);
         return self + o;
       })
     .define_method(
       "_gte_double",
-      *[](LinearExpr& self, double other) {
+      [](LinearExpr& self, double other) {
         LinearExpr o(other);
         return self >= o;
       })
     .define_method(
       "_gte_linear_expr",
-      *[](LinearExpr& self, LinearExpr& other) {
+      [](LinearExpr& self, LinearExpr& other) {
         return self >= other;
       })
     .define_method(
       "_lte_double",
-      *[](LinearExpr& self, double other) {
+      [](LinearExpr& self, double other) {
         LinearExpr o(other);
         return self <= o;
       })
     .define_method(
       "_lte_linear_expr",
-      *[](LinearExpr& self, LinearExpr& other) {
+      [](LinearExpr& self, LinearExpr& other) {
         return self <= other;
       })
     .define_method(
       "==",
-      *[](LinearExpr& self, double other) {
+      [](LinearExpr& self, double other) {
         LinearExpr o(other);
         return self == o;
       })
     .define_method(
       "to_s",
-      *[](LinearExpr& self) {
+      [](LinearExpr& self) {
         return self.ToString();
       })
     .define_method(
       "inspect",
-      *[](LinearExpr& self) {
+      [](LinearExpr& self) {
         return "#<ORTools::LinearExpr \"" + self.ToString() + "\">";
       });
 
@@ -155,7 +150,7 @@ void init_linear(Rice::Module& m) {
     .define_method("infinity", &MPSolver::infinity)
     .define_method(
       "int_var",
-      *[](MPSolver& self, double min, double max, const std::string& name) {
+      [](MPSolver& self, double min, double max, const std::string& name) {
         return self.MakeIntVar(min, max, name);
       })
     .define_method("num_var", &MPSolver::MakeNumVar)
@@ -168,27 +163,27 @@ void init_linear(Rice::Module& m) {
     .define_method("objective", &MPSolver::MutableObjective)
     .define_method(
       "maximize",
-      *[](MPSolver& self, LinearExpr& expr) {
+      [](MPSolver& self, LinearExpr& expr) {
         return self.MutableObjective()->MaximizeLinearExpr(expr);
       })
     .define_method(
       "minimize",
-      *[](MPSolver& self, LinearExpr& expr) {
+      [](MPSolver& self, LinearExpr& expr) {
         return self.MutableObjective()->MinimizeLinearExpr(expr);
       })
     .define_method(
       "add",
-      *[](MPSolver& self, const LinearRange& range) {
+      [](MPSolver& self, const LinearRange& range) {
         return self.MakeRowConstraint(range);
       })
     .define_method(
       "constraint",
-      *[](MPSolver& self, double lb, double ub) {
+      [](MPSolver& self, double lb, double ub) {
         return self.MakeRowConstraint(lb, ub);
       })
     .define_method(
       "solve",
-      *[](MPSolver& self) {
+      [](MPSolver& self) {
         auto status = self.Solve();
 
         if (status == MPSolver::ResultStatus::OPTIMAL) {

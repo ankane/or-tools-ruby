@@ -16,7 +16,7 @@ void Init_ext()
 
   m.define_singleton_method(
     "lib_version",
-    *[]() {
+    []() {
       return std::to_string(operations_research::OrToolsMajorVersion()) + "."
         + std::to_string(operations_research::OrToolsMinorVersion());
     });

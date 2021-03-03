@@ -1,8 +1,6 @@
 #include <ortools/algorithms/knapsack_solver.h>
 
-#include <rice/Array.hpp>
-#include <rice/Constructor.hpp>
-#include <rice/Module.hpp>
+#include <rice/rice.hpp>
 
 using operations_research::KnapsackSolver;
 
@@ -29,7 +27,7 @@ void init_bin_packing(Rice::Module& m) {
     .define_method("best_solution_contains?", &KnapsackSolver::BestSolutionContains)
     .define_method(
       "init",
-      *[](KnapsackSolver& self, Array rb_values, Array rb_weights, Array rb_capacities) {
+      [](KnapsackSolver& self, Array rb_values, Array rb_weights, Array rb_capacities) {
         std::vector<int64> values;
         for (std::size_t i = 0; i < rb_values.size(); ++i) {
           values.push_back(from_ruby<int64>(rb_values[i]));

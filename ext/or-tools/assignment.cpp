@@ -1,12 +1,9 @@
 #include <ortools/graph/assignment.h>
 
-#include <rice/Array.hpp>
-#include <rice/Constructor.hpp>
-#include <rice/Module.hpp>
+#include <rice/rice.hpp>
 
 using operations_research::SimpleLinearSumAssignment;
 
-using Rice::Array;
 using Rice::Symbol;
 
 void init_assignment(Rice::Module& m) {
@@ -23,7 +20,7 @@ void init_assignment(Rice::Module& m) {
     .define_method("assignment_cost", &SimpleLinearSumAssignment::AssignmentCost)
     .define_method(
       "solve",
-      *[](SimpleLinearSumAssignment& self) {
+      [](SimpleLinearSumAssignment& self) {
         auto status = self.Solve();
 
         if (status == SimpleLinearSumAssignment::Status::OPTIMAL) {
