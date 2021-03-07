@@ -105,7 +105,7 @@ Object to_ruby<operations_research::Solver*>(operations_research::Solver* const 
 }
 
 void init_routing(Rice::Module& m) {
-  m.define_singleton_method("default_routing_search_parameters", &DefaultRoutingSearchParameters);
+  m.define_singleton_function("default_routing_search_parameters", &DefaultRoutingSearchParameters);
 
   Rice::define_class_under<RoutingSearchParameters>(m, "RoutingSearchParameters")
     .define_method(
@@ -190,12 +190,12 @@ void init_routing(Rice::Module& m) {
       });
 
   Rice::define_class_under<RoutingIndexManager>(m, "RoutingIndexManager")
-    .define_singleton_method(
+    .define_singleton_function(
       "_new_depot",
       [](int num_nodes, int num_vehicles, RoutingNodeIndex depot) {
         return RoutingIndexManager(num_nodes, num_vehicles, depot);
       })
-    .define_singleton_method(
+    .define_singleton_function(
       "_new_starts_ends",
       [](int num_nodes, int num_vehicles, Array starts, Array ends) {
         return RoutingIndexManager(num_nodes, num_vehicles, nodeIndexVector(starts), nodeIndexVector(ends));
