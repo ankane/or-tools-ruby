@@ -19,25 +19,32 @@ using Rice::Object;
 using Rice::String;
 using Rice::Symbol;
 
-template<>
-inline
-RoutingNodeIndex from_ruby<RoutingNodeIndex>(Object x)
+namespace Rice::detail
 {
-  const RoutingNodeIndex index{from_ruby<int>(x)};
-  return index;
-}
+  template<>
+  struct From_Ruby<RoutingNodeIndex>
+  {
+    static RoutingNodeIndex convert(VALUE x)
+    {
+      const RoutingNodeIndex index{Rice::detail::From_Ruby<int>::convert(x)};
+      return index;
+    }
+  };
 
-template<>
-inline
-Object to_ruby<RoutingNodeIndex>(RoutingNodeIndex const &x)
-{
-  return to_ruby<int>(x.value());
+  template<>
+  struct To_Ruby<RoutingNodeIndex>
+  {
+    static VALUE convert(RoutingNodeIndex const & x)
+    {
+      return Rice::detail<int>::convert(x.value());
+    }
+  };
 }
 
 std::vector<RoutingNodeIndex> nodeIndexVector(Array x) {
   std::vector<RoutingNodeIndex> res;
   for (auto const& v : x) {
-    res.push_back(from_ruby<RoutingNodeIndex>(v));
+    res.push_back(Rice::detail::From_Ruby<RoutingNodeIndex>(v.value()));
   }
   return res;
 }

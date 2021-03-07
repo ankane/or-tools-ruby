@@ -8,16 +8,22 @@ using Rice::Array;
 using Rice::Object;
 using Rice::Symbol;
 
-template<>
-inline
-KnapsackSolver::SolverType from_ruby<KnapsackSolver::SolverType>(Object x)
+namespace Rice::detail
 {
-  std::string s = Symbol(x).str();
-  if (s == "branch_and_bound") {
-    return KnapsackSolver::KNAPSACK_MULTIDIMENSION_BRANCH_AND_BOUND_SOLVER;
-  } else {
-    throw std::runtime_error("Unknown solver type: " + s);
-  }
+  template<>
+  struct From_Ruby<KnapsackSolver::SolverType>
+  {
+    static KnapsackSolver::SolverType convert(VALUE x)
+    {
+      Object obj(x);
+      std::string s = Symbol(obj).str();
+      if (s == "branch_and_bound") {
+        return KnapsackSolver::KNAPSACK_MULTIDIMENSION_BRANCH_AND_BOUND_SOLVER;
+      } else {
+        throw std::runtime_error("Unknown solver type: " + s);
+      }
+    }
+  };
 }
 
 void init_bin_packing(Rice::Module& m) {
@@ -30,7 +36,7 @@ void init_bin_packing(Rice::Module& m) {
       [](KnapsackSolver& self, Array rb_values, Array rb_weights, Array rb_capacities) {
         std::vector<int64> values;
         for (std::size_t i = 0; i < rb_values.size(); ++i) {
-          values.push_back(from_ruby<int64>(rb_values[i]));
+          values.push_back(Rice::detail::From_Ruby<int64>::convert(rb_values[i].value()));
         }
 
         std::vector<std::vector<int64>> weights;
@@ -38,14 +44,14 @@ void init_bin_packing(Rice::Module& m) {
           Array rb_w = Array(rb_weights[i]);
           std::vector<int64> w;
           for (std::size_t j = 0; j < rb_w.size(); ++j) {
-            w.push_back(from_ruby<int64>(rb_w[j]));
+            w.push_back(Rice::detail::From_Ruby<int64>::convert(rb_w[j].value()));
           }
           weights.push_back(w);
         }
 
         std::vector<int64> capacities;
         for (std::size_t i = 0; i < rb_capacities.size(); ++i) {
-          capacities.push_back(from_ruby<int64>(rb_capacities[i]));
+          capacities.push_back(Rice::detail::From_Ruby<int64>::convert(rb_capacities[i].value()));
         }
 
         self.Init(values, weights, capacities);
