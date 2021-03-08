@@ -16,43 +16,57 @@ using Rice::Object;
 using Rice::String;
 using Rice::Symbol;
 
-template<>
-inline
-MPSolver::OptimizationProblemType from_ruby<MPSolver::OptimizationProblemType>(Object x)
+namespace Rice::detail
 {
-  std::string s = Symbol(x).str();
-  if (s == "glop") {
-    return MPSolver::OptimizationProblemType::GLOP_LINEAR_PROGRAMMING;
-  } else if (s == "cbc") {
-    return MPSolver::OptimizationProblemType::CBC_MIXED_INTEGER_PROGRAMMING;
-  } else {
-    throw std::runtime_error("Unknown optimization problem type: " + s);
-  }
+  template<>
+  struct From_Ruby<MPSolver::OptimizationProblemType>
+  {
+    static MPSolver::OptimizationProblemType convert(VALUE x)
+    {
+      std::string s = Symbol(x).str();
+      if (s == "glop") {
+        return MPSolver::OptimizationProblemType::GLOP_LINEAR_PROGRAMMING;
+      } else if (s == "cbc") {
+        return MPSolver::OptimizationProblemType::CBC_MIXED_INTEGER_PROGRAMMING;
+      } else {
+        throw std::runtime_error("Unknown optimization problem type: " + s);
+      }
+    }
+  };
 }
 
 Class rb_cMPVariable;
 Class rb_cMPConstraint;
 Class rb_cMPObjective;
 
-template<>
-inline
-Object to_ruby<MPVariable*>(MPVariable* const &x)
+namespace Rice::detail
 {
-  return Rice::Data_Object<MPVariable>(x, rb_cMPVariable, nullptr, nullptr);
-}
+  template<>
+  struct To_Ruby<MPVariable*>
+  {
+    static VALUE convert(MPVariable* const & x)
+    {
+      return Rice::Data_Object<MPVariable>(x, rb_cMPVariable, nullptr, nullptr);
+    }
+  };
 
-template<>
-inline
-Object to_ruby<MPConstraint*>(MPConstraint* const &x)
-{
-  return Rice::Data_Object<MPConstraint>(x, rb_cMPConstraint, nullptr, nullptr);
-}
+  template<>
+  struct To_Ruby<MPConstraint*>
+  {
+    static VALUE convert(MPConstraint* const & x)
+    {
+      return Rice::Data_Object<MPConstraint>(x, rb_cMPVariable, nullptr, nullptr);
+    }
+  };
 
-template<>
-inline
-Object to_ruby<MPObjective*>(MPObjective* const &x)
-{
-  return Rice::Data_Object<MPObjective>(x, rb_cMPObjective, nullptr, nullptr);
+  template<>
+  struct To_Ruby<MPObjective*>
+  {
+    static VALUE convert(MPObjective* const & x)
+    {
+      return Rice::Data_Object<MPObjective>(x, rb_cMPVariable, nullptr, nullptr);
+    }
+  };
 }
 
 void init_linear(Rice::Module& m) {
