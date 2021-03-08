@@ -22,39 +22,45 @@ using Rice::Object;
 using Rice::String;
 using Rice::Symbol;
 
-template<>
-inline
-LinearExpr from_ruby<LinearExpr>(Object x)
+namespace Rice::detail
 {
-  LinearExpr expr;
+  template<>
+  struct From_Ruby<LinearExpr>
+  {
+    static LinearExpr convert(VALUE v)
+    {
+      Object x(v);
+      LinearExpr expr;
 
-  if (x.respond_to("to_i")) {
-    expr = from_ruby<int64>(x.call("to_i"));
-  } else if (x.respond_to("vars")) {
-    Array vars = x.call("vars");
-    for(auto const& var: vars) {
-      auto cvar = (Array) var;
-      // TODO clean up
-      Object o = cvar[0];
-      std::string type = ((String) o.call("class").call("name")).str();
-      if (type == "ORTools::BoolVar") {
-        expr.AddTerm(from_ruby<BoolVar>(cvar[0]), from_ruby<int64>(cvar[1]));
-      } else if (type == "Integer") {
-        expr.AddConstant(from_ruby<int64>(cvar[0]) * from_ruby<int64>(cvar[1]));
+      if (x.respond_to("to_i")) {
+        expr = Rice::detail::From_Ruby<int64>::convert(x.call("to_i").value());
+      } else if (x.respond_to("vars")) {
+        Array vars = x.call("vars");
+        for(auto const& var: vars) {
+          auto cvar = (Array) var;
+          // TODO clean up
+          Object o = cvar[0];
+          std::string type = ((String) o.call("class").call("name")).str();
+          if (type == "ORTools::BoolVar") {
+            expr.AddTerm(Rice::detail::From_Ruby<BoolVar>::convert(cvar[0].value()), Rice::detail::From_Ruby<int64>::convert(cvar[1].value()));
+          } else if (type == "Integer") {
+            expr.AddConstant(Rice::detail::From_Ruby<int64>::convert(cvar[0].value()) * Rice::detail::From_Ruby<int64>::convert(cvar[1].value()));
+          } else {
+            expr.AddTerm(Rice::detail::From_Ruby<IntVar>::convert(cvar[0].value()), Rice::detail::From_Ruby<int64>::convert(cvar[1].value()));
+          }
+        }
       } else {
-        expr.AddTerm(from_ruby<IntVar>(cvar[0]), from_ruby<int64>(cvar[1]));
+        std::string type = ((String) x.call("class").call("name")).str();
+        if (type == "ORTools::BoolVar") {
+          expr = Rice::detail::From_Ruby<BoolVar>::convert(x.value());
+        } else {
+          expr = Rice::detail::From_Ruby<IntVar>::convert(x.value());
+        }
       }
-    }
-  } else {
-    std::string type = ((String) x.call("class").call("name")).str();
-    if (type == "ORTools::BoolVar") {
-      expr = from_ruby<BoolVar>(x);
-    } else {
-      expr = from_ruby<IntVar>(x);
-    }
-  }
 
-  return expr;
+      return expr;
+    }
+  };
 }
 
 // need a wrapper class since absl::Span doesn't own
@@ -65,7 +71,7 @@ class IntVarSpan {
       Array a = Array(x);
       vec.reserve(a.size());
       for (std::size_t i = 0; i < a.size(); ++i) {
-        vec.push_back(from_ruby<IntVar>(a[i]));
+        vec.push_back(Rice::detail::From_Ruby<IntVar>::convert(a[i].value()));
       }
     }
     operator absl::Span<const IntVar>() {
@@ -73,11 +79,16 @@ class IntVarSpan {
     }
 };
 
-template<>
-inline
-IntVarSpan from_ruby<IntVarSpan>(Object x)
+namespace Rice::detail
 {
-  return IntVarSpan(x);
+  template<>
+  struct From_Ruby<IntVarSpan>
+  {
+    static IntVarSpan convert(VALUE x)
+    {
+      return IntVarSpan(x);
+    }
+  };
 }
 
 // need a wrapper class since absl::Span doesn't own
@@ -88,7 +99,7 @@ class IntervalVarSpan {
       Array a = Array(x);
       vec.reserve(a.size());
       for (std::size_t i = 0; i < a.size(); ++i) {
-        vec.push_back(from_ruby<IntervalVar>(a[i]));
+        vec.push_back(Rice::detail::From_Ruby<IntervalVar>::convert(a[i].value()));
       }
     }
     operator absl::Span<const IntervalVar>() {
@@ -96,11 +107,16 @@ class IntervalVarSpan {
     }
 };
 
-template<>
-inline
-IntervalVarSpan from_ruby<IntervalVarSpan>(Object x)
+namespace Rice::detail
 {
-  return IntervalVarSpan(x);
+  template<>
+  struct From_Ruby<IntervalVarSpan>
+  {
+    static IntervalVarSpan convert(VALUE x)
+    {
+      return IntervalVarSpan(x);
+    }
+  };
 }
 
 // need a wrapper class since absl::Span doesn't own
@@ -111,7 +127,7 @@ class LinearExprSpan {
       Array a = Array(x);
       vec.reserve(a.size());
       for (std::size_t i = 0; i < a.size(); ++i) {
-        vec.push_back(from_ruby<LinearExpr>(a[i]));
+        vec.push_back(Rice::detail::From_Ruby<LinearExpr>::convert(a[i].value()));
       }
     }
     operator absl::Span<const LinearExpr>() {
@@ -119,11 +135,16 @@ class LinearExprSpan {
     }
 };
 
-template<>
-inline
-LinearExprSpan from_ruby<LinearExprSpan>(Object x)
+namespace Rice::detail
 {
-  return LinearExprSpan(x);
+  template<>
+  struct From_Ruby<LinearExprSpan>
+  {
+    static LinearExprSpan convert(VALUE x)
+    {
+      return LinearExprSpan(x);
+    }
+  };
 }
 
 // need a wrapper class since absl::Span doesn't own
@@ -134,7 +155,7 @@ class BoolVarSpan {
       Array a = Array(x);
       vec.reserve(a.size());
       for (std::size_t i = 0; i < a.size(); ++i) {
-        vec.push_back(from_ruby<BoolVar>(a[i]));
+        vec.push_back(Rice::detail::From_Ruby<BoolVar>::convert(a[i].value()));
       }
     }
     operator absl::Span<const BoolVar>() {
@@ -142,11 +163,16 @@ class BoolVarSpan {
     }
 };
 
-template<>
-inline
-BoolVarSpan from_ruby<BoolVarSpan>(Object x)
+namespace Rice::detail
 {
-  return BoolVarSpan(x);
+  template<>
+  struct From_Ruby<BoolVarSpan>
+  {
+    static BoolVarSpan convert(VALUE x)
+    {
+      return BoolVarSpan(x);
+    }
+  };
 }
 
 void init_constraint(Rice::Module& m) {
