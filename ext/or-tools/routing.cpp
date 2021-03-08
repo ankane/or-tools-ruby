@@ -36,7 +36,7 @@ namespace Rice::detail
   {
     static VALUE convert(RoutingNodeIndex const & x)
     {
-      return Rice::detail<int>::convert(x.value());
+      return Rice::detail::From_Ruby<int>::convert(x.value());
     }
   };
 }
@@ -44,7 +44,7 @@ namespace Rice::detail
 std::vector<RoutingNodeIndex> nodeIndexVector(Array x) {
   std::vector<RoutingNodeIndex> res;
   for (auto const& v : x) {
-    res.push_back(Rice::detail::From_Ruby<RoutingNodeIndex>(v.value()));
+    res.push_back(Rice::detail::From_Ruby<RoutingNodeIndex>::convert(v.value()));
   }
   return res;
 }
@@ -76,40 +76,40 @@ Class rb_cRoutingDimension;
 Class rb_cConstraint;
 Class rb_cSolver2;
 
-template<>
-inline
-Object to_ruby<operations_research::IntVar*>(operations_research::IntVar* const &x)
-{
-  return Rice::Data_Object<operations_research::IntVar>(x, rb_cIntVar, nullptr, nullptr);
-}
+// template<>
+// inline
+// Object to_ruby<operations_research::IntVar*>(operations_research::IntVar* const &x)
+// {
+//   return Rice::Data_Object<operations_research::IntVar>(x, rb_cIntVar, nullptr, nullptr);
+// }
 
-template<>
-inline
-Object to_ruby<operations_research::IntervalVar*>(operations_research::IntervalVar* const &x)
-{
-  return Rice::Data_Object<operations_research::IntervalVar>(x, rb_cIntervalVar, nullptr, nullptr);
-}
+// template<>
+// inline
+// Object to_ruby<operations_research::IntervalVar*>(operations_research::IntervalVar* const &x)
+// {
+//   return Rice::Data_Object<operations_research::IntervalVar>(x, rb_cIntervalVar, nullptr, nullptr);
+// }
 
-template<>
-inline
-Object to_ruby<RoutingDimension*>(RoutingDimension* const &x)
-{
-  return Rice::Data_Object<RoutingDimension>(x, rb_cRoutingDimension, nullptr, nullptr);
-}
+// template<>
+// inline
+// Object to_ruby<RoutingDimension*>(RoutingDimension* const &x)
+// {
+//   return Rice::Data_Object<RoutingDimension>(x, rb_cRoutingDimension, nullptr, nullptr);
+// }
 
-template<>
-inline
-Object to_ruby<operations_research::Constraint*>(operations_research::Constraint* const &x)
-{
-  return Rice::Data_Object<operations_research::Constraint>(x, rb_cConstraint, nullptr, nullptr);
-}
+// template<>
+// inline
+// Object to_ruby<operations_research::Constraint*>(operations_research::Constraint* const &x)
+// {
+//   return Rice::Data_Object<operations_research::Constraint>(x, rb_cConstraint, nullptr, nullptr);
+// }
 
-template<>
-inline
-Object to_ruby<operations_research::Solver*>(operations_research::Solver* const &x)
-{
-  return Rice::Data_Object<operations_research::Solver>(x, rb_cSolver2, nullptr, nullptr);
-}
+// template<>
+// inline
+// Object to_ruby<operations_research::Solver*>(operations_research::Solver* const &x)
+// {
+//   return Rice::Data_Object<operations_research::Solver>(x, rb_cSolver2, nullptr, nullptr);
+// }
 
 void init_routing(Rice::Module& m) {
   m.define_singleton_function("default_routing_search_parameters", &DefaultRoutingSearchParameters);
@@ -238,8 +238,8 @@ void init_routing(Rice::Module& m) {
       [](operations_research::Solver& self, Object o) {
         operations_research::Constraint* constraint;
         if (o.respond_to("left")) {
-          operations_research::IntExpr* left(from_ruby<operations_research::IntVar*>(o.call("left")));
-          operations_research::IntExpr* right(from_ruby<operations_research::IntVar*>(o.call("right")));
+          operations_research::IntExpr* left(Rice::detail::From_Ruby<operations_research::IntVar*>::convert(o.call("left").value()));
+          operations_research::IntExpr* right(Rice::detail::From_Ruby<operations_research::IntVar*>::convert(o.call("right").value()));
           auto op = o.call("operator").to_s().str();
           if (op == "==") {
             constraint = self.MakeEquality(left, right);
@@ -249,7 +249,7 @@ void init_routing(Rice::Module& m) {
             throw std::runtime_error("Unknown operator");
           }
         } else {
-          constraint = from_ruby<operations_research::Constraint*>(o);
+          constraint = Rice::detail::From_Ruby<operations_research::Constraint*>::convert(o.value());
         }
         self.AddConstraint(constraint);
       })
@@ -263,12 +263,12 @@ void init_routing(Rice::Module& m) {
       [](operations_research::Solver& self, Array rb_intervals, Array rb_demands, int64 capacity, const std::string& name) {
         std::vector<operations_research::IntervalVar*> intervals;
         for (std::size_t i = 0; i < rb_intervals.size(); ++i) {
-          intervals.push_back(from_ruby<operations_research::IntervalVar*>(rb_intervals[i]));
+          intervals.push_back(Rice::detail::From_Ruby<operations_research::IntervalVar*>::convert(rb_intervals[i].value()));
         }
 
         std::vector<int64> demands;
         for (std::size_t i = 0; i < rb_demands.size(); ++i) {
-          demands.push_back(from_ruby<int64>(rb_demands[i]));
+          demands.push_back(Rice::detail::From_Ruby<int64>::convert(rb_demands[i].value()));
         }
 
         return self.MakeCumulative(intervals, demands, capacity, name);
@@ -281,7 +281,7 @@ void init_routing(Rice::Module& m) {
       [](RoutingModel& self, Object callback) {
         return self.RegisterTransitCallback(
           [callback](int64 from_index, int64 to_index) -> int64 {
-            return from_ruby<int64>(callback.call("call", from_index, to_index));
+            return Rice::detail::From_Ruby<int64>::convert(callback.call("call", from_index, to_index).value());
           }
         );
       })
@@ -290,7 +290,7 @@ void init_routing(Rice::Module& m) {
       [](RoutingModel& self, Object callback) {
         return self.RegisterUnaryTransitCallback(
           [callback](int64 from_index) -> int64 {
-            return from_ruby<int64>(callback.call("call", from_index));
+            return Rice::detail::From_Ruby<int64>::convert(callback.call("call", from_index).value());
           }
         );
       })
@@ -325,7 +325,7 @@ void init_routing(Rice::Module& m) {
       [](RoutingModel& self, int evaluator_index, int64 slack_max, Array vc, bool fix_start_cumul_to_zero, const std::string& name) {
         std::vector<int64> vehicle_capacities;
         for (std::size_t i = 0; i < vc.size(); ++i) {
-          vehicle_capacities.push_back(from_ruby<int64>(vc[i]));
+          vehicle_capacities.push_back(Rice::detail::From_Ruby<int64>::convert(vc[i].value()));
         }
         self.AddDimensionWithVehicleCapacity(evaluator_index, slack_max, vehicle_capacities, fix_start_cumul_to_zero, name);
       })
@@ -334,7 +334,7 @@ void init_routing(Rice::Module& m) {
       [](RoutingModel& self, Array rb_indices, int64 slack_max, int64 capacity, bool fix_start_cumul_to_zero, const std::string& name) {
         std::vector<int> evaluator_indices;
         for (std::size_t i = 0; i < rb_indices.size(); ++i) {
-          evaluator_indices.push_back(from_ruby<int>(rb_indices[i]));
+          evaluator_indices.push_back(Rice::detail::From_Ruby<int>::convert(rb_indices[i].value()));
         }
         self.AddDimensionWithVehicleTransits(evaluator_indices, slack_max, capacity, fix_start_cumul_to_zero, name);
       })
@@ -343,7 +343,7 @@ void init_routing(Rice::Module& m) {
       [](RoutingModel& self, Array rb_indices, int64 penalty) {
         std::vector<int64> indices;
         for (std::size_t i = 0; i < rb_indices.size(); ++i) {
-          indices.push_back(from_ruby<int64>(rb_indices[i]));
+          indices.push_back(Rice::detail::From_Ruby<int64>::convert(rb_indices[i].value()));
         }
         self.AddDisjunction(indices, penalty);
       })

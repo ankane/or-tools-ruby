@@ -39,35 +39,35 @@ Class rb_cMPVariable;
 Class rb_cMPConstraint;
 Class rb_cMPObjective;
 
-namespace Rice::detail
-{
-  template<>
-  struct To_Ruby<MPVariable*>
-  {
-    static VALUE convert(MPVariable* const & x)
-    {
-      return Rice::Data_Object<MPVariable>(x, rb_cMPVariable, nullptr, nullptr);
-    }
-  };
+// namespace Rice::detail
+// {
+//   template<>
+//   struct To_Ruby<MPVariable*>
+//   {
+//     static VALUE convert(MPVariable* const & x)
+//     {
+//       return Rice::Data_Object<MPVariable>(x, rb_cMPVariable, nullptr, nullptr);
+//     }
+//   };
 
-  template<>
-  struct To_Ruby<MPConstraint*>
-  {
-    static VALUE convert(MPConstraint* const & x)
-    {
-      return Rice::Data_Object<MPConstraint>(x, rb_cMPVariable, nullptr, nullptr);
-    }
-  };
+//   template<>
+//   struct To_Ruby<MPConstraint*>
+//   {
+//     static VALUE convert(MPConstraint* const & x)
+//     {
+//       return Rice::Data_Object<MPConstraint>(x, rb_cMPVariable, nullptr, nullptr);
+//     }
+//   };
 
-  template<>
-  struct To_Ruby<MPObjective*>
-  {
-    static VALUE convert(MPObjective* const & x)
-    {
-      return Rice::Data_Object<MPObjective>(x, rb_cMPVariable, nullptr, nullptr);
-    }
-  };
-}
+//   template<>
+//   struct To_Ruby<MPObjective*>
+//   {
+//     static VALUE convert(MPObjective* const & x)
+//     {
+//       return Rice::Data_Object<MPObjective>(x, rb_cMPVariable, nullptr, nullptr);
+//     }
+//   };
+// }
 
 void init_linear(Rice::Module& m) {
   rb_cMPVariable = Rice::define_class_under<MPVariable>(m, "MPVariable")
@@ -161,7 +161,11 @@ void init_linear(Rice::Module& m) {
 
   Rice::define_class_under<MPSolver>(m, "Solver")
     .define_constructor(Rice::Constructor<MPSolver, std::string, MPSolver::OptimizationProblemType>())
-    .define_method("infinity", &MPSolver::infinity)
+    .define_method(
+      "infinity",
+      [](MPSolver& self) {
+        return self.infinity();
+      })
     .define_method(
       "int_var",
       [](MPSolver& self, double min, double max, const std::string& name) {
