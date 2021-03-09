@@ -36,7 +36,7 @@ namespace Rice::detail
   {
     static VALUE convert(RoutingNodeIndex const & x)
     {
-      return Rice::detail::From_Ruby<int>::convert(x.value());
+      return Rice::detail::To_Ruby<int>::convert(x.value());
     }
   };
 }
