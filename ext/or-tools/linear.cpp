@@ -35,42 +35,8 @@ namespace Rice::detail
   };
 }
 
-Class rb_cMPVariable;
-Class rb_cMPConstraint;
-Class rb_cMPObjective;
-
-namespace Rice::detail
-{
-  template<>
-  struct To_Ruby<MPVariable*>
-  {
-    static VALUE convert(MPVariable* const & x)
-    {
-      return Rice::Data_Object<MPVariable>(x, rb_cMPVariable);
-    }
-  };
-
-  template<>
-  struct To_Ruby<MPConstraint*>
-  {
-    static VALUE convert(MPConstraint* const & x)
-    {
-      return Rice::Data_Object<MPConstraint>(x, rb_cMPVariable);
-    }
-  };
-
-  template<>
-  struct To_Ruby<MPObjective*>
-  {
-    static VALUE convert(MPObjective* const & x)
-    {
-      return Rice::Data_Object<MPObjective>(x, rb_cMPVariable);
-    }
-  };
-}
-
 void init_linear(Rice::Module& m) {
-  rb_cMPVariable = Rice::define_class_under<MPVariable>(m, "MPVariable")
+  Rice::define_class_under<MPVariable>(m, "MPVariable")
     .define_method("name", &MPVariable::name)
     .define_method("solution_value", &MPVariable::solution_value)
     .define_method(
@@ -151,10 +117,10 @@ void init_linear(Rice::Module& m) {
 
   Rice::define_class_under<LinearRange>(m, "LinearRange");
 
-  rb_cMPConstraint = Rice::define_class_under<MPConstraint>(m, "MPConstraint")
+  Rice::define_class_under<MPConstraint>(m, "MPConstraint")
     .define_method("set_coefficient", &MPConstraint::SetCoefficient);
 
-  rb_cMPObjective = Rice::define_class_under<MPObjective>(m, "MPObjective")
+  Rice::define_class_under<MPObjective>(m, "MPObjective")
     .define_method("value", &MPObjective::Value)
     .define_method("set_coefficient", &MPObjective::SetCoefficient)
     .define_method("set_maximization", &MPObjective::SetMaximization);
@@ -170,15 +136,15 @@ void init_linear(Rice::Module& m) {
       "int_var",
       [](MPSolver& self, double min, double max, const std::string& name) {
         return self.MakeIntVar(min, max, name);
-      })
-    .define_method("num_var", &MPSolver::MakeNumVar)
-    .define_method("bool_var", &MPSolver::MakeBoolVar)
+      }, Rice::Return().takeOwnership(false))
+    .define_method("num_var", &MPSolver::MakeNumVar, Rice::Return().takeOwnership(false))
+    .define_method("bool_var", &MPSolver::MakeBoolVar, Rice::Return().takeOwnership(false))
     .define_method("num_variables", &MPSolver::NumVariables)
     .define_method("num_constraints", &MPSolver::NumConstraints)
     .define_method("wall_time", &MPSolver::wall_time)
     .define_method("iterations", &MPSolver::iterations)
     .define_method("nodes", &MPSolver::nodes)
-    .define_method("objective", &MPSolver::MutableObjective)
+    .define_method("objective", &MPSolver::MutableObjective, Rice::Return().takeOwnership(false))
     .define_method(
       "maximize",
       [](MPSolver& self, LinearExpr& expr) {
@@ -193,12 +159,12 @@ void init_linear(Rice::Module& m) {
       "add",
       [](MPSolver& self, const LinearRange& range) {
         return self.MakeRowConstraint(range);
-      })
+      }, Rice::Return().takeOwnership(false))
     .define_method(
       "constraint",
       [](MPSolver& self, double lb, double ub) {
         return self.MakeRowConstraint(lb, ub);
-      })
+      }, Rice::Return().takeOwnership(false))
     .define_method(
       "solve",
       [](MPSolver& self) {
