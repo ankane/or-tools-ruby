@@ -315,7 +315,7 @@ void init_routing(Rice::Module& m) {
     .define_method("vehicle_index", &RoutingModel::VehicleIndex)
     .define_method("next", &RoutingModel::Next)
     .define_method("vehicle_used?", &RoutingModel::IsVehicleUsed)
-    .define_method("next_var", &RoutingModel::NextVar)
+    .define_method("next_var", &RoutingModel::NextVar, Rice::Return().takeOwnership(false))
     .define_method("arc_cost_for_vehicle", &RoutingModel::GetArcCostForVehicle)
     .define_method("mutable_dimension", &RoutingModel::GetMutableDimension, Rice::Return().takeOwnership(false))
     .define_method("add_variable_minimized_by_finalizer", &RoutingModel::AddVariableMinimizedByFinalizer)
