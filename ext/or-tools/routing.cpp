@@ -76,40 +76,53 @@ Class rb_cRoutingDimension;
 Class rb_cConstraint;
 Class rb_cSolver2;
 
-// template<>
-// inline
-// Object to_ruby<operations_research::IntVar*>(operations_research::IntVar* const &x)
-// {
-//   return Rice::Data_Object<operations_research::IntVar>(x, rb_cIntVar, nullptr, nullptr);
-// }
+namespace Rice::detail
+{
+  template<>
+  struct To_Ruby<operations_research::IntVar*>
+  {
+    static VALUE convert(operations_research::IntVar* const & x)
+    {
+      return Rice::Data_Object<operations_research::IntVar>(x, rb_cIntVar);
+    }
+  };
 
-// template<>
-// inline
-// Object to_ruby<operations_research::IntervalVar*>(operations_research::IntervalVar* const &x)
-// {
-//   return Rice::Data_Object<operations_research::IntervalVar>(x, rb_cIntervalVar, nullptr, nullptr);
-// }
+  template<>
+  struct To_Ruby<operations_research::IntervalVar*>
+  {
+    static VALUE convert(operations_research::IntervalVar* const & x)
+    {
+      return Rice::Data_Object<operations_research::IntervalVar>(x, rb_cIntervalVar);
+    }
+  };
 
-// template<>
-// inline
-// Object to_ruby<RoutingDimension*>(RoutingDimension* const &x)
-// {
-//   return Rice::Data_Object<RoutingDimension>(x, rb_cRoutingDimension, nullptr, nullptr);
-// }
+  template<>
+  struct To_Ruby<operations_research::RoutingDimension*>
+  {
+    static VALUE convert(operations_research::RoutingDimension* const & x)
+    {
+      return Rice::Data_Object<operations_research::RoutingDimension>(x, rb_cRoutingDimension);
+    }
+  };
 
-// template<>
-// inline
-// Object to_ruby<operations_research::Constraint*>(operations_research::Constraint* const &x)
-// {
-//   return Rice::Data_Object<operations_research::Constraint>(x, rb_cConstraint, nullptr, nullptr);
-// }
+  template<>
+  struct To_Ruby<operations_research::Constraint*>
+  {
+    static VALUE convert(operations_research::Constraint* const & x)
+    {
+      return Rice::Data_Object<operations_research::Constraint>(x, rb_cConstraint);
+    }
+  };
 
-// template<>
-// inline
-// Object to_ruby<operations_research::Solver*>(operations_research::Solver* const &x)
-// {
-//   return Rice::Data_Object<operations_research::Solver>(x, rb_cSolver2, nullptr, nullptr);
-// }
+  template<>
+  struct To_Ruby<operations_research::Solver*>
+  {
+    static VALUE convert(operations_research::Solver* const & x)
+    {
+      return Rice::Data_Object<operations_research::Solver>(x, rb_cSolver2);
+    }
+  };
+}
 
 void init_routing(Rice::Module& m) {
   m.define_singleton_function("default_routing_search_parameters", &DefaultRoutingSearchParameters);

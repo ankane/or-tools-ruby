@@ -39,35 +39,35 @@ Class rb_cMPVariable;
 Class rb_cMPConstraint;
 Class rb_cMPObjective;
 
-// namespace Rice::detail
-// {
-//   template<>
-//   struct To_Ruby<MPVariable*>
-//   {
-//     static VALUE convert(MPVariable* const & x)
-//     {
-//       return Rice::Data_Object<MPVariable>(x, rb_cMPVariable, nullptr, nullptr);
-//     }
-//   };
+namespace Rice::detail
+{
+  template<>
+  struct To_Ruby<MPVariable*>
+  {
+    static VALUE convert(MPVariable* const & x)
+    {
+      return Rice::Data_Object<MPVariable>(x, rb_cMPVariable);
+    }
+  };
 
-//   template<>
-//   struct To_Ruby<MPConstraint*>
-//   {
-//     static VALUE convert(MPConstraint* const & x)
-//     {
-//       return Rice::Data_Object<MPConstraint>(x, rb_cMPVariable, nullptr, nullptr);
-//     }
-//   };
+  template<>
+  struct To_Ruby<MPConstraint*>
+  {
+    static VALUE convert(MPConstraint* const & x)
+    {
+      return Rice::Data_Object<MPConstraint>(x, rb_cMPVariable);
+    }
+  };
 
-//   template<>
-//   struct To_Ruby<MPObjective*>
-//   {
-//     static VALUE convert(MPObjective* const & x)
-//     {
-//       return Rice::Data_Object<MPObjective>(x, rb_cMPVariable, nullptr, nullptr);
-//     }
-//   };
-// }
+  template<>
+  struct To_Ruby<MPObjective*>
+  {
+    static VALUE convert(MPObjective* const & x)
+    {
+      return Rice::Data_Object<MPObjective>(x, rb_cMPVariable);
+    }
+  };
+}
 
 void init_linear(Rice::Module& m) {
   rb_cMPVariable = Rice::define_class_under<MPVariable>(m, "MPVariable")
