@@ -70,60 +70,6 @@ class Assignment {
     }
 };
 
-Class rb_cIntVar;
-Class rb_cIntervalVar;
-Class rb_cRoutingDimension;
-Class rb_cConstraint;
-Class rb_cSolver2;
-
-namespace Rice::detail
-{
-  template<>
-  struct To_Ruby<operations_research::IntVar*>
-  {
-    static VALUE convert(operations_research::IntVar* const & x)
-    {
-      return Rice::Data_Object<operations_research::IntVar>(x, rb_cIntVar);
-    }
-  };
-
-  template<>
-  struct To_Ruby<operations_research::IntervalVar*>
-  {
-    static VALUE convert(operations_research::IntervalVar* const & x)
-    {
-      return Rice::Data_Object<operations_research::IntervalVar>(x, rb_cIntervalVar);
-    }
-  };
-
-  template<>
-  struct To_Ruby<operations_research::RoutingDimension*>
-  {
-    static VALUE convert(operations_research::RoutingDimension* const & x)
-    {
-      return Rice::Data_Object<operations_research::RoutingDimension>(x, rb_cRoutingDimension);
-    }
-  };
-
-  template<>
-  struct To_Ruby<operations_research::Constraint*>
-  {
-    static VALUE convert(operations_research::Constraint* const & x)
-    {
-      return Rice::Data_Object<operations_research::Constraint>(x, rb_cConstraint);
-    }
-  };
-
-  template<>
-  struct To_Ruby<operations_research::Solver*>
-  {
-    static VALUE convert(operations_research::Solver* const & x)
-    {
-      return Rice::Data_Object<operations_research::Solver>(x, rb_cSolver2);
-    }
-  };
-}
-
 void init_routing(Rice::Module& m) {
   m.define_singleton_function("default_routing_search_parameters", &DefaultRoutingSearchParameters);
 
@@ -230,22 +176,22 @@ void init_routing(Rice::Module& m) {
     .define_method("max", &Assignment::Max);
 
   // not to be confused with operations_research::sat::IntVar
-  rb_cIntVar = Rice::define_class_under<operations_research::IntVar>(m, "IntVar")
+  Rice::define_class_under<operations_research::IntVar>(m, "IntVar")
     .define_method(
       "set_range",
       [](operations_research::IntVar& self, int64 new_min, int64 new_max) {
         self.SetRange(new_min, new_max);
       });
 
-  rb_cIntervalVar = Rice::define_class_under<operations_research::IntervalVar>(m, "IntervalVar");
+  Rice::define_class_under<operations_research::IntervalVar>(m, "IntervalVar");
 
-  rb_cRoutingDimension = Rice::define_class_under<RoutingDimension>(m, "RoutingDimension")
+  Rice::define_class_under<RoutingDimension>(m, "RoutingDimension")
     .define_method("global_span_cost_coefficient=", &RoutingDimension::SetGlobalSpanCostCoefficient)
     .define_method("cumul_var", &RoutingDimension::CumulVar);
 
-  rb_cConstraint = Rice::define_class_under<operations_research::Constraint>(m, "Constraint");
+  Rice::define_class_under<operations_research::Constraint>(m, "Constraint");
 
-  rb_cSolver2 = Rice::define_class_under<operations_research::Solver>(m, "Solver2")
+  Rice::define_class_under<operations_research::Solver>(m, "Solver2")
     .define_method(
       "add",
       [](operations_research::Solver& self, Object o) {
@@ -270,7 +216,7 @@ void init_routing(Rice::Module& m) {
       "fixed_duration_interval_var",
       [](operations_research::Solver& self, operations_research::IntVar* const start_variable, int64 duration, const std::string& name) {
         return self.MakeFixedDurationIntervalVar(start_variable, duration, name);
-      })
+      }, Rice::Return().takeOwnership(false))
     .define_method(
       "cumulative",
       [](operations_research::Solver& self, Array rb_intervals, Array rb_demands, int64 capacity, const std::string& name) {
@@ -285,7 +231,7 @@ void init_routing(Rice::Module& m) {
         }
 
         return self.MakeCumulative(intervals, demands, capacity, name);
-      });
+      }, Rice::Return().takeOwnership(false));
 
   Rice::define_class_under<RoutingModel>(m, "RoutingModel")
     .define_constructor(Rice::Constructor<RoutingModel, RoutingIndexManager>())
@@ -361,7 +307,7 @@ void init_routing(Rice::Module& m) {
         self.AddDisjunction(indices, penalty);
       })
     .define_method("add_pickup_and_delivery", &RoutingModel::AddPickupAndDelivery)
-    .define_method("solver", &RoutingModel::solver)
+    .define_method("solver", &RoutingModel::solver, Rice::Return().takeOwnership(false))
     .define_method("start", &RoutingModel::Start)
     .define_method("end", &RoutingModel::End)
     .define_method("start?", &RoutingModel::IsStart)
@@ -371,7 +317,7 @@ void init_routing(Rice::Module& m) {
     .define_method("vehicle_used?", &RoutingModel::IsVehicleUsed)
     .define_method("next_var", &RoutingModel::NextVar)
     .define_method("arc_cost_for_vehicle", &RoutingModel::GetArcCostForVehicle)
-    .define_method("mutable_dimension", &RoutingModel::GetMutableDimension)
+    .define_method("mutable_dimension", &RoutingModel::GetMutableDimension, Rice::Return().takeOwnership(false))
     .define_method("add_variable_minimized_by_finalizer", &RoutingModel::AddVariableMinimizedByFinalizer)
     .define_method(
       "solve_with_parameters",
