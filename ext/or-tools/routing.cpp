@@ -187,7 +187,7 @@ void init_routing(Rice::Module& m) {
 
   Rice::define_class_under<RoutingDimension>(m, "RoutingDimension")
     .define_method("global_span_cost_coefficient=", &RoutingDimension::SetGlobalSpanCostCoefficient)
-    .define_method("cumul_var", &RoutingDimension::CumulVar);
+    .define_method("cumul_var", &RoutingDimension::CumulVar, Rice::Return().takeOwnership(false));
 
   Rice::define_class_under<operations_research::Constraint>(m, "Constraint");
 
@@ -272,7 +272,7 @@ void init_routing(Rice::Module& m) {
           throw std::runtime_error("Unknown solver status");
         }
       })
-    .define_method("vehicle_var", &RoutingModel::VehicleVar)
+    .define_method("vehicle_var", &RoutingModel::VehicleVar, Rice::Return().takeOwnership(false))
     .define_method("set_arc_cost_evaluator_of_all_vehicles", &RoutingModel::SetArcCostEvaluatorOfAllVehicles)
     .define_method("set_arc_cost_evaluator_of_vehicle", &RoutingModel::SetArcCostEvaluatorOfVehicle)
     .define_method("set_fixed_cost_of_all_vehicles", &RoutingModel::SetFixedCostOfAllVehicles)
