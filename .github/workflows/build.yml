@@ -10,6 +10,8 @@ jobs:
         include:
         - ruby: 3.0
           os: ubuntu-20.04
+        - ruby: 3.0
+          os: macos-latest
         - ruby: 2.7
           os: ubuntu-20.04
         - ruby: 2.6
