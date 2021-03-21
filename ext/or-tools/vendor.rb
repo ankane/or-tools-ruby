@@ -18,7 +18,7 @@ else
     filename = "or-tools_ubuntu-18.04_v#{version}.tar.gz"
     checksum = "0d052deb2ba4491c29e86242fb5d61d0fe14bac847c2feaa35fbeff925ea40a0"
   elsif os == "Debian" && os_version == "10"
-    filename = "or-tools_debian-10_v#{version}.tar.gz "
+    filename = "or-tools_debian-10_v#{version}.tar.gz"
     checksum = "1f2ec99181c92859ab46e68a6231babce92ded949fd1d08ee31afa4db04c43b3"
   elsif os == "CentOS" && os_version == "8"
     filename = "or-tools_centos-8_v#{version}.tar.gz"
