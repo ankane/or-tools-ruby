@@ -136,15 +136,15 @@ void init_linear(Rice::Module& m) {
       "int_var",
       [](MPSolver& self, double min, double max, const std::string& name) {
         return self.MakeIntVar(min, max, name);
-      }, Rice::Return().takeOwnership(false))
-    .define_method("num_var", &MPSolver::MakeNumVar, Rice::Return().takeOwnership(false))
-    .define_method("bool_var", &MPSolver::MakeBoolVar, Rice::Return().takeOwnership(false))
+      })
+    .define_method("num_var", &MPSolver::MakeNumVar)
+    .define_method("bool_var", &MPSolver::MakeBoolVar)
     .define_method("num_variables", &MPSolver::NumVariables)
     .define_method("num_constraints", &MPSolver::NumConstraints)
     .define_method("wall_time", &MPSolver::wall_time)
     .define_method("iterations", &MPSolver::iterations)
     .define_method("nodes", &MPSolver::nodes)
-    .define_method("objective", &MPSolver::MutableObjective, Rice::Return().takeOwnership(false))
+    .define_method("objective", &MPSolver::MutableObjective)
     .define_method(
       "maximize",
       [](MPSolver& self, LinearExpr& expr) {
@@ -159,12 +159,12 @@ void init_linear(Rice::Module& m) {
       "add",
       [](MPSolver& self, const LinearRange& range) {
         return self.MakeRowConstraint(range);
-      }, Rice::Return().takeOwnership(false))
+      })
     .define_method(
       "constraint",
       [](MPSolver& self, double lb, double ub) {
         return self.MakeRowConstraint(lb, ub);
-      }, Rice::Return().takeOwnership(false))
+      })
     .define_method(
       "solve",
       [](MPSolver& self) {

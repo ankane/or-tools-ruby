@@ -389,7 +389,7 @@ void init_constraint(Rice::Module& m) {
         m.Add(NewFeasibleSolutionObserver(
           [callback](const CpSolverResponse& r) {
             // TODO find a better way to do this
-            callback.call("response=", r);
+            callback.call("response=", Object(Rice::detail::To_Ruby<CpSolverResponse>::convert(r, true)));
             callback.call("on_solution_callback");
           })
         );

@@ -34,9 +34,9 @@ namespace Rice::detail
   template<>
   struct To_Ruby<RoutingNodeIndex>
   {
-    static VALUE convert(RoutingNodeIndex const & x)
+    static VALUE convert(RoutingNodeIndex const & x, bool takeOwnership)
     {
-      return Rice::detail::To_Ruby<int>::convert(x.value());
+      return Rice::detail::To_Ruby<int>::convert(x.value(), takeOwnership);
     }
   };
 }
@@ -187,7 +187,7 @@ void init_routing(Rice::Module& m) {
 
   Rice::define_class_under<RoutingDimension>(m, "RoutingDimension")
     .define_method("global_span_cost_coefficient=", &RoutingDimension::SetGlobalSpanCostCoefficient)
-    .define_method("cumul_var", &RoutingDimension::CumulVar, Rice::Return().takeOwnership(false));
+    .define_method("cumul_var", &RoutingDimension::CumulVar);
 
   Rice::define_class_under<operations_research::Constraint>(m, "Constraint");
 
@@ -216,7 +216,7 @@ void init_routing(Rice::Module& m) {
       "fixed_duration_interval_var",
       [](operations_research::Solver& self, operations_research::IntVar* const start_variable, int64 duration, const std::string& name) {
         return self.MakeFixedDurationIntervalVar(start_variable, duration, name);
-      }, Rice::Return().takeOwnership(false))
+      })
     .define_method(
       "cumulative",
       [](operations_research::Solver& self, Array rb_intervals, Array rb_demands, int64 capacity, const std::string& name) {
@@ -231,7 +231,7 @@ void init_routing(Rice::Module& m) {
         }
 
         return self.MakeCumulative(intervals, demands, capacity, name);
-      }, Rice::Return().takeOwnership(false));
+      });
 
   Rice::define_class_under<RoutingModel>(m, "RoutingModel")
     .define_constructor(Rice::Constructor<RoutingModel, RoutingIndexManager>())
@@ -272,7 +272,7 @@ void init_routing(Rice::Module& m) {
           throw std::runtime_error("Unknown solver status");
         }
       })
-    .define_method("vehicle_var", &RoutingModel::VehicleVar, Rice::Return().takeOwnership(false))
+    .define_method("vehicle_var", &RoutingModel::VehicleVar)
     .define_method("set_arc_cost_evaluator_of_all_vehicles", &RoutingModel::SetArcCostEvaluatorOfAllVehicles)
     .define_method("set_arc_cost_evaluator_of_vehicle", &RoutingModel::SetArcCostEvaluatorOfVehicle)
     .define_method("set_fixed_cost_of_all_vehicles", &RoutingModel::SetFixedCostOfAllVehicles)
@@ -307,7 +307,7 @@ void init_routing(Rice::Module& m) {
         self.AddDisjunction(indices, penalty);
       })
     .define_method("add_pickup_and_delivery", &RoutingModel::AddPickupAndDelivery)
-    .define_method("solver", &RoutingModel::solver, Rice::Return().takeOwnership(false))
+    .define_method("solver", &RoutingModel::solver)
     .define_method("start", &RoutingModel::Start)
     .define_method("end", &RoutingModel::End)
     .define_method("start?", &RoutingModel::IsStart)
@@ -315,9 +315,9 @@ void init_routing(Rice::Module& m) {
     .define_method("vehicle_index", &RoutingModel::VehicleIndex)
     .define_method("next", &RoutingModel::Next)
     .define_method("vehicle_used?", &RoutingModel::IsVehicleUsed)
-    .define_method("next_var", &RoutingModel::NextVar, Rice::Return().takeOwnership(false))
+    .define_method("next_var", &RoutingModel::NextVar)
     .define_method("arc_cost_for_vehicle", &RoutingModel::GetArcCostForVehicle)
-    .define_method("mutable_dimension", &RoutingModel::GetMutableDimension, Rice::Return().takeOwnership(false))
+    .define_method("mutable_dimension", &RoutingModel::GetMutableDimension)
     .define_method("add_variable_minimized_by_finalizer", &RoutingModel::AddVariableMinimizedByFinalizer)
     .define_method(
       "solve_with_parameters",
