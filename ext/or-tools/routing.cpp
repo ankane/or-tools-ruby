@@ -1,7 +1,7 @@
 #include <ortools/constraint_solver/routing.h>
 #include <ortools/constraint_solver/routing_parameters.h>
 
-#include <rice/rice.hpp>
+#include "ext.h"
 
 using operations_research::DefaultRoutingSearchParameters;
 using operations_research::FirstSolutionStrategy;

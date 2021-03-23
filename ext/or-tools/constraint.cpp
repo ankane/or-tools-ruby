@@ -1,7 +1,7 @@
 #include <google/protobuf/text_format.h>
 #include <ortools/sat/cp_model.h>
 
-#include <rice/rice.hpp>
+#include "ext.h"
 
 using operations_research::sat::BoolVar;
 using operations_research::sat::Constraint;

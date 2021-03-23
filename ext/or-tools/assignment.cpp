@@ -1,6 +1,6 @@
 #include <ortools/graph/assignment.h>
 
-#include <rice/rice.hpp>
+#include "ext.h"
 
 using operations_research::SimpleLinearSumAssignment;
 

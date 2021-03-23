@@ -1,6 +1,6 @@
 #include <ortools/algorithms/knapsack_solver.h>
 
-#include <rice/rice.hpp>
+#include "ext.h"
 
 using operations_research::KnapsackSolver;
 

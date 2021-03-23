@@ -1,6 +1,6 @@
 #include <ortools/base/version.h>
 
-#include <rice/rice.hpp>
+#include "ext.h"
 
 void init_assignment(Rice::Module& m);
 void init_bin_packing(Rice::Module& m);

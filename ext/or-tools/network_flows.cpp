@@ -1,7 +1,7 @@
 #include <ortools/graph/max_flow.h>
 #include <ortools/graph/min_cost_flow.h>
 
-#include <rice/rice.hpp>
+#include "ext.h"
 
 using operations_research::NodeIndex;
 using operations_research::SimpleMaxFlow;

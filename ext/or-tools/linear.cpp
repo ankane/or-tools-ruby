@@ -1,6 +1,6 @@
 #include <ortools/linear_solver/linear_solver.h>
 
-#include <rice/rice.hpp>
+#include "ext.h"
 
 using operations_research::LinearExpr;
 using operations_research::LinearRange;
