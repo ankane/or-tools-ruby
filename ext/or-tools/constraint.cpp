@@ -355,6 +355,16 @@ void init_constraint(Rice::Module& m) {
         self.ScaleObjectiveBy(scaling);
       })
     .define_method(
+      "add_hint",
+      *[](CpModelBuilder& self, IntVar var, int64 value) {
+        self.AddHint(var, value);
+      })
+    .define_method(
+      "clear_hints",
+      *[](CpModelBuilder& self) {
+        self.ClearHints();
+      })
+    .define_method(
       "add_assumption",
       *[](CpModelBuilder& self, BoolVar lit) {
         self.AddAssumption(lit);
@@ -363,6 +373,11 @@ void init_constraint(Rice::Module& m) {
       "add_assumptions",
       *[](CpModelBuilder& self, BoolVarSpan literals) {
         self.AddAssumptions(literals);
+      })
+    .define_method(
+      "clear_assumptions",
+      *[](CpModelBuilder& self) {
+        self.ClearAssumptions();
       })
     .define_method(
       "to_s",
