@@ -1,5 +1,6 @@
 ## 0.4.3 (unreleased)
 
+- Added `only_enforce_if` to `SatConstraint`
 - Fixed installation for Debian
 
 ## 0.4.2 (2021-03-03)
