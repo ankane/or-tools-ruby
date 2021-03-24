@@ -200,13 +200,13 @@ void init_constraint(Rice::Module& m) {
     .define_constructor(Rice::Constructor<CpModelBuilder>())
     .define_method(
       "new_int_var",
-      *[](CpModelBuilder& self, int64 start, int64 end, std::string name) {
+      *[](CpModelBuilder& self, int64 start, int64 end, const std::string& name) {
         const operations_research::Domain domain(start, end);
         return self.NewIntVar(domain).WithName(name);
       })
     .define_method(
       "new_bool_var",
-      *[](CpModelBuilder& self, std::string name) {
+      *[](CpModelBuilder& self, const std::string& name) {
         return self.NewBoolVar().WithName(name);
       })
     .define_method(
@@ -226,12 +226,12 @@ void init_constraint(Rice::Module& m) {
       })
     .define_method(
       "new_interval_var",
-      *[](CpModelBuilder& self, IntVar start, IntVar size, IntVar end, std::string name) {
+      *[](CpModelBuilder& self, IntVar start, IntVar size, IntVar end, const std::string& name) {
         return self.NewIntervalVar(start, size, end).WithName(name);
       })
     .define_method(
       "new_optional_interval_var",
-      *[](CpModelBuilder& self, IntVar start, IntVar size, IntVar end, BoolVar presence, std::string name) {
+      *[](CpModelBuilder& self, IntVar start, IntVar size, IntVar end, BoolVar presence, const std::string& name) {
         return self.NewOptionalIntervalVar(start, size, end, presence).WithName(name);
       })
     .define_method(
