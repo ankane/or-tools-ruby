@@ -128,6 +128,8 @@ LinearExprSpan from_ruby<LinearExprSpan>(Object x)
   return LinearExprSpan(x);
 }
 
+Rice::Class rb_cSatIntVar;
+
 // need a wrapper class since absl::Span doesn't own
 class BoolVarSpan {
   std::vector<BoolVar> vec;
@@ -136,7 +138,11 @@ class BoolVarSpan {
       Array a = Array(x);
       vec.reserve(a.size());
       for (std::size_t i = 0; i < a.size(); ++i) {
-        vec.push_back(from_ruby<BoolVar>(a[i]));
+        if (((Object) a[i]).is_a(rb_cSatIntVar)) {
+          vec.push_back(from_ruby<IntVar>(a[i]).ToBoolVar());
+        } else {
+          vec.push_back(from_ruby<BoolVar>(a[i]));
+        }
       }
     }
     operator absl::Span<const BoolVar>() {
@@ -150,8 +156,6 @@ BoolVarSpan from_ruby<BoolVarSpan>(Object x)
 {
   return BoolVarSpan(x);
 }
-
-Rice::Class rb_cSatIntVar;
 
 void init_constraint(Rice::Module& m) {
   rb_cSatIntVar = Rice::define_class_under<IntVar>(m, "SatIntVar")
