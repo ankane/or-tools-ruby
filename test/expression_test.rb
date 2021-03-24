@@ -49,6 +49,16 @@ class ExpressionTest < Minitest::Test
     assert_equal(0, solver.value(x))
   end
 
+  def test_only_enforce_if_array
+    model = ORTools::CpModel.new
+    x = model.new_bool_var("x")
+    model.add(x != x).only_enforce_if([x])
+
+    solver = ORTools::CpSolver.new
+    assert_equal :optimal, solver.solve(model)
+    assert_equal false, solver.value(x)
+  end
+
   def test_add_assumption
     model = ORTools::CpModel.new
     x = model.new_bool_var("x")

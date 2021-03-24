@@ -166,8 +166,10 @@ void init_constraint(Rice::Module& m) {
       *[](Constraint& self, Object literal) {
         if (literal.is_a(rb_cSatIntVar)) {
           return self.OnlyEnforceIf(from_ruby<IntVar>(literal).ToBoolVar());
+        } else if (literal.is_a(rb_cArray)) {
+          // TODO support IntVarSpan
+          return self.OnlyEnforceIf(from_ruby<BoolVarSpan>(literal));
         } else {
-          // TODO support BoolVarSpan
           return self.OnlyEnforceIf(from_ruby<BoolVar>(literal));
         }
       });
