@@ -355,6 +355,16 @@ void init_constraint(Rice::Module& m) {
         self.ScaleObjectiveBy(scaling);
       })
     .define_method(
+      "add_assumption",
+      *[](CpModelBuilder& self, BoolVar lit) {
+        self.AddAssumption(lit);
+      })
+    .define_method(
+      "add_assumptions",
+      *[](CpModelBuilder& self, BoolVarSpan literals) {
+        self.AddAssumptions(literals);
+      })
+    .define_method(
       "to_s",
       *[](CpModelBuilder& self) {
         std::string proto_string;

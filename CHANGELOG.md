@@ -1,5 +1,6 @@
 ## 0.4.3 (unreleased)
 
+- Added `add_assumption` and `add_assumptions` to `CpModel`
 - Added `only_enforce_if` to `SatConstraint`
 - Fixed installation for Debian
 
