@@ -50,7 +50,9 @@ url = "https://github.com/google/or-tools/releases/download/v#{short_version}/#{
 
 $stdout.sync = true
 
-def download_file(url, download_path)
+def download_file(url, download_path, redirects = 0)
+  raise "Too many redirects" if redirects > 10
+
   uri = URI(url)
   location = nil
 
@@ -79,7 +81,7 @@ def download_file(url, download_path)
   end
 
   # outside of Net::HTTP block to close previous connection
-  download_file(location, download_path) if location
+  download_file(location, download_path, redirects + 1) if location
 end
 
 # download
