@@ -24,10 +24,19 @@ else
     filename = "or-tools_centos-8_v#{version}.tar.gz"
     checksum = "be638a20b36f6da81aa29fd24c69c4a66afc980b8a221b1cbabb3910b9827718"
   else
+    platform =
+      if Gem.win_platform?
+        "Windows"
+      elsif os || os_version
+        "#{os} #{os_version}"
+      else
+        "Unknown"
+      end
+
     # there is a binary download for Windows
     # however, it's compiled with Visual Studio rather than MinGW (which RubyInstaller uses)
     raise <<~MSG
-      Binary installation not available for this platform.
+      Binary installation not available for this platform: #{platform}
 
       Build the OR-Tools C++ library from source, then run:
       bundle config build.or-tools --with-or-tools-dir=/path/to/or-tools
