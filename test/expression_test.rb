@@ -39,14 +39,69 @@ class ExpressionTest < Minitest::Test
     assert_equal 0, solver.value(y)
   end
 
+  def test_only_enforce_if
+    model = ORTools::CpModel.new
+    x = model.new_int_var(0, 1, "x")
+    model.add(x == x + 1).only_enforce_if(x)
+
+    solver = ORTools::CpSolver.new
+    assert_equal :optimal, solver.solve(model)
+    assert_equal(0, solver.value(x))
+  end
+
+  def test_only_enforce_if_array
+    model = ORTools::CpModel.new
+    x = model.new_bool_var("x")
+    model.add(x != x).only_enforce_if([x])
+
+    solver = ORTools::CpSolver.new
+    assert_equal :optimal, solver.solve(model)
+    assert_equal false, solver.value(x)
+  end
+
+  def test_only_enforce_if_int_array
+    model = ORTools::CpModel.new
+    x = model.new_int_var(0, 1, "x")
+    model.add(x == x + 1).only_enforce_if([x])
+
+    solver = ORTools::CpSolver.new
+    assert_equal :optimal, solver.solve(model)
+    assert_equal 0, solver.value(x)
+  end
+
+  def test_add_assumption
+    model = ORTools::CpModel.new
+    x = model.new_bool_var("x")
+    model.add_assumption(x)
+
+    solver = ORTools::CpSolver.new
+    assert_equal :optimal, solver.solve(model)
+    assert_equal true, solver.value(x)
+  end
+
+  def test_add_assumptions
+    model = ORTools::CpModel.new
+    x = model.new_bool_var("x")
+    model.add_assumptions([x])
+
+    solver = ORTools::CpSolver.new
+    assert_equal :optimal, solver.solve(model)
+    assert_equal true, solver.value(x)
+  end
+
   def test_to_s
     model = ORTools::CpModel.new
-    x = model.new_int_var(-7, 7, "x")
-    y = model.new_int_var(0, 7, "y")
-    model.add_max_equality(y, [x, model.new_constant(0)])
+    x = model.new_int_var(0, 1, "x")
+    y = model.new_int_var(0, 1, "y")
+    z = model.new_int_var(0, 1, "z")
+    # model.add(model.sum([x, y]) == z)
+    model.add(x + y == z)
 
     output = model.to_s
     assert_match "variables", output
     assert_match "constraints", output
+
+    # TODO
+    # assert_equal File.binread("test/support/proto.txt"), output
   end
 end

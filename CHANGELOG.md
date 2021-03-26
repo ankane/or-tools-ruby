@@ -1,3 +1,14 @@
+## 0.4.3 (unreleased)
+
+- Added `add_assumption`, `add_assumptions`, and `clear_assumptions` to `CpModel`
+- Added `add_hint` and `clear_hints` to `CpModel`
+- Added `only_enforce_if` to `SatConstraint`
+- Fixed installation for Debian
+
+## 0.4.2 (2021-03-03)
+
+- Updated OR-Tools to 8.2
+
 ## 0.4.1 (2021-02-23)
 
 - Added solution printers

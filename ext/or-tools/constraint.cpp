@@ -128,6 +128,8 @@ LinearExprSpan from_ruby<LinearExprSpan>(Object x)
   return LinearExprSpan(x);
 }
 
+Rice::Class rb_cSatIntVar;
+
 // need a wrapper class since absl::Span doesn't own
 class BoolVarSpan {
   std::vector<BoolVar> vec;
@@ -136,7 +138,11 @@ class BoolVarSpan {
       Array a = Array(x);
       vec.reserve(a.size());
       for (std::size_t i = 0; i < a.size(); ++i) {
-        vec.push_back(from_ruby<BoolVar>(a[i]));
+        if (((Object) a[i]).is_a(rb_cSatIntVar)) {
+          vec.push_back(from_ruby<IntVar>(a[i]).ToBoolVar());
+        } else {
+          vec.push_back(from_ruby<BoolVar>(a[i]));
+        }
       }
     }
     operator absl::Span<const BoolVar>() {
@@ -152,13 +158,25 @@ BoolVarSpan from_ruby<BoolVarSpan>(Object x)
 }
 
 void init_constraint(Rice::Module& m) {
-  Rice::define_class_under<IntVar>(m, "SatIntVar")
+  rb_cSatIntVar = Rice::define_class_under<IntVar>(m, "SatIntVar")
     .define_method("name", &IntVar::Name);
 
   Rice::define_class_under<IntervalVar>(m, "SatIntervalVar")
     .define_method("name", &IntervalVar::Name);
 
-  Rice::define_class_under<Constraint>(m, "SatConstraint");
+  Rice::define_class_under<Constraint>(m, "SatConstraint")
+    .define_method(
+      "only_enforce_if",
+      *[](Constraint& self, Object literal) {
+        if (literal.is_a(rb_cSatIntVar)) {
+          return self.OnlyEnforceIf(from_ruby<IntVar>(literal).ToBoolVar());
+        } else if (literal.is_a(rb_cArray)) {
+          // TODO support IntVarSpan
+          return self.OnlyEnforceIf(from_ruby<BoolVarSpan>(literal));
+        } else {
+          return self.OnlyEnforceIf(from_ruby<BoolVar>(literal));
+        }
+      });
 
   Rice::define_class_under<BoolVar>(m, "BoolVar")
     .define_method("name", &BoolVar::Name)
@@ -182,13 +200,13 @@ void init_constraint(Rice::Module& m) {
     .define_constructor(Rice::Constructor<CpModelBuilder>())
     .define_method(
       "new_int_var",
-      *[](CpModelBuilder& self, int64 start, int64 end, std::string name) {
+      *[](CpModelBuilder& self, int64 start, int64 end, const std::string& name) {
         const operations_research::Domain domain(start, end);
         return self.NewIntVar(domain).WithName(name);
       })
     .define_method(
       "new_bool_var",
-      *[](CpModelBuilder& self, std::string name) {
+      *[](CpModelBuilder& self, const std::string& name) {
         return self.NewBoolVar().WithName(name);
       })
     .define_method(
@@ -208,124 +226,124 @@ void init_constraint(Rice::Module& m) {
       })
     .define_method(
       "new_interval_var",
-      *[](CpModelBuilder& self, IntVar start, IntVar size, IntVar end, std::string name) {
+      *[](CpModelBuilder& self, IntVar start, IntVar size, IntVar end, const std::string& name) {
         return self.NewIntervalVar(start, size, end).WithName(name);
       })
     .define_method(
       "new_optional_interval_var",
-      *[](CpModelBuilder& self, IntVar start, IntVar size, IntVar end, BoolVar presence, std::string name) {
+      *[](CpModelBuilder& self, IntVar start, IntVar size, IntVar end, BoolVar presence, const std::string& name) {
         return self.NewOptionalIntervalVar(start, size, end, presence).WithName(name);
       })
     .define_method(
       "add_bool_or",
       *[](CpModelBuilder& self, BoolVarSpan literals) {
-        self.AddBoolOr(literals);
+        return self.AddBoolOr(literals);
       })
     .define_method(
       "add_bool_and",
       *[](CpModelBuilder& self, BoolVarSpan literals) {
-        self.AddBoolAnd(literals);
+        return self.AddBoolAnd(literals);
       })
     .define_method(
       "add_bool_xor",
       *[](CpModelBuilder& self, BoolVarSpan literals) {
-        self.AddBoolXor(literals);
+        return self.AddBoolXor(literals);
       })
     .define_method(
       "add_implication",
       *[](CpModelBuilder& self, BoolVar a, BoolVar b) {
-        self.AddImplication(a, b);
+        return self.AddImplication(a, b);
       })
     .define_method(
       "add_equality",
       *[](CpModelBuilder& self, LinearExpr x, LinearExpr y) {
-        self.AddEquality(x, y);
+        return self.AddEquality(x, y);
       })
     .define_method(
       "add_greater_or_equal",
       *[](CpModelBuilder& self, LinearExpr x, LinearExpr y) {
-        self.AddGreaterOrEqual(x, y);
+        return self.AddGreaterOrEqual(x, y);
       })
     .define_method(
       "add_greater_than",
       *[](CpModelBuilder& self, LinearExpr x, LinearExpr y) {
-        self.AddGreaterThan(x, y);
+        return self.AddGreaterThan(x, y);
       })
     .define_method(
       "add_less_or_equal",
       *[](CpModelBuilder& self, LinearExpr x, LinearExpr y) {
-        self.AddLessOrEqual(x, y);
+        return self.AddLessOrEqual(x, y);
       })
     .define_method(
       "add_less_than",
       *[](CpModelBuilder& self, LinearExpr x, LinearExpr y) {
-        self.AddLessThan(x, y);
+        return self.AddLessThan(x, y);
       })
     // TODO add domain
     // .define_method(
     //   "add_linear_constraint",
     //   *[](CpModelBuilder& self, LinearExpr expr, Domain domain) {
-    //     self.AddLinearConstraint(expr, domain);
+    //     return self.AddLinearConstraint(expr, domain);
     //   })
     .define_method(
       "add_not_equal",
       *[](CpModelBuilder& self, LinearExpr x, LinearExpr y) {
-        self.AddNotEqual(x, y);
+        return self.AddNotEqual(x, y);
       })
     .define_method(
       "add_all_different",
       *[](CpModelBuilder& self, IntVarSpan vars) {
-        self.AddAllDifferent(vars);
+        return self.AddAllDifferent(vars);
       })
     .define_method(
       "add_inverse_constraint",
       *[](CpModelBuilder& self, IntVarSpan variables, IntVarSpan inverse_variables) {
-        self.AddInverseConstraint(variables, inverse_variables);
+        return self.AddInverseConstraint(variables, inverse_variables);
       })
     .define_method(
       "add_min_equality",
       *[](CpModelBuilder& self, IntVar target, IntVarSpan vars) {
-        self.AddMinEquality(target, vars);
+        return self.AddMinEquality(target, vars);
       })
     .define_method(
       "add_lin_min_equality",
       *[](CpModelBuilder& self, LinearExpr target, LinearExprSpan exprs) {
-        self.AddLinMinEquality(target, exprs);
+        return self.AddLinMinEquality(target, exprs);
       })
     .define_method(
       "add_max_equality",
       *[](CpModelBuilder& self, IntVar target, IntVarSpan vars) {
-        self.AddMaxEquality(target, vars);
+        return self.AddMaxEquality(target, vars);
       })
     .define_method(
       "add_lin_max_equality",
       *[](CpModelBuilder& self, LinearExpr target, LinearExprSpan exprs) {
-        self.AddLinMaxEquality(target, exprs);
+        return self.AddLinMaxEquality(target, exprs);
       })
     .define_method(
       "add_division_equality",
       *[](CpModelBuilder& self, IntVar target, IntVar numerator, IntVar denominator) {
-        self.AddDivisionEquality(target, numerator, denominator);
+        return self.AddDivisionEquality(target, numerator, denominator);
       })
     .define_method(
       "add_abs_equality",
       *[](CpModelBuilder& self, IntVar target, IntVar var) {
-        self.AddAbsEquality(target, var);
+        return self.AddAbsEquality(target, var);
       })
     .define_method(
       "add_modulo_equality",
       *[](CpModelBuilder& self, IntVar target, IntVar var, IntVar mod) {
-        self.AddModuloEquality(target, var, mod);
+        return self.AddModuloEquality(target, var, mod);
       })
     .define_method(
       "add_product_equality",
       *[](CpModelBuilder& self, IntVar target, IntVarSpan vars) {
-        self.AddProductEquality(target, vars);
+        return self.AddProductEquality(target, vars);
       })
     .define_method(
       "add_no_overlap",
       *[](CpModelBuilder& self, IntervalVarSpan vars) {
-        self.AddNoOverlap(vars);
+        return self.AddNoOverlap(vars);
       })
     .define_method(
       "maximize",
@@ -341,6 +359,31 @@ void init_constraint(Rice::Module& m) {
       "scale_objective_by",
       *[](CpModelBuilder& self, double scaling) {
         self.ScaleObjectiveBy(scaling);
+      })
+    .define_method(
+      "add_hint",
+      *[](CpModelBuilder& self, IntVar var, int64 value) {
+        self.AddHint(var, value);
+      })
+    .define_method(
+      "clear_hints",
+      *[](CpModelBuilder& self) {
+        self.ClearHints();
+      })
+    .define_method(
+      "add_assumption",
+      *[](CpModelBuilder& self, BoolVar lit) {
+        self.AddAssumption(lit);
+      })
+    .define_method(
+      "add_assumptions",
+      *[](CpModelBuilder& self, BoolVarSpan literals) {
+        self.AddAssumptions(literals);
+      })
+    .define_method(
+      "clear_assumptions",
+      *[](CpModelBuilder& self) {
+        self.ClearAssumptions();
       })
     .define_method(
       "to_s",

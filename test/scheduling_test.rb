@@ -14,26 +14,24 @@ class NursesPartialSolutionPrinter < ORTools::CpSolverSolutionCallback
   end
 
   def on_solution_callback
-    if @solution_count < 2
-      solution = []
-      @num_days.times do |d|
-        day = []
-        @num_nurses.times do |n|
-          working = false
-          @num_shifts.times do |s|
-            if value(@shifts[[n, d, s]])
-              working = true
-              day[n] = s
-            end
-          end
-          unless working
-            day[n] = nil
+    solution = []
+    @num_days.times do |d|
+      day = []
+      @num_nurses.times do |n|
+        working = false
+        @num_shifts.times do |s|
+          if value(@shifts[[n, d, s]])
+            working = true
+            day[n] = s
           end
         end
-        solution << day
+        unless working
+          day[n] = nil
+        end
       end
-      @solutions << solution
+      solution << day
     end
+    @solutions << solution
     @solution_count += 1
   end
 end
@@ -88,17 +86,8 @@ class SchedulingTest < Minitest::Test
     solver.search_for_all_solutions(model, solution_printer)
 
     assert_equal 5184, solution_printer.solution_count
-
-    skip if ci?
-
-    expected = [
-      [[nil, 2, 0, 1], [1, 0, 2, nil], [0, 1, nil, 2]],
-      [[nil, 2, 0, 1], [2, 1, 0, nil], [0, 1, nil, 2]]
-    ]
-    assert_equal expected, solutions
-
-    assert_equal 847, solver.num_conflicts
-    assert_equal 62821, solver.num_branches
+    assert_includes solutions, [[nil, 2, 0, 1], [1, 0, 2, nil], [0, 1, nil, 2]]
+    assert_includes solutions, [[nil, 2, 0, 1], [2, 1, 0, nil], [0, 1, nil, 2]]
   end
 
   def test_job_shop

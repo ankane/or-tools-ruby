@@ -120,7 +120,7 @@ def add_soft_sequence_constraint(model, works, hard_min, soft_min, min_cost,
                 cost_coefficients.append(max_cost * (length - soft_max))
 
     # Just forbid any sequence of true variables with length hard_max + 1
-    for start in range(len(works) - hard_max):
+    for start in range(len(works) - hard_max - 1):
         model.AddBoolOr(
             [works[i].Not() for i in range(start, start + hard_max + 1)])
     return cost_literals, cost_coefficients
@@ -164,7 +164,7 @@ def add_soft_sum_constraint(model, works, hard_min, soft_min, min_cost,
     # Penalize sums below the soft_min target.
     if soft_min > hard_min and min_cost > 0:
         delta = model.NewIntVar(-len(works), len(works), '')
-        model.Add(delta + sum_var == soft_min)
+        model.Add(delta == soft_min - sum_var)
         # TODO(user): Compare efficiency with only excess >= soft_min - sum_var.
         excess = model.NewIntVar(0, 7, prefix + ': under_sum')
         model.AddMaxEquality(excess, [delta, 0])
@@ -174,7 +174,7 @@ def add_soft_sum_constraint(model, works, hard_min, soft_min, min_cost,
     # Penalize sums above the soft_max target.
     if soft_max < hard_max and max_cost > 0:
         delta = model.NewIntVar(-7, 7, '')
-        model.Add(delta + sum_var == soft_max)
+        model.Add(delta == sum_var - soft_max)
         excess = model.NewIntVar(0, 7, prefix + ': over_sum')
         model.AddMaxEquality(excess, [delta, 0])
         cost_variables.append(excess)

@@ -1,0 +1,27 @@
+variables {
+  name: "x"
+  domain: 0
+  domain: 1
+}
+variables {
+  name: "y"
+  domain: 0
+  domain: 1
+}
+variables {
+  name: "z"
+  domain: 0
+  domain: 1
+}
+constraints {
+  linear {
+    vars: 2
+    vars: 1
+    vars: 0
+    coeffs: -1
+    coeffs: 1
+    coeffs: 1
+    domain: 0
+    domain: 0
+  }
+}
