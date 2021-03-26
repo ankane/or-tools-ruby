@@ -1,4 +1,4 @@
-## 0.4.3 (unreleased)
+## 0.4.3 (2021-03-26)
 
 - Added `add_assumption`, `add_assumptions`, and `clear_assumptions` to `CpModel`
 - Added `add_hint` and `clear_hints` to `CpModel`
