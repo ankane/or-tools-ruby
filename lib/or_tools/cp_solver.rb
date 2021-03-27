@@ -29,6 +29,10 @@ module ORTools
       @response.status
     end
 
+    def sufficient_assumptions_for_infeasibility
+      @response.sufficient_assumptions_for_infeasibility
+    end
+
     def parameters
       @parameters ||= SatParameters.new
     end

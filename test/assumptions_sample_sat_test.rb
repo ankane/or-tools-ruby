@@ -20,10 +20,7 @@ class AssumptionsSampleSat < Minitest::Test
 
     solver = ORTools::CpSolver.new
     status = solver.solve(model)
-
-    assert_equal :feasible, status
-
-    puts('status: %s' % status)
-    puts('SufficientAssumptionsForInfeasibility = %s' % solver.sufficient_assumptions_for_infeasibility)
+    assert_equal :infeasible, status
+    assert_equal [3, 4, 5], solver.sufficient_assumptions_for_infeasibility
   end
 end

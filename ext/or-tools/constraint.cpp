@@ -462,5 +462,15 @@ void init_constraint(Rice::Module& m) {
         } else {
           throw std::runtime_error("Unknown solver status");
         }
+      })
+    .define_method(
+      "sufficient_assumptions_for_infeasibility",
+      *[](CpSolverResponse& self) {
+        auto a = Array();
+        auto assumptions = self.sufficient_assumptions_for_infeasibility();
+        for (auto const& v : assumptions) {
+          a.push(v);
+        }
+        return a;
       });
 }

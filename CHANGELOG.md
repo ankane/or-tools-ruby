@@ -1,3 +1,7 @@
+## 0.4.4 (unreleased)
+
+- Added `sufficient_assumptions_for_infeasibility` to `CpSolver`
+
 ## 0.4.3 (2021-03-26)
 
 - Added `add_assumption`, `add_assumptions`, and `clear_assumptions` to `CpModel`
