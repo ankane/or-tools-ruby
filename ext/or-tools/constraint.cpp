@@ -20,9 +20,13 @@ using operations_research::sat::SolutionBooleanValue;
 using operations_research::sat::SolutionIntegerValue;
 
 using Rice::Array;
+using Rice::Class;
 using Rice::Object;
 using Rice::String;
 using Rice::Symbol;
+
+Class rb_cBoolVar;
+Class rb_cSatIntVar;
 
 template<>
 inline
@@ -34,26 +38,21 @@ LinearExpr from_ruby<LinearExpr>(Object x)
     expr = from_ruby<int64>(x.call("to_i"));
   } else if (x.respond_to("vars")) {
     Array vars = x.call("vars");
-    for(auto const& var: vars) {
+    for (auto const& var: vars) {
       auto cvar = (Array) var;
-      // TODO clean up
       Object o = cvar[0];
-      std::string type = ((String) o.call("class").call("name")).str();
-      if (type == "ORTools::BoolVar") {
+      if (o.is_a(rb_cBoolVar)) {
         expr.AddTerm(from_ruby<BoolVar>(cvar[0]), from_ruby<int64>(cvar[1]));
-      } else if (type == "Integer") {
+      } else if (o.is_a(rb_cInteger)) {
         expr.AddConstant(from_ruby<int64>(cvar[0]) * from_ruby<int64>(cvar[1]));
       } else {
         expr.AddTerm(from_ruby<IntVar>(cvar[0]), from_ruby<int64>(cvar[1]));
       }
     }
+  } else if (x.is_a(rb_cBoolVar)) {
+    expr = from_ruby<BoolVar>(x);
   } else {
-    std::string type = ((String) x.call("class").call("name")).str();
-    if (type == "ORTools::BoolVar") {
-      expr = from_ruby<BoolVar>(x);
-    } else {
-      expr = from_ruby<IntVar>(x);
-    }
+    expr = from_ruby<IntVar>(x);
   }
 
   return expr;
@@ -128,8 +127,6 @@ LinearExprSpan from_ruby<LinearExprSpan>(Object x)
   return LinearExprSpan(x);
 }
 
-Rice::Class rb_cSatIntVar;
-
 // need a wrapper class since absl::Span doesn't own
 class BoolVarSpan {
   std::vector<BoolVar> vec;
@@ -178,7 +175,7 @@ void init_constraint(Rice::Module& m) {
         }
       });
 
-  Rice::define_class_under<BoolVar>(m, "BoolVar")
+  rb_cBoolVar = Rice::define_class_under<BoolVar>(m, "BoolVar")
     .define_method("name", &BoolVar::Name)
     .define_method("index", &BoolVar::index)
     .define_method("not", &BoolVar::Not)

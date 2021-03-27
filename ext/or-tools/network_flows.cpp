@@ -47,7 +47,7 @@ void init_network_flows(Rice::Module& m) {
         self.GetSourceSideMinCut(&result);
 
         Array ret;
-        for(auto const& it: result) {
+        for (auto const& it: result) {
           ret.push(it);
         }
         return ret;
@@ -59,7 +59,7 @@ void init_network_flows(Rice::Module& m) {
         self.GetSinkSideMinCut(&result);
 
         Array ret;
-        for(auto const& it: result) {
+        for (auto const& it: result) {
           ret.push(it);
         }
         return ret;
