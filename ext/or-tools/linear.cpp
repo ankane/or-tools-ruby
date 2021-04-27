@@ -19,6 +19,15 @@ using Rice::Symbol;
 namespace Rice::detail
 {
   template<>
+  struct Type<MPSolver::OptimizationProblemType>
+  {
+    static bool verify()
+    {
+      return true;
+    }
+  };
+
+  template<>
   struct From_Ruby<MPSolver::OptimizationProblemType>
   {
     static MPSolver::OptimizationProblemType convert(VALUE x)
@@ -36,6 +45,9 @@ namespace Rice::detail
 }
 
 void init_linear(Rice::Module& m) {
+  Rice::define_class_under<LinearRange>(m, "LinearRange");
+  auto rb_cLinearExpr = Rice::define_class_under<LinearExpr>(m, "LinearExpr");
+
   Rice::define_class_under<MPVariable>(m, "MPVariable")
     .define_method("name", &MPVariable::name)
     .define_method("solution_value", &MPVariable::solution_value)
@@ -63,7 +75,7 @@ void init_linear(Rice::Module& m) {
         return "#<ORTools::MPVariable @name=\"" + self.name() + "\">";
       });
 
-  Rice::define_class_under<LinearExpr>(m, "LinearExpr")
+  rb_cLinearExpr
     .define_constructor(Rice::Constructor<LinearExpr>())
     .define_method(
       "_add_linear_expr",
@@ -114,8 +126,6 @@ void init_linear(Rice::Module& m) {
       [](LinearExpr& self) {
         return "#<ORTools::LinearExpr \"" + self.ToString() + "\">";
       });
-
-  Rice::define_class_under<LinearRange>(m, "LinearRange");
 
   Rice::define_class_under<MPConstraint>(m, "MPConstraint")
     .define_method("set_coefficient", &MPConstraint::SetCoefficient);

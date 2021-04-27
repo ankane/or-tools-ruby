@@ -25,6 +25,15 @@ using Rice::Symbol;
 namespace Rice::detail
 {
   template<>
+  struct Type<LinearExpr>
+  {
+    static bool verify()
+    {
+      return true;
+    }
+  };
+
+  template<>
   struct From_Ruby<LinearExpr>
   {
     static LinearExpr convert(VALUE v)
@@ -33,7 +42,7 @@ namespace Rice::detail
       LinearExpr expr;
 
       if (x.respond_to("to_i")) {
-        expr = Rice::detail::From_Ruby<int64>::convert(x.call("to_i").value());
+        expr = Rice::detail::From_Ruby<int64>().convert(x.call("to_i").value());
       } else if (x.respond_to("vars")) {
         Array vars = x.call("vars");
         for(auto const& var: vars) {
@@ -42,19 +51,19 @@ namespace Rice::detail
           Object o = cvar[0];
           std::string type = ((String) o.call("class").call("name")).str();
           if (type == "ORTools::BoolVar") {
-            expr.AddTerm(Rice::detail::From_Ruby<BoolVar>::convert(cvar[0].value()), Rice::detail::From_Ruby<int64>::convert(cvar[1].value()));
+            expr.AddTerm(Rice::detail::From_Ruby<BoolVar>().convert(cvar[0].value()), Rice::detail::From_Ruby<int64>().convert(cvar[1].value()));
           } else if (type == "Integer") {
-            expr.AddConstant(Rice::detail::From_Ruby<int64>::convert(cvar[0].value()) * Rice::detail::From_Ruby<int64>::convert(cvar[1].value()));
+            expr.AddConstant(Rice::detail::From_Ruby<int64>().convert(cvar[0].value()) * Rice::detail::From_Ruby<int64>().convert(cvar[1].value()));
           } else {
-            expr.AddTerm(Rice::detail::From_Ruby<IntVar>::convert(cvar[0].value()), Rice::detail::From_Ruby<int64>::convert(cvar[1].value()));
+            expr.AddTerm(Rice::detail::From_Ruby<IntVar>().convert(cvar[0].value()), Rice::detail::From_Ruby<int64>().convert(cvar[1].value()));
           }
         }
       } else {
         std::string type = ((String) x.call("class").call("name")).str();
         if (type == "ORTools::BoolVar") {
-          expr = Rice::detail::From_Ruby<BoolVar>::convert(x.value());
+          expr = Rice::detail::From_Ruby<BoolVar>().convert(x.value());
         } else {
-          expr = Rice::detail::From_Ruby<IntVar>::convert(x.value());
+          expr = Rice::detail::From_Ruby<IntVar>().convert(x.value());
         }
       }
 
@@ -71,7 +80,7 @@ class IntVarSpan {
       Array a = Array(x);
       vec.reserve(a.size());
       for (std::size_t i = 0; i < a.size(); ++i) {
-        vec.push_back(Rice::detail::From_Ruby<IntVar>::convert(a[i].value()));
+        vec.push_back(Rice::detail::From_Ruby<IntVar>().convert(a[i].value()));
       }
     }
     operator absl::Span<const IntVar>() {
@@ -81,6 +90,15 @@ class IntVarSpan {
 
 namespace Rice::detail
 {
+  template<>
+  struct Type<IntVarSpan>
+  {
+    static bool verify()
+    {
+      return true;
+    }
+  };
+
   template<>
   struct From_Ruby<IntVarSpan>
   {
@@ -99,7 +117,7 @@ class IntervalVarSpan {
       Array a = Array(x);
       vec.reserve(a.size());
       for (std::size_t i = 0; i < a.size(); ++i) {
-        vec.push_back(Rice::detail::From_Ruby<IntervalVar>::convert(a[i].value()));
+        vec.push_back(Rice::detail::From_Ruby<IntervalVar>().convert(a[i].value()));
       }
     }
     operator absl::Span<const IntervalVar>() {
@@ -109,6 +127,15 @@ class IntervalVarSpan {
 
 namespace Rice::detail
 {
+  template<>
+  struct Type<IntervalVarSpan>
+  {
+    static bool verify()
+    {
+      return true;
+    }
+  };
+
   template<>
   struct From_Ruby<IntervalVarSpan>
   {
@@ -127,7 +154,7 @@ class LinearExprSpan {
       Array a = Array(x);
       vec.reserve(a.size());
       for (std::size_t i = 0; i < a.size(); ++i) {
-        vec.push_back(Rice::detail::From_Ruby<LinearExpr>::convert(a[i].value()));
+        vec.push_back(Rice::detail::From_Ruby<LinearExpr>().convert(a[i].value()));
       }
     }
     operator absl::Span<const LinearExpr>() {
@@ -137,6 +164,15 @@ class LinearExprSpan {
 
 namespace Rice::detail
 {
+  template<>
+  struct Type<LinearExprSpan>
+  {
+    static bool verify()
+    {
+      return true;
+    }
+  };
+
   template<>
   struct From_Ruby<LinearExprSpan>
   {
@@ -155,7 +191,7 @@ class BoolVarSpan {
       Array a = Array(x);
       vec.reserve(a.size());
       for (std::size_t i = 0; i < a.size(); ++i) {
-        vec.push_back(Rice::detail::From_Ruby<BoolVar>::convert(a[i].value()));
+        vec.push_back(Rice::detail::From_Ruby<BoolVar>().convert(a[i].value()));
       }
     }
     operator absl::Span<const BoolVar>() {
@@ -165,6 +201,15 @@ class BoolVarSpan {
 
 namespace Rice::detail
 {
+  template<>
+  struct Type<BoolVarSpan>
+  {
+    static bool verify()
+    {
+      return true;
+    }
+  };
+
   template<>
   struct From_Ruby<BoolVarSpan>
   {
@@ -374,6 +419,38 @@ void init_constraint(Rice::Module& m) {
         return proto_string;
       });
 
+  Rice::define_class_under<CpSolverResponse>(m, "CpSolverResponse")
+    .define_method("objective_value", &CpSolverResponse::objective_value)
+    .define_method("num_conflicts", &CpSolverResponse::num_conflicts)
+    .define_method("num_branches", &CpSolverResponse::num_branches)
+    .define_method("wall_time", &CpSolverResponse::wall_time)
+    .define_method(
+      "solution_integer_value",
+      [](CpSolverResponse& self, IntVar& x) {
+        LinearExpr expr(x);
+        return SolutionIntegerValue(self, expr);
+      })
+    .define_method("solution_boolean_value", &SolutionBooleanValue)
+    .define_method(
+      "status",
+      [](CpSolverResponse& self) {
+        auto status = self.status();
+
+        if (status == CpSolverStatus::OPTIMAL) {
+          return Symbol("optimal");
+        } else if (status == CpSolverStatus::FEASIBLE) {
+          return Symbol("feasible");
+        } else if (status == CpSolverStatus::INFEASIBLE) {
+          return Symbol("infeasible");
+        } else if (status == CpSolverStatus::MODEL_INVALID) {
+          return Symbol("model_invalid");
+        } else if (status == CpSolverStatus::UNKNOWN) {
+          return Symbol("unknown");
+        } else {
+          throw std::runtime_error("Unknown solver status");
+        }
+      });
+
   Rice::define_class_under(m, "CpSolver")
     .define_method(
       "_solve_with_observer",
@@ -411,37 +488,5 @@ void init_constraint(Rice::Module& m) {
       "_solution_boolean_value",
       [](Object self, CpSolverResponse& response, BoolVar& x) {
         return SolutionBooleanValue(response, x);
-      });
-
-  Rice::define_class_under<CpSolverResponse>(m, "CpSolverResponse")
-    .define_method("objective_value", &CpSolverResponse::objective_value)
-    .define_method("num_conflicts", &CpSolverResponse::num_conflicts)
-    .define_method("num_branches", &CpSolverResponse::num_branches)
-    .define_method("wall_time", &CpSolverResponse::wall_time)
-    .define_method(
-      "solution_integer_value",
-      [](CpSolverResponse& self, IntVar& x) {
-        LinearExpr expr(x);
-        return SolutionIntegerValue(self, expr);
-      })
-    .define_method("solution_boolean_value", &SolutionBooleanValue)
-    .define_method(
-      "status",
-      [](CpSolverResponse& self) {
-        auto status = self.status();
-
-        if (status == CpSolverStatus::OPTIMAL) {
-          return Symbol("optimal");
-        } else if (status == CpSolverStatus::FEASIBLE) {
-          return Symbol("feasible");
-        } else if (status == CpSolverStatus::INFEASIBLE) {
-          return Symbol("infeasible");
-        } else if (status == CpSolverStatus::MODEL_INVALID) {
-          return Symbol("model_invalid");
-        } else if (status == CpSolverStatus::UNKNOWN) {
-          return Symbol("unknown");
-        } else {
-          throw std::runtime_error("Unknown solver status");
-        }
       });
 }

@@ -22,11 +22,20 @@ using Rice::Symbol;
 namespace Rice::detail
 {
   template<>
+  struct Type<RoutingNodeIndex>
+  {
+    static bool verify()
+    {
+      return true;
+    }
+  };
+
+  template<>
   struct From_Ruby<RoutingNodeIndex>
   {
     static RoutingNodeIndex convert(VALUE x)
     {
-      const RoutingNodeIndex index{Rice::detail::From_Ruby<int>::convert(x)};
+      const RoutingNodeIndex index{Rice::detail::From_Ruby<int>().convert(x)};
       return index;
     }
   };
@@ -34,9 +43,9 @@ namespace Rice::detail
   template<>
   struct To_Ruby<RoutingNodeIndex>
   {
-    static VALUE convert(RoutingNodeIndex const & x, bool takeOwnership)
+    static VALUE convert(RoutingNodeIndex const & x)
     {
-      return Rice::detail::To_Ruby<int>::convert(x.value(), takeOwnership);
+      return Rice::detail::To_Ruby<int>().convert(x.value());
     }
   };
 }
@@ -44,7 +53,7 @@ namespace Rice::detail
 std::vector<RoutingNodeIndex> nodeIndexVector(Array x) {
   std::vector<RoutingNodeIndex> res;
   for (auto const& v : x) {
-    res.push_back(Rice::detail::From_Ruby<RoutingNodeIndex>::convert(v.value()));
+    res.push_back(Rice::detail::From_Ruby<RoutingNodeIndex>().convert(v.value()));
   }
   return res;
 }
@@ -71,9 +80,12 @@ class Assignment {
 };
 
 void init_routing(Rice::Module& m) {
+  auto rb_cRoutingSearchParameters = Rice::define_class_under<RoutingSearchParameters>(m, "RoutingSearchParameters");
+  auto rb_cIntVar = Rice::define_class_under<operations_research::IntVar>(m, "IntVar");
+
   m.define_singleton_function("default_routing_search_parameters", &DefaultRoutingSearchParameters);
 
-  Rice::define_class_under<RoutingSearchParameters>(m, "RoutingSearchParameters")
+  rb_cRoutingSearchParameters
     .define_method(
       "first_solution_strategy=",
       [](RoutingSearchParameters& self, Symbol value) {
@@ -176,7 +188,7 @@ void init_routing(Rice::Module& m) {
     .define_method("max", &Assignment::Max);
 
   // not to be confused with operations_research::sat::IntVar
-  Rice::define_class_under<operations_research::IntVar>(m, "IntVar")
+  rb_cIntVar
     .define_method(
       "set_range",
       [](operations_research::IntVar& self, int64 new_min, int64 new_max) {
@@ -197,8 +209,8 @@ void init_routing(Rice::Module& m) {
       [](operations_research::Solver& self, Object o) {
         operations_research::Constraint* constraint;
         if (o.respond_to("left")) {
-          operations_research::IntExpr* left(Rice::detail::From_Ruby<operations_research::IntVar*>::convert(o.call("left").value()));
-          operations_research::IntExpr* right(Rice::detail::From_Ruby<operations_research::IntVar*>::convert(o.call("right").value()));
+          operations_research::IntExpr* left(Rice::detail::From_Ruby<operations_research::IntVar*>().convert(o.call("left").value()));
+          operations_research::IntExpr* right(Rice::detail::From_Ruby<operations_research::IntVar*>().convert(o.call("right").value()));
           auto op = o.call("operator").to_s().str();
           if (op == "==") {
             constraint = self.MakeEquality(left, right);
@@ -208,7 +220,7 @@ void init_routing(Rice::Module& m) {
             throw std::runtime_error("Unknown operator");
           }
         } else {
-          constraint = Rice::detail::From_Ruby<operations_research::Constraint*>::convert(o.value());
+          constraint = Rice::detail::From_Ruby<operations_research::Constraint*>().convert(o.value());
         }
         self.AddConstraint(constraint);
       })
@@ -222,12 +234,12 @@ void init_routing(Rice::Module& m) {
       [](operations_research::Solver& self, Array rb_intervals, Array rb_demands, int64 capacity, const std::string& name) {
         std::vector<operations_research::IntervalVar*> intervals;
         for (std::size_t i = 0; i < rb_intervals.size(); ++i) {
-          intervals.push_back(Rice::detail::From_Ruby<operations_research::IntervalVar*>::convert(rb_intervals[i].value()));
+          intervals.push_back(Rice::detail::From_Ruby<operations_research::IntervalVar*>().convert(rb_intervals[i].value()));
         }
 
         std::vector<int64> demands;
         for (std::size_t i = 0; i < rb_demands.size(); ++i) {
-          demands.push_back(Rice::detail::From_Ruby<int64>::convert(rb_demands[i].value()));
+          demands.push_back(Rice::detail::From_Ruby<int64>().convert(rb_demands[i].value()));
         }
 
         return self.MakeCumulative(intervals, demands, capacity, name);
@@ -240,7 +252,7 @@ void init_routing(Rice::Module& m) {
       [](RoutingModel& self, Object callback) {
         return self.RegisterTransitCallback(
           [callback](int64 from_index, int64 to_index) -> int64 {
-            return Rice::detail::From_Ruby<int64>::convert(callback.call("call", from_index, to_index).value());
+            return Rice::detail::From_Ruby<int64>().convert(callback.call("call", from_index, to_index).value());
           }
         );
       })
@@ -249,7 +261,7 @@ void init_routing(Rice::Module& m) {
       [](RoutingModel& self, Object callback) {
         return self.RegisterUnaryTransitCallback(
           [callback](int64 from_index) -> int64 {
-            return Rice::detail::From_Ruby<int64>::convert(callback.call("call", from_index).value());
+            return Rice::detail::From_Ruby<int64>().convert(callback.call("call", from_index).value());
           }
         );
       })
@@ -284,7 +296,7 @@ void init_routing(Rice::Module& m) {
       [](RoutingModel& self, int evaluator_index, int64 slack_max, Array vc, bool fix_start_cumul_to_zero, const std::string& name) {
         std::vector<int64> vehicle_capacities;
         for (std::size_t i = 0; i < vc.size(); ++i) {
-          vehicle_capacities.push_back(Rice::detail::From_Ruby<int64>::convert(vc[i].value()));
+          vehicle_capacities.push_back(Rice::detail::From_Ruby<int64>().convert(vc[i].value()));
         }
         self.AddDimensionWithVehicleCapacity(evaluator_index, slack_max, vehicle_capacities, fix_start_cumul_to_zero, name);
       })
@@ -293,7 +305,7 @@ void init_routing(Rice::Module& m) {
       [](RoutingModel& self, Array rb_indices, int64 slack_max, int64 capacity, bool fix_start_cumul_to_zero, const std::string& name) {
         std::vector<int> evaluator_indices;
         for (std::size_t i = 0; i < rb_indices.size(); ++i) {
-          evaluator_indices.push_back(Rice::detail::From_Ruby<int>::convert(rb_indices[i].value()));
+          evaluator_indices.push_back(Rice::detail::From_Ruby<int>().convert(rb_indices[i].value()));
         }
         self.AddDimensionWithVehicleTransits(evaluator_indices, slack_max, capacity, fix_start_cumul_to_zero, name);
       })
@@ -302,7 +314,7 @@ void init_routing(Rice::Module& m) {
       [](RoutingModel& self, Array rb_indices, int64 penalty) {
         std::vector<int64> indices;
         for (std::size_t i = 0; i < rb_indices.size(); ++i) {
-          indices.push_back(Rice::detail::From_Ruby<int64>::convert(rb_indices[i].value()));
+          indices.push_back(Rice::detail::From_Ruby<int64>().convert(rb_indices[i].value()));
         }
         self.AddDisjunction(indices, penalty);
       })

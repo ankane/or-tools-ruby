@@ -11,6 +11,15 @@ using Rice::Symbol;
 namespace Rice::detail
 {
   template<>
+  struct Type<KnapsackSolver::SolverType>
+  {
+    static bool verify()
+    {
+      return true;
+    }
+  };
+
+  template<>
   struct From_Ruby<KnapsackSolver::SolverType>
   {
     static KnapsackSolver::SolverType convert(VALUE x)
@@ -36,7 +45,7 @@ void init_bin_packing(Rice::Module& m) {
       [](KnapsackSolver& self, Array rb_values, Array rb_weights, Array rb_capacities) {
         std::vector<int64> values;
         for (std::size_t i = 0; i < rb_values.size(); ++i) {
-          values.push_back(Rice::detail::From_Ruby<int64>::convert(rb_values[i].value()));
+          values.push_back(Rice::detail::From_Ruby<int64>().convert(rb_values[i].value()));
         }
 
         std::vector<std::vector<int64>> weights;
@@ -44,14 +53,14 @@ void init_bin_packing(Rice::Module& m) {
           Array rb_w = Array(rb_weights[i]);
           std::vector<int64> w;
           for (std::size_t j = 0; j < rb_w.size(); ++j) {
-            w.push_back(Rice::detail::From_Ruby<int64>::convert(rb_w[j].value()));
+            w.push_back(Rice::detail::From_Ruby<int64>().convert(rb_w[j].value()));
           }
           weights.push_back(w);
         }
 
         std::vector<int64> capacities;
         for (std::size_t i = 0; i < rb_capacities.size(); ++i) {
-          capacities.push_back(Rice::detail::From_Ruby<int64>::convert(rb_capacities[i].value()));
+          capacities.push_back(Rice::detail::From_Ruby<int64>().convert(rb_capacities[i].value()));
         }
 
         self.Init(values, weights, capacities);
