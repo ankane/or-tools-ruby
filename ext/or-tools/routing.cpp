@@ -54,16 +54,16 @@ class Assignment {
     Assignment(const operations_research::Assignment* v) {
       self = v;
     }
-    int64 ObjectiveValue() {
+    int64_t ObjectiveValue() {
       return self->ObjectiveValue();
     }
-    int64 Value(const operations_research::IntVar* const var) const {
+    int64_t Value(const operations_research::IntVar* const var) const {
       return self->Value(var);
     }
-    int64 Min(const operations_research::IntVar* const var) const {
+    int64_t Min(const operations_research::IntVar* const var) const {
       return self->Min(var);
     }
-    int64 Max(const operations_research::IntVar* const var) const {
+    int64_t Max(const operations_research::IntVar* const var) const {
       return self->Max(var);
     }
 };
@@ -180,17 +180,17 @@ void init_routing(Rice::Module& m) {
       })
     .define_method(
       "solution_limit=",
-      *[](RoutingSearchParameters& self, int64 value) {
+      *[](RoutingSearchParameters& self, int64_t value) {
         self.set_solution_limit(value);
       })
     .define_method(
       "time_limit=",
-      *[](RoutingSearchParameters& self, int64 value) {
+      *[](RoutingSearchParameters& self, int64_t value) {
         self.mutable_time_limit()->set_seconds(value);
       })
     .define_method(
       "lns_time_limit=",
-      *[](RoutingSearchParameters& self, int64 value) {
+      *[](RoutingSearchParameters& self, int64_t value) {
         self.mutable_lns_time_limit()->set_seconds(value);
       });
 
@@ -218,7 +218,7 @@ void init_routing(Rice::Module& m) {
   rb_cIntVar = Rice::define_class_under<operations_research::IntVar>(m, "IntVar")
     .define_method(
       "set_range",
-      *[](operations_research::IntVar& self, int64 new_min, int64 new_max) {
+      *[](operations_research::IntVar& self, int64_t new_min, int64_t new_max) {
         self.SetRange(new_min, new_max);
       });
 
@@ -253,20 +253,20 @@ void init_routing(Rice::Module& m) {
       })
     .define_method(
       "fixed_duration_interval_var",
-      *[](operations_research::Solver& self, operations_research::IntVar* const start_variable, int64 duration, const std::string& name) {
+      *[](operations_research::Solver& self, operations_research::IntVar* const start_variable, int64_t duration, const std::string& name) {
         return self.MakeFixedDurationIntervalVar(start_variable, duration, name);
       })
     .define_method(
       "cumulative",
-      *[](operations_research::Solver& self, Array rb_intervals, Array rb_demands, int64 capacity, const std::string& name) {
+      *[](operations_research::Solver& self, Array rb_intervals, Array rb_demands, int64_t capacity, const std::string& name) {
         std::vector<operations_research::IntervalVar*> intervals;
         for (std::size_t i = 0; i < rb_intervals.size(); ++i) {
           intervals.push_back(from_ruby<operations_research::IntervalVar*>(rb_intervals[i]));
         }
 
-        std::vector<int64> demands;
+        std::vector<int64_t> demands;
         for (std::size_t i = 0; i < rb_demands.size(); ++i) {
-          demands.push_back(from_ruby<int64>(rb_demands[i]));
+          demands.push_back(from_ruby<int64_t>(rb_demands[i]));
         }
 
         return self.MakeCumulative(intervals, demands, capacity, name);
@@ -278,8 +278,8 @@ void init_routing(Rice::Module& m) {
       "register_transit_callback",
       *[](RoutingModel& self, Object callback) {
         return self.RegisterTransitCallback(
-          [callback](int64 from_index, int64 to_index) -> int64 {
-            return from_ruby<int64>(callback.call("call", from_index, to_index));
+          [callback](int64_t from_index, int64_t to_index) -> int64_t {
+            return from_ruby<int64_t>(callback.call("call", from_index, to_index));
           }
         );
       })
@@ -287,8 +287,8 @@ void init_routing(Rice::Module& m) {
       "register_unary_transit_callback",
       *[](RoutingModel& self, Object callback) {
         return self.RegisterUnaryTransitCallback(
-          [callback](int64 from_index) -> int64 {
-            return from_ruby<int64>(callback.call("call", from_index));
+          [callback](int64_t from_index) -> int64_t {
+            return from_ruby<int64_t>(callback.call("call", from_index));
           }
         );
       })
@@ -320,16 +320,16 @@ void init_routing(Rice::Module& m) {
     .define_method("add_dimension", &RoutingModel::AddDimension)
     .define_method(
       "add_dimension_with_vehicle_capacity",
-      *[](RoutingModel& self, int evaluator_index, int64 slack_max, Array vc, bool fix_start_cumul_to_zero, const std::string& name) {
-        std::vector<int64> vehicle_capacities;
+      *[](RoutingModel& self, int evaluator_index, int64_t slack_max, Array vc, bool fix_start_cumul_to_zero, const std::string& name) {
+        std::vector<int64_t> vehicle_capacities;
         for (std::size_t i = 0; i < vc.size(); ++i) {
-          vehicle_capacities.push_back(from_ruby<int64>(vc[i]));
+          vehicle_capacities.push_back(from_ruby<int64_t>(vc[i]));
         }
         self.AddDimensionWithVehicleCapacity(evaluator_index, slack_max, vehicle_capacities, fix_start_cumul_to_zero, name);
       })
     .define_method(
       "add_dimension_with_vehicle_transits",
-      *[](RoutingModel& self, Array rb_indices, int64 slack_max, int64 capacity, bool fix_start_cumul_to_zero, const std::string& name) {
+      *[](RoutingModel& self, Array rb_indices, int64_t slack_max, int64_t capacity, bool fix_start_cumul_to_zero, const std::string& name) {
         std::vector<int> evaluator_indices;
         for (std::size_t i = 0; i < rb_indices.size(); ++i) {
           evaluator_indices.push_back(from_ruby<int>(rb_indices[i]));
@@ -338,10 +338,10 @@ void init_routing(Rice::Module& m) {
       })
     .define_method(
       "add_disjunction",
-      *[](RoutingModel& self, Array rb_indices, int64 penalty) {
-        std::vector<int64> indices;
+      *[](RoutingModel& self, Array rb_indices, int64_t penalty) {
+        std::vector<int64_t> indices;
         for (std::size_t i = 0; i < rb_indices.size(); ++i) {
-          indices.push_back(from_ruby<int64>(rb_indices[i]));
+          indices.push_back(from_ruby<int64_t>(rb_indices[i]));
         }
         self.AddDisjunction(indices, penalty);
       })

@@ -3,26 +3,29 @@ require "fileutils"
 require "net/http"
 require "tmpdir"
 
-version = "8.2.8710"
+version = "9.0.9048"
 
 if RbConfig::CONFIG["host_os"] =~ /darwin/i
-  filename = "or-tools_MacOsX-11.2.1_v#{version}.tar.gz"
-  checksum = "1c3bd45ab10677aa96d404cb837067e786a6d98123d8b556cf29d6994aa43b3b"
+  filename = "or-tools_MacOsX-11.2.3_v#{version}.tar.gz"
+  checksum = "adf73a00d4ec49558b67be5ce3cfc8f30268da2253b35feb11d0d40700550bf6"
 else
   os = %x[lsb_release -is].chomp rescue nil
   os_version = %x[lsb_release -rs].chomp rescue nil
   if os == "Ubuntu" && os_version == "20.04"
     filename = "or-tools_ubuntu-20.04_v#{version}.tar.gz"
-    checksum = "ab3b3051b10a4bbe8d080857f3c4ef3cfe9c10896ff94f352bb779e993756dd7"
+    checksum = "5565343c1c310d2885a40ce850ae7e3468299b3fee97ae8eed8425ce06bd4960"
   elsif os == "Ubuntu" && os_version == "18.04"
     filename = "or-tools_ubuntu-18.04_v#{version}.tar.gz"
-    checksum = "0d052deb2ba4491c29e86242fb5d61d0fe14bac847c2feaa35fbeff925ea40a0"
+    checksum = "08cf548d0179f7fa814bb7458be94cd1b8a3de14985e6a9faf6118a1d8571539"
   elsif os == "Debian" && os_version == "10"
     filename = "or-tools_debian-10_v#{version}.tar.gz"
-    checksum = "1f2ec99181c92859ab46e68a6231babce92ded949fd1d08ee31afa4db04c43b3"
+    checksum = "063fb1d8765ae23b0bb25b9c561e904532713416fe0458f7db45a0f72190eb50"
   elsif os == "CentOS" && os_version == "8"
     filename = "or-tools_centos-8_v#{version}.tar.gz"
-    checksum = "be638a20b36f6da81aa29fd24c69c4a66afc980b8a221b1cbabb3910b9827718"
+    checksum = "c98212ed4fc699d8ae70c1f53cd1d8dacd28e52970336fab5b86dedf7406f215"
+  elsif os == "CentOS" && os_version == "7"
+    filename = "or-tools_centos-7_v#{version}.tar.gz"
+    checksum = "b992bda4614bbc703583b0e9edcd2ade54bacfb9909399b20c8aa95ff7197d68"
   else
     platform =
       if Gem.win_platform?

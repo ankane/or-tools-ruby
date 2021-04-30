@@ -35,18 +35,18 @@ LinearExpr from_ruby<LinearExpr>(Object x)
   LinearExpr expr;
 
   if (x.respond_to("to_i")) {
-    expr = from_ruby<int64>(x.call("to_i"));
+    expr = from_ruby<int64_t>(x.call("to_i"));
   } else if (x.respond_to("vars")) {
     Array vars = x.call("vars");
     for (auto const& var: vars) {
       auto cvar = (Array) var;
       Object o = cvar[0];
       if (o.is_a(rb_cBoolVar)) {
-        expr.AddTerm(from_ruby<BoolVar>(cvar[0]), from_ruby<int64>(cvar[1]));
+        expr.AddTerm(from_ruby<BoolVar>(cvar[0]), from_ruby<int64_t>(cvar[1]));
       } else if (o.is_a(rb_cInteger)) {
-        expr.AddConstant(from_ruby<int64>(cvar[0]) * from_ruby<int64>(cvar[1]));
+        expr.AddConstant(from_ruby<int64_t>(cvar[0]) * from_ruby<int64_t>(cvar[1]));
       } else {
-        expr.AddTerm(from_ruby<IntVar>(cvar[0]), from_ruby<int64>(cvar[1]));
+        expr.AddTerm(from_ruby<IntVar>(cvar[0]), from_ruby<int64_t>(cvar[1]));
       }
     }
   } else if (x.is_a(rb_cBoolVar)) {
@@ -197,7 +197,7 @@ void init_constraint(Rice::Module& m) {
     .define_constructor(Rice::Constructor<CpModelBuilder>())
     .define_method(
       "new_int_var",
-      *[](CpModelBuilder& self, int64 start, int64 end, const std::string& name) {
+      *[](CpModelBuilder& self, int64_t start, int64_t end, const std::string& name) {
         const operations_research::Domain domain(start, end);
         return self.NewIntVar(domain).WithName(name);
       })
@@ -208,7 +208,7 @@ void init_constraint(Rice::Module& m) {
       })
     .define_method(
       "new_constant",
-      *[](CpModelBuilder& self, int64 value) {
+      *[](CpModelBuilder& self, int64_t value) {
         return self.NewConstant(value);
       })
     .define_method(
@@ -359,7 +359,7 @@ void init_constraint(Rice::Module& m) {
       })
     .define_method(
       "add_hint",
-      *[](CpModelBuilder& self, IntVar var, int64 value) {
+      *[](CpModelBuilder& self, IntVar var, int64_t value) {
         self.AddHint(var, value);
       })
     .define_method(

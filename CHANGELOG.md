@@ -1,5 +1,7 @@
-## 0.4.4 (unreleased)
+## 0.5.0 (unreleased)
 
+- Updated OR-Tools to 9.0
+- Added binary installation for CentOS 7
 - Added `sufficient_assumptions_for_infeasibility` to `CpSolver`
 
 ## 0.4.3 (2021-03-26)
