@@ -1,4 +1,4 @@
-## 0.5.0 (unreleased)
+## 0.5.0 (2021-04-30)
 
 - Updated OR-Tools to 9.0
 - Added binary installation for CentOS 7
