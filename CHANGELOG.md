@@ -1,3 +1,7 @@
+## 0.4.2 (unreleased)
+
+- Added support for Rice 4
+
 ## 0.4.1 (2021-02-23)
 
 - Added solution printers
