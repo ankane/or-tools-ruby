@@ -3,6 +3,7 @@
 
 #include "ext.h"
 
+using operations_research::Assignment;
 using operations_research::DefaultRoutingSearchParameters;
 using operations_research::FirstSolutionStrategy;
 using operations_research::LocalSearchMetaheuristic;
@@ -51,27 +52,6 @@ namespace Rice::detail
     }
   };
 }
-
-// need a wrapper class due to const
-class Assignment {
-  const operations_research::Assignment* self;
-  public:
-    Assignment(const operations_research::Assignment* v) {
-      self = v;
-    }
-    int64_t ObjectiveValue() {
-      return self->ObjectiveValue();
-    }
-    int64_t Value(const operations_research::IntVar* const var) const {
-      return self->Value(var);
-    }
-    int64_t Min(const operations_research::IntVar* const var) const {
-      return self->Min(var);
-    }
-    int64_t Max(const operations_research::IntVar* const var) const {
-      return self->Max(var);
-    }
-};
 
 void init_routing(Rice::Module& m) {
   auto rb_cRoutingSearchParameters = Rice::define_class_under<RoutingSearchParameters>(m, "RoutingSearchParameters");
@@ -306,8 +286,6 @@ void init_routing(Rice::Module& m) {
     .define_method(
       "solve_with_parameters",
       [](RoutingModel& self, const RoutingSearchParameters& search_parameters) {
-        auto assignment = self.SolveWithParameters(search_parameters);
-        // std::cout << assignment->DebugString();
-        return (Assignment) assignment;
+        return self.SolveWithParameters(search_parameters);
       });
 }
