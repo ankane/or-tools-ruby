@@ -78,82 +78,6 @@ namespace Rice::detail
 }
 
 // need a wrapper class since absl::Span doesn't own
-class IntervalVarSpan {
-  std::vector<IntervalVar> vec;
-  public:
-    IntervalVarSpan(Object x) {
-      auto a = Array(x);
-      vec.reserve(a.size());
-      for (std::size_t i = 0; i < a.size(); ++i) {
-        vec.push_back(Rice::detail::From_Ruby<IntervalVar>().convert(a[i].value()));
-      }
-    }
-    operator absl::Span<const IntervalVar>() {
-      return absl::Span<const IntervalVar>(vec);
-    }
-};
-
-namespace Rice::detail
-{
-  template<>
-  struct Type<IntervalVarSpan>
-  {
-    static bool verify()
-    {
-      return true;
-    }
-  };
-
-  template<>
-  class From_Ruby<IntervalVarSpan>
-  {
-  public:
-    IntervalVarSpan convert(VALUE x)
-    {
-      return IntervalVarSpan(x);
-    }
-  };
-}
-
-// need a wrapper class since absl::Span doesn't own
-class LinearExprSpan {
-  std::vector<LinearExpr> vec;
-  public:
-    LinearExprSpan(Object x) {
-      auto a = Array(x);
-      vec.reserve(a.size());
-      for (std::size_t i = 0; i < a.size(); ++i) {
-        vec.push_back(Rice::detail::From_Ruby<LinearExpr>().convert(a[i].value()));
-      }
-    }
-    operator absl::Span<const LinearExpr>() {
-      return absl::Span<const LinearExpr>(vec);
-    }
-};
-
-namespace Rice::detail
-{
-  template<>
-  struct Type<LinearExprSpan>
-  {
-    static bool verify()
-    {
-      return true;
-    }
-  };
-
-  template<>
-  class From_Ruby<LinearExprSpan>
-  {
-  public:
-    LinearExprSpan convert(VALUE x)
-    {
-      return LinearExprSpan(x);
-    }
-  };
-}
-
-// need a wrapper class since absl::Span doesn't own
 class BoolVarSpan {
   std::vector<BoolVar> vec;
   public:
@@ -345,7 +269,7 @@ void init_constraint(Rice::Module& m) {
       })
     .define_method(
       "add_lin_min_equality",
-      [](CpModelBuilder& self, LinearExpr target, LinearExprSpan exprs) {
+      [](CpModelBuilder& self, LinearExpr target, std::vector<LinearExpr> exprs) {
         return self.AddLinMinEquality(target, exprs);
       })
     .define_method(
@@ -355,7 +279,7 @@ void init_constraint(Rice::Module& m) {
       })
     .define_method(
       "add_lin_max_equality",
-      [](CpModelBuilder& self, LinearExpr target, LinearExprSpan exprs) {
+      [](CpModelBuilder& self, LinearExpr target, std::vector<LinearExpr> exprs) {
         return self.AddLinMaxEquality(target, exprs);
       })
     .define_method(
@@ -380,7 +304,7 @@ void init_constraint(Rice::Module& m) {
       })
     .define_method(
       "add_no_overlap",
-      [](CpModelBuilder& self, IntervalVarSpan vars) {
+      [](CpModelBuilder& self, std::vector<IntervalVar> vars) {
         return self.AddNoOverlap(vars);
       })
     .define_method(
