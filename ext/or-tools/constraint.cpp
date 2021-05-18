@@ -78,44 +78,6 @@ namespace Rice::detail
 }
 
 // need a wrapper class since absl::Span doesn't own
-class IntVarSpan {
-  std::vector<IntVar> vec;
-  public:
-    IntVarSpan(Object x) {
-      auto a = Array(x);
-      vec.reserve(a.size());
-      for (std::size_t i = 0; i < a.size(); ++i) {
-        vec.push_back(Rice::detail::From_Ruby<IntVar>().convert(a[i].value()));
-      }
-    }
-    operator absl::Span<const IntVar>() {
-      return absl::Span<const IntVar>(vec);
-    }
-};
-
-namespace Rice::detail
-{
-  template<>
-  struct Type<IntVarSpan>
-  {
-    static bool verify()
-    {
-      return true;
-    }
-  };
-
-  template<>
-  class From_Ruby<IntVarSpan>
-  {
-  public:
-    IntVarSpan convert(VALUE x)
-    {
-      return IntVarSpan(x);
-    }
-  };
-}
-
-// need a wrapper class since absl::Span doesn't own
 class IntervalVarSpan {
   std::vector<IntervalVar> vec;
   public:
@@ -368,17 +330,17 @@ void init_constraint(Rice::Module& m) {
       })
     .define_method(
       "add_all_different",
-      [](CpModelBuilder& self, IntVarSpan vars) {
+      [](CpModelBuilder& self, std::vector<IntVar> vars) {
         return self.AddAllDifferent(vars);
       })
     .define_method(
       "add_inverse_constraint",
-      [](CpModelBuilder& self, IntVarSpan variables, IntVarSpan inverse_variables) {
+      [](CpModelBuilder& self, std::vector<IntVar> variables, std::vector<IntVar> inverse_variables) {
         return self.AddInverseConstraint(variables, inverse_variables);
       })
     .define_method(
       "add_min_equality",
-      [](CpModelBuilder& self, IntVar target, IntVarSpan vars) {
+      [](CpModelBuilder& self, IntVar target, std::vector<IntVar> vars) {
         return self.AddMinEquality(target, vars);
       })
     .define_method(
@@ -388,7 +350,7 @@ void init_constraint(Rice::Module& m) {
       })
     .define_method(
       "add_max_equality",
-      [](CpModelBuilder& self, IntVar target, IntVarSpan vars) {
+      [](CpModelBuilder& self, IntVar target, std::vector<IntVar> vars) {
         return self.AddMaxEquality(target, vars);
       })
     .define_method(
@@ -413,7 +375,7 @@ void init_constraint(Rice::Module& m) {
       })
     .define_method(
       "add_product_equality",
-      [](CpModelBuilder& self, IntVar target, IntVarSpan vars) {
+      [](CpModelBuilder& self, IntVar target, std::vector<IntVar> vars) {
         return self.AddProductEquality(target, vars);
       })
     .define_method(
