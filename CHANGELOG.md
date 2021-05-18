@@ -1,3 +1,7 @@
+## 0.5.1 (unreleased)
+
+- Updated to Rice 4
+
 ## 0.5.0 (2021-04-30)
 
 - Updated OR-Tools to 9.0

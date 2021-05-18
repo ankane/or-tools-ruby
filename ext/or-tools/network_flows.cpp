@@ -1,9 +1,7 @@
 #include <ortools/graph/max_flow.h>
 #include <ortools/graph/min_cost_flow.h>
 
-#include <rice/Array.hpp>
-#include <rice/Constructor.hpp>
-#include <rice/Module.hpp>
+#include "ext.h"
 
 using operations_research::NodeIndex;
 using operations_research::SimpleMaxFlow;
@@ -25,7 +23,7 @@ void init_network_flows(Rice::Module& m) {
     .define_method("flow", &SimpleMaxFlow::Flow)
     .define_method(
       "solve",
-      *[](SimpleMaxFlow& self, NodeIndex source, NodeIndex sink) {
+      [](SimpleMaxFlow& self, NodeIndex source, NodeIndex sink) {
         auto status = self.Solve(source, sink);
 
         if (status == SimpleMaxFlow::Status::OPTIMAL) {
@@ -42,7 +40,7 @@ void init_network_flows(Rice::Module& m) {
       })
     .define_method(
       "source_side_min_cut",
-      *[](SimpleMaxFlow& self) {
+      [](SimpleMaxFlow& self) {
         std::vector<NodeIndex> result;
         self.GetSourceSideMinCut(&result);
 
@@ -54,7 +52,7 @@ void init_network_flows(Rice::Module& m) {
       })
     .define_method(
       "sink_side_min_cut",
-      *[](SimpleMaxFlow& self) {
+      [](SimpleMaxFlow& self) {
         std::vector<NodeIndex> result;
         self.GetSinkSideMinCut(&result);
 
@@ -81,7 +79,7 @@ void init_network_flows(Rice::Module& m) {
     .define_method("unit_cost", &SimpleMinCostFlow::UnitCost)
     .define_method(
       "solve",
-      *[](SimpleMinCostFlow& self) {
+      [](SimpleMinCostFlow& self) {
         auto status = self.Solve();
 
         if (status == SimpleMinCostFlow::Status::NOT_SOLVED) {

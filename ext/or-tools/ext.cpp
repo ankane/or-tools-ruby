@@ -1,6 +1,6 @@
 #include <ortools/base/version.h>
 
-#include <rice/Module.hpp>
+#include "ext.h"
 
 void init_assignment(Rice::Module& m);
 void init_bin_packing(Rice::Module& m);
@@ -14,9 +14,9 @@ void Init_ext()
 {
   auto m = Rice::define_module("ORTools");
 
-  m.define_singleton_method(
+  m.define_singleton_function(
     "lib_version",
-    *[]() {
+    []() {
       return std::to_string(operations_research::OrToolsMajorVersion()) + "."
         + std::to_string(operations_research::OrToolsMinorVersion());
     });

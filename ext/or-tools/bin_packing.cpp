@@ -1,8 +1,6 @@
 #include <ortools/algorithms/knapsack_solver.h>
 
-#include <rice/Array.hpp>
-#include <rice/Constructor.hpp>
-#include <rice/Module.hpp>
+#include "ext.h"
 
 using operations_research::KnapsackSolver;
 
@@ -10,16 +8,32 @@ using Rice::Array;
 using Rice::Object;
 using Rice::Symbol;
 
-template<>
-inline
-KnapsackSolver::SolverType from_ruby<KnapsackSolver::SolverType>(Object x)
+namespace Rice::detail
 {
-  std::string s = Symbol(x).str();
-  if (s == "branch_and_bound") {
-    return KnapsackSolver::KNAPSACK_MULTIDIMENSION_BRANCH_AND_BOUND_SOLVER;
-  } else {
-    throw std::runtime_error("Unknown solver type: " + s);
-  }
+  template<>
+  struct Type<KnapsackSolver::SolverType>
+  {
+    static bool verify()
+    {
+      return true;
+    }
+  };
+
+  template<>
+  class From_Ruby<KnapsackSolver::SolverType>
+  {
+  public:
+    KnapsackSolver::SolverType convert(VALUE x)
+    {
+      Object obj(x);
+      std::string s = Symbol(obj).str();
+      if (s == "branch_and_bound") {
+        return KnapsackSolver::KNAPSACK_MULTIDIMENSION_BRANCH_AND_BOUND_SOLVER;
+      } else {
+        throw std::runtime_error("Unknown solver type: " + s);
+      }
+    }
+  };
 }
 
 void init_bin_packing(Rice::Module& m) {
@@ -29,10 +43,10 @@ void init_bin_packing(Rice::Module& m) {
     .define_method("best_solution_contains?", &KnapsackSolver::BestSolutionContains)
     .define_method(
       "init",
-      *[](KnapsackSolver& self, Array rb_values, Array rb_weights, Array rb_capacities) {
+      [](KnapsackSolver& self, Array rb_values, Array rb_weights, Array rb_capacities) {
         std::vector<int64_t> values;
         for (std::size_t i = 0; i < rb_values.size(); ++i) {
-          values.push_back(from_ruby<int64_t>(rb_values[i]));
+          values.push_back(Rice::detail::From_Ruby<int64_t>().convert(rb_values[i].value()));
         }
 
         std::vector<std::vector<int64_t>> weights;
@@ -40,14 +54,14 @@ void init_bin_packing(Rice::Module& m) {
           Array rb_w = Array(rb_weights[i]);
           std::vector<int64_t> w;
           for (std::size_t j = 0; j < rb_w.size(); ++j) {
-            w.push_back(from_ruby<int64_t>(rb_w[j]));
+            w.push_back(Rice::detail::From_Ruby<int64_t>().convert(rb_w[j].value()));
           }
           weights.push_back(w);
         }
 
         std::vector<int64_t> capacities;
         for (std::size_t i = 0; i < rb_capacities.size(); ++i) {
-          capacities.push_back(from_ruby<int64_t>(rb_capacities[i]));
+          capacities.push_back(Rice::detail::From_Ruby<int64_t>().convert(rb_capacities[i].value()));
         }
 
         self.Init(values, weights, capacities);

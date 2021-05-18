@@ -1,11 +1,6 @@
 #include <ortools/linear_solver/linear_solver.h>
 
-#include <rice/Array.hpp>
-#include <rice/Class.hpp>
-#include <rice/Constructor.hpp>
-#include <rice/Module.hpp>
-#include <rice/String.hpp>
-#include <rice/Symbol.hpp>
+#include "ext.h"
 
 using operations_research::LinearExpr;
 using operations_research::LinearRange;
@@ -21,141 +16,135 @@ using Rice::Object;
 using Rice::String;
 using Rice::Symbol;
 
-template<>
-inline
-MPSolver::OptimizationProblemType from_ruby<MPSolver::OptimizationProblemType>(Object x)
+namespace Rice::detail
 {
-  std::string s = Symbol(x).str();
-  if (s == "glop") {
-    return MPSolver::OptimizationProblemType::GLOP_LINEAR_PROGRAMMING;
-  } else if (s == "cbc") {
-    return MPSolver::OptimizationProblemType::CBC_MIXED_INTEGER_PROGRAMMING;
-  } else {
-    throw std::runtime_error("Unknown optimization problem type: " + s);
-  }
-}
+  template<>
+  struct Type<MPSolver::OptimizationProblemType>
+  {
+    static bool verify()
+    {
+      return true;
+    }
+  };
 
-Class rb_cMPVariable;
-Class rb_cMPConstraint;
-Class rb_cMPObjective;
-
-template<>
-inline
-Object to_ruby<MPVariable*>(MPVariable* const &x)
-{
-  return Rice::Data_Object<MPVariable>(x, rb_cMPVariable, nullptr, nullptr);
-}
-
-template<>
-inline
-Object to_ruby<MPConstraint*>(MPConstraint* const &x)
-{
-  return Rice::Data_Object<MPConstraint>(x, rb_cMPConstraint, nullptr, nullptr);
-}
-
-template<>
-inline
-Object to_ruby<MPObjective*>(MPObjective* const &x)
-{
-  return Rice::Data_Object<MPObjective>(x, rb_cMPObjective, nullptr, nullptr);
+  template<>
+  struct From_Ruby<MPSolver::OptimizationProblemType>
+  {
+    static MPSolver::OptimizationProblemType convert(VALUE x)
+    {
+      std::string s = Symbol(x).str();
+      if (s == "glop") {
+        return MPSolver::OptimizationProblemType::GLOP_LINEAR_PROGRAMMING;
+      } else if (s == "cbc") {
+        return MPSolver::OptimizationProblemType::CBC_MIXED_INTEGER_PROGRAMMING;
+      } else {
+        throw std::runtime_error("Unknown optimization problem type: " + s);
+      }
+    }
+  };
 }
 
 void init_linear(Rice::Module& m) {
-  rb_cMPVariable = Rice::define_class_under<MPVariable>(m, "MPVariable")
+  Rice::define_class_under<LinearRange>(m, "LinearRange");
+  auto rb_cLinearExpr = Rice::define_class_under<LinearExpr>(m, "LinearExpr");
+
+  Rice::define_class_under<MPVariable>(m, "MPVariable")
     .define_method("name", &MPVariable::name)
     .define_method("solution_value", &MPVariable::solution_value)
     .define_method(
       "+",
-      *[](MPVariable& self, LinearExpr& other) {
+      [](MPVariable& self, LinearExpr& other) {
         LinearExpr s(&self);
         return s + other;
       })
     .define_method(
       "-",
-      *[](MPVariable& self, LinearExpr& other) {
+      [](MPVariable& self, LinearExpr& other) {
         LinearExpr s(&self);
         return s - other;
       })
     .define_method(
       "*",
-      *[](MPVariable& self, double other) {
+      [](MPVariable& self, double other) {
         LinearExpr s(&self);
         return s * other;
       })
     .define_method(
       "inspect",
-      *[](MPVariable& self) {
+      [](MPVariable& self) {
         return "#<ORTools::MPVariable @name=\"" + self.name() + "\">";
       });
 
-  Rice::define_class_under<LinearExpr>(m, "LinearExpr")
+  rb_cLinearExpr
     .define_constructor(Rice::Constructor<LinearExpr>())
     .define_method(
       "_add_linear_expr",
-      *[](LinearExpr& self, LinearExpr& other) {
+      [](LinearExpr& self, LinearExpr& other) {
         return self + other;
       })
     .define_method(
       "_add_mp_variable",
-      *[](LinearExpr& self, MPVariable &other) {
+      [](LinearExpr& self, MPVariable &other) {
         LinearExpr o(&other);
         return self + o;
       })
     .define_method(
       "_gte_double",
-      *[](LinearExpr& self, double other) {
+      [](LinearExpr& self, double other) {
         LinearExpr o(other);
         return self >= o;
       })
     .define_method(
       "_gte_linear_expr",
-      *[](LinearExpr& self, LinearExpr& other) {
+      [](LinearExpr& self, LinearExpr& other) {
         return self >= other;
       })
     .define_method(
       "_lte_double",
-      *[](LinearExpr& self, double other) {
+      [](LinearExpr& self, double other) {
         LinearExpr o(other);
         return self <= o;
       })
     .define_method(
       "_lte_linear_expr",
-      *[](LinearExpr& self, LinearExpr& other) {
+      [](LinearExpr& self, LinearExpr& other) {
         return self <= other;
       })
     .define_method(
       "==",
-      *[](LinearExpr& self, double other) {
+      [](LinearExpr& self, double other) {
         LinearExpr o(other);
         return self == o;
       })
     .define_method(
       "to_s",
-      *[](LinearExpr& self) {
+      [](LinearExpr& self) {
         return self.ToString();
       })
     .define_method(
       "inspect",
-      *[](LinearExpr& self) {
+      [](LinearExpr& self) {
         return "#<ORTools::LinearExpr \"" + self.ToString() + "\">";
       });
 
-  Rice::define_class_under<LinearRange>(m, "LinearRange");
-
-  rb_cMPConstraint = Rice::define_class_under<MPConstraint>(m, "MPConstraint")
+  Rice::define_class_under<MPConstraint>(m, "MPConstraint")
     .define_method("set_coefficient", &MPConstraint::SetCoefficient);
 
-  rb_cMPObjective = Rice::define_class_under<MPObjective>(m, "MPObjective")
+  Rice::define_class_under<MPObjective>(m, "MPObjective")
     .define_method("value", &MPObjective::Value)
     .define_method("set_coefficient", &MPObjective::SetCoefficient)
     .define_method("set_maximization", &MPObjective::SetMaximization);
 
   Rice::define_class_under<MPSolver>(m, "Solver")
     .define_constructor(Rice::Constructor<MPSolver, std::string, MPSolver::OptimizationProblemType>())
-    .define_method("infinity", &MPSolver::infinity)
+    .define_method(
+      "infinity",
+      [](MPSolver& self) {
+        return self.infinity();
+      })
     .define_method(
       "int_var",
-      *[](MPSolver& self, double min, double max, const std::string& name) {
+      [](MPSolver& self, double min, double max, const std::string& name) {
         return self.MakeIntVar(min, max, name);
       })
     .define_method("num_var", &MPSolver::MakeNumVar)
@@ -168,27 +157,27 @@ void init_linear(Rice::Module& m) {
     .define_method("objective", &MPSolver::MutableObjective)
     .define_method(
       "maximize",
-      *[](MPSolver& self, LinearExpr& expr) {
+      [](MPSolver& self, LinearExpr& expr) {
         return self.MutableObjective()->MaximizeLinearExpr(expr);
       })
     .define_method(
       "minimize",
-      *[](MPSolver& self, LinearExpr& expr) {
+      [](MPSolver& self, LinearExpr& expr) {
         return self.MutableObjective()->MinimizeLinearExpr(expr);
       })
     .define_method(
       "add",
-      *[](MPSolver& self, const LinearRange& range) {
+      [](MPSolver& self, const LinearRange& range) {
         return self.MakeRowConstraint(range);
       })
     .define_method(
       "constraint",
-      *[](MPSolver& self, double lb, double ub) {
+      [](MPSolver& self, double lb, double ub) {
         return self.MakeRowConstraint(lb, ub);
       })
     .define_method(
       "solve",
-      *[](MPSolver& self) {
+      [](MPSolver& self) {
         auto status = self.Solve();
 
         if (status == MPSolver::ResultStatus::OPTIMAL) {

@@ -1,9 +1,7 @@
 #include <google/protobuf/text_format.h>
 #include <ortools/sat/cp_model.h>
 
-#include <rice/Array.hpp>
-#include <rice/Constructor.hpp>
-#include <rice/Module.hpp>
+#include "ext.h"
 
 using operations_research::sat::BoolVar;
 using operations_research::sat::Constraint;
@@ -28,34 +26,55 @@ using Rice::Symbol;
 Class rb_cBoolVar;
 Class rb_cSatIntVar;
 
-template<>
-inline
-LinearExpr from_ruby<LinearExpr>(Object x)
+namespace Rice::detail
 {
-  LinearExpr expr;
-
-  if (x.respond_to("to_i")) {
-    expr = from_ruby<int64_t>(x.call("to_i"));
-  } else if (x.respond_to("vars")) {
-    Array vars = x.call("vars");
-    for (auto const& var: vars) {
-      auto cvar = (Array) var;
-      Object o = cvar[0];
-      if (o.is_a(rb_cBoolVar)) {
-        expr.AddTerm(from_ruby<BoolVar>(cvar[0]), from_ruby<int64_t>(cvar[1]));
-      } else if (o.is_a(rb_cInteger)) {
-        expr.AddConstant(from_ruby<int64_t>(cvar[0]) * from_ruby<int64_t>(cvar[1]));
-      } else {
-        expr.AddTerm(from_ruby<IntVar>(cvar[0]), from_ruby<int64_t>(cvar[1]));
-      }
+  template<>
+  struct Type<LinearExpr>
+  {
+    static bool verify()
+    {
+      return true;
     }
-  } else if (x.is_a(rb_cBoolVar)) {
-    expr = from_ruby<BoolVar>(x);
-  } else {
-    expr = from_ruby<IntVar>(x);
-  }
+  };
 
-  return expr;
+  template<>
+  class From_Ruby<LinearExpr>
+  {
+  public:
+    LinearExpr convert(VALUE v)
+    {
+      Object x(v);
+      LinearExpr expr;
+
+      if (x.respond_to("to_i")) {
+        expr = Rice::detail::From_Ruby<int64_t>().convert(x.call("to_i").value());
+      } else if (x.respond_to("vars")) {
+        Array vars = x.call("vars");
+        for(auto const& var: vars) {
+          auto cvar = (Array) var;
+          // TODO clean up
+          Object o = cvar[0];
+          std::string type = ((String) o.call("class").call("name")).str();
+          if (type == "ORTools::BoolVar") {
+            expr.AddTerm(Rice::detail::From_Ruby<BoolVar>().convert(cvar[0].value()), Rice::detail::From_Ruby<int64_t>().convert(cvar[1].value()));
+          } else if (type == "Integer") {
+            expr.AddConstant(Rice::detail::From_Ruby<int64_t>().convert(cvar[0].value()) * Rice::detail::From_Ruby<int64_t>().convert(cvar[1].value()));
+          } else {
+            expr.AddTerm(Rice::detail::From_Ruby<IntVar>().convert(cvar[0].value()), Rice::detail::From_Ruby<int64_t>().convert(cvar[1].value()));
+          }
+        }
+      } else {
+        std::string type = ((String) x.call("class").call("name")).str();
+        if (type == "ORTools::BoolVar") {
+          expr = Rice::detail::From_Ruby<BoolVar>().convert(x.value());
+        } else {
+          expr = Rice::detail::From_Ruby<IntVar>().convert(x.value());
+        }
+      }
+
+      return expr;
+    }
+  };
 }
 
 // need a wrapper class since absl::Span doesn't own
@@ -66,7 +85,7 @@ class IntVarSpan {
       Array a = Array(x);
       vec.reserve(a.size());
       for (std::size_t i = 0; i < a.size(); ++i) {
-        vec.push_back(from_ruby<IntVar>(a[i]));
+        vec.push_back(Rice::detail::From_Ruby<IntVar>().convert(a[i].value()));
       }
     }
     operator absl::Span<const IntVar>() {
@@ -74,11 +93,26 @@ class IntVarSpan {
     }
 };
 
-template<>
-inline
-IntVarSpan from_ruby<IntVarSpan>(Object x)
+namespace Rice::detail
 {
-  return IntVarSpan(x);
+  template<>
+  struct Type<IntVarSpan>
+  {
+    static bool verify()
+    {
+      return true;
+    }
+  };
+
+  template<>
+  class From_Ruby<IntVarSpan>
+  {
+  public:
+    IntVarSpan convert(VALUE x)
+    {
+      return IntVarSpan(x);
+    }
+  };
 }
 
 // need a wrapper class since absl::Span doesn't own
@@ -89,7 +123,7 @@ class IntervalVarSpan {
       Array a = Array(x);
       vec.reserve(a.size());
       for (std::size_t i = 0; i < a.size(); ++i) {
-        vec.push_back(from_ruby<IntervalVar>(a[i]));
+        vec.push_back(Rice::detail::From_Ruby<IntervalVar>().convert(a[i].value()));
       }
     }
     operator absl::Span<const IntervalVar>() {
@@ -97,11 +131,26 @@ class IntervalVarSpan {
     }
 };
 
-template<>
-inline
-IntervalVarSpan from_ruby<IntervalVarSpan>(Object x)
+namespace Rice::detail
 {
-  return IntervalVarSpan(x);
+  template<>
+  struct Type<IntervalVarSpan>
+  {
+    static bool verify()
+    {
+      return true;
+    }
+  };
+
+  template<>
+  class From_Ruby<IntervalVarSpan>
+  {
+  public:
+    IntervalVarSpan convert(VALUE x)
+    {
+      return IntervalVarSpan(x);
+    }
+  };
 }
 
 // need a wrapper class since absl::Span doesn't own
@@ -112,7 +161,7 @@ class LinearExprSpan {
       Array a = Array(x);
       vec.reserve(a.size());
       for (std::size_t i = 0; i < a.size(); ++i) {
-        vec.push_back(from_ruby<LinearExpr>(a[i]));
+        vec.push_back(Rice::detail::From_Ruby<LinearExpr>().convert(a[i].value()));
       }
     }
     operator absl::Span<const LinearExpr>() {
@@ -120,11 +169,26 @@ class LinearExprSpan {
     }
 };
 
-template<>
-inline
-LinearExprSpan from_ruby<LinearExprSpan>(Object x)
+namespace Rice::detail
 {
-  return LinearExprSpan(x);
+  template<>
+  struct Type<LinearExprSpan>
+  {
+    static bool verify()
+    {
+      return true;
+    }
+  };
+
+  template<>
+  class From_Ruby<LinearExprSpan>
+  {
+  public:
+    LinearExprSpan convert(VALUE x)
+    {
+      return LinearExprSpan(x);
+    }
+  };
 }
 
 // need a wrapper class since absl::Span doesn't own
@@ -136,9 +200,9 @@ class BoolVarSpan {
       vec.reserve(a.size());
       for (std::size_t i = 0; i < a.size(); ++i) {
         if (((Object) a[i]).is_a(rb_cSatIntVar)) {
-          vec.push_back(from_ruby<IntVar>(a[i]).ToBoolVar());
+          vec.push_back(Rice::detail::From_Ruby<IntVar>().convert(a[i].value()).ToBoolVar());
         } else {
-          vec.push_back(from_ruby<BoolVar>(a[i]));
+          vec.push_back(Rice::detail::From_Ruby<BoolVar>().convert(a[i].value()));
         }
       }
     }
@@ -147,11 +211,26 @@ class BoolVarSpan {
     }
 };
 
-template<>
-inline
-BoolVarSpan from_ruby<BoolVarSpan>(Object x)
+namespace Rice::detail
 {
-  return BoolVarSpan(x);
+  template<>
+  struct Type<BoolVarSpan>
+  {
+    static bool verify()
+    {
+      return true;
+    }
+  };
+
+  template<>
+  class From_Ruby<BoolVarSpan>
+  {
+  public:
+    BoolVarSpan convert(VALUE x)
+    {
+      return BoolVarSpan(x);
+    }
+  };
 }
 
 void init_constraint(Rice::Module& m) {
@@ -166,12 +245,12 @@ void init_constraint(Rice::Module& m) {
       "only_enforce_if",
       *[](Constraint& self, Object literal) {
         if (literal.is_a(rb_cSatIntVar)) {
-          return self.OnlyEnforceIf(from_ruby<IntVar>(literal).ToBoolVar());
+          return self.OnlyEnforceIf(Rice::detail::From_Ruby<IntVar>().convert(literal).ToBoolVar());
         } else if (literal.is_a(rb_cArray)) {
           // TODO support IntVarSpan
-          return self.OnlyEnforceIf(from_ruby<BoolVarSpan>(literal));
+          return self.OnlyEnforceIf(Rice::detail::From_Ruby<BoolVarSpan>().convert(literal));
         } else {
-          return self.OnlyEnforceIf(from_ruby<BoolVar>(literal));
+          return self.OnlyEnforceIf(Rice::detail::From_Ruby<BoolVar>().convert(literal));
         }
       });
 
@@ -390,45 +469,6 @@ void init_constraint(Rice::Module& m) {
         return proto_string;
       });
 
-  Rice::define_class_under(m, "CpSolver")
-    .define_method(
-      "_solve_with_observer",
-      *[](Object self, CpModelBuilder& model, SatParameters& parameters, Object callback, bool all_solutions) {
-        Model m;
-
-        if (all_solutions) {
-          // set parameters for SearchForAllSolutions
-          parameters.set_enumerate_all_solutions(true);
-        }
-        m.Add(NewSatParameters(parameters));
-
-        m.Add(NewFeasibleSolutionObserver(
-          [callback](const CpSolverResponse& r) {
-            // TODO find a better way to do this
-            callback.call("response=", r);
-            callback.call("on_solution_callback");
-          })
-        );
-        return SolveCpModel(model.Build(), &m);
-      })
-    .define_method(
-      "_solve",
-      *[](Object self, CpModelBuilder& model, SatParameters& parameters) {
-        Model m;
-        m.Add(NewSatParameters(parameters));
-        return SolveCpModel(model.Build(), &m);
-      })
-    .define_method(
-      "_solution_integer_value",
-      *[](Object self, CpSolverResponse& response, IntVar& x) {
-        return SolutionIntegerValue(response, x);
-      })
-    .define_method(
-      "_solution_boolean_value",
-      *[](Object self, CpSolverResponse& response, BoolVar& x) {
-        return SolutionBooleanValue(response, x);
-      });
-
   Rice::define_class_under<CpSolverResponse>(m, "CpSolverResponse")
     .define_method("objective_value", &CpSolverResponse::objective_value)
     .define_method("num_conflicts", &CpSolverResponse::num_conflicts)
@@ -469,5 +509,44 @@ void init_constraint(Rice::Module& m) {
           a.push(v);
         }
         return a;
+      });
+
+  Rice::define_class_under(m, "CpSolver")
+    .define_method(
+      "_solve_with_observer",
+      *[](Object self, CpModelBuilder& model, SatParameters& parameters, Object callback, bool all_solutions) {
+        Model m;
+
+        if (all_solutions) {
+          // set parameters for SearchForAllSolutions
+          parameters.set_enumerate_all_solutions(true);
+        }
+        m.Add(NewSatParameters(parameters));
+
+        m.Add(NewFeasibleSolutionObserver(
+          [callback](const CpSolverResponse& r) {
+            // TODO find a better way to do this
+            callback.call("response=", r);
+            callback.call("on_solution_callback");
+          })
+        );
+        return SolveCpModel(model.Build(), &m);
+      })
+    .define_method(
+      "_solve",
+      *[](Object self, CpModelBuilder& model, SatParameters& parameters) {
+        Model m;
+        m.Add(NewSatParameters(parameters));
+        return SolveCpModel(model.Build(), &m);
+      })
+    .define_method(
+      "_solution_integer_value",
+      *[](Object self, CpSolverResponse& response, IntVar& x) {
+        return SolutionIntegerValue(response, x);
+      })
+    .define_method(
+      "_solution_boolean_value",
+      *[](Object self, CpSolverResponse& response, BoolVar& x) {
+        return SolutionBooleanValue(response, x);
       });
 }
