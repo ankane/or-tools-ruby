@@ -225,12 +225,7 @@ void init_routing(Rice::Module& m) {
       })
     .define_method(
       "cumulative",
-      [](operations_research::Solver& self, Array rb_intervals, std::vector<int64_t> demands, int64_t capacity, const std::string& name) {
-        std::vector<operations_research::IntervalVar*> intervals;
-        for (std::size_t i = 0; i < rb_intervals.size(); ++i) {
-          intervals.push_back(Rice::detail::From_Ruby<operations_research::IntervalVar*>().convert(rb_intervals[i].value()));
-        }
-
+      [](operations_research::Solver& self, std::vector<operations_research::IntervalVar*> intervals, std::vector<int64_t> demands, int64_t capacity, const std::string& name) {
         return self.MakeCumulative(intervals, demands, capacity, name);
       });
 
