@@ -36,7 +36,7 @@ namespace Rice::detail
   public:
     RoutingNodeIndex convert(VALUE x)
     {
-      const RoutingNodeIndex index{Rice::detail::From_Ruby<int>().convert(x)};
+      const RoutingNodeIndex index{From_Ruby<int>().convert(x)};
       return index;
     }
   };
@@ -47,17 +47,9 @@ namespace Rice::detail
   public:
     VALUE convert(RoutingNodeIndex const & x)
     {
-      return Rice::detail::To_Ruby<int>().convert(x.value());
+      return To_Ruby<int>().convert(x.value());
     }
   };
-}
-
-std::vector<RoutingNodeIndex> nodeIndexVector(Array x) {
-  std::vector<RoutingNodeIndex> res;
-  for (auto const& v : x) {
-    res.push_back(Rice::detail::From_Ruby<RoutingNodeIndex>().convert(v.value()));
-  }
-  return res;
 }
 
 // need a wrapper class due to const
@@ -91,7 +83,7 @@ void init_routing(Rice::Module& m) {
     .define_method(
       "first_solution_strategy=",
       [](RoutingSearchParameters& self, Symbol value) {
-        std::string s = Symbol(value).str();
+        auto s = Symbol(value).str();
 
         FirstSolutionStrategy::Value v;
         if (s == "path_cheapest_arc") {
@@ -131,7 +123,7 @@ void init_routing(Rice::Module& m) {
     .define_method(
       "local_search_metaheuristic=",
       [](RoutingSearchParameters& self, Symbol value) {
-        std::string s = Symbol(value).str();
+        auto s = Symbol(value).str();
 
         LocalSearchMetaheuristic::Value v;
         if (s == "guided_local_search") {
@@ -177,8 +169,8 @@ void init_routing(Rice::Module& m) {
       })
     .define_singleton_function(
       "_new_starts_ends",
-      [](int num_nodes, int num_vehicles, Array starts, Array ends) {
-        return RoutingIndexManager(num_nodes, num_vehicles, nodeIndexVector(starts), nodeIndexVector(ends));
+      [](int num_nodes, int num_vehicles, std::vector<RoutingNodeIndex> starts, std::vector<RoutingNodeIndex> ends) {
+        return RoutingIndexManager(num_nodes, num_vehicles, starts, ends);
       })
     .define_method("index_to_node", &RoutingIndexManager::IndexToNode)
     .define_method("node_to_index", &RoutingIndexManager::NodeToIndex);
@@ -233,15 +225,10 @@ void init_routing(Rice::Module& m) {
       })
     .define_method(
       "cumulative",
-      [](operations_research::Solver& self, Array rb_intervals, Array rb_demands, int64_t capacity, const std::string& name) {
+      [](operations_research::Solver& self, Array rb_intervals, std::vector<int64_t> demands, int64_t capacity, const std::string& name) {
         std::vector<operations_research::IntervalVar*> intervals;
         for (std::size_t i = 0; i < rb_intervals.size(); ++i) {
           intervals.push_back(Rice::detail::From_Ruby<operations_research::IntervalVar*>().convert(rb_intervals[i].value()));
-        }
-
-        std::vector<int64_t> demands;
-        for (std::size_t i = 0; i < rb_demands.size(); ++i) {
-          demands.push_back(Rice::detail::From_Ruby<int64_t>().convert(rb_demands[i].value()));
         }
 
         return self.MakeCumulative(intervals, demands, capacity, name);
@@ -295,29 +282,17 @@ void init_routing(Rice::Module& m) {
     .define_method("add_dimension", &RoutingModel::AddDimension)
     .define_method(
       "add_dimension_with_vehicle_capacity",
-      [](RoutingModel& self, int evaluator_index, int64_t slack_max, Array vc, bool fix_start_cumul_to_zero, const std::string& name) {
-        std::vector<int64_t> vehicle_capacities;
-        for (std::size_t i = 0; i < vc.size(); ++i) {
-          vehicle_capacities.push_back(Rice::detail::From_Ruby<int64_t>().convert(vc[i].value()));
-        }
+      [](RoutingModel& self, int evaluator_index, int64_t slack_max, std::vector<int64_t> vehicle_capacities, bool fix_start_cumul_to_zero, const std::string& name) {
         self.AddDimensionWithVehicleCapacity(evaluator_index, slack_max, vehicle_capacities, fix_start_cumul_to_zero, name);
       })
     .define_method(
       "add_dimension_with_vehicle_transits",
-      [](RoutingModel& self, Array rb_indices, int64_t slack_max, int64_t capacity, bool fix_start_cumul_to_zero, const std::string& name) {
-        std::vector<int> evaluator_indices;
-        for (std::size_t i = 0; i < rb_indices.size(); ++i) {
-          evaluator_indices.push_back(Rice::detail::From_Ruby<int>().convert(rb_indices[i].value()));
-        }
+      [](RoutingModel& self, std::vector<int> evaluator_indices, int64_t slack_max, int64_t capacity, bool fix_start_cumul_to_zero, const std::string& name) {
         self.AddDimensionWithVehicleTransits(evaluator_indices, slack_max, capacity, fix_start_cumul_to_zero, name);
       })
     .define_method(
       "add_disjunction",
-      [](RoutingModel& self, Array rb_indices, int64_t penalty) {
-        std::vector<int64_t> indices;
-        for (std::size_t i = 0; i < rb_indices.size(); ++i) {
-          indices.push_back(Rice::detail::From_Ruby<int64_t>().convert(rb_indices[i].value()));
-        }
+      [](RoutingModel& self, std::vector<int64_t> indices, int64_t penalty) {
         self.AddDisjunction(indices, penalty);
       })
     .define_method("add_pickup_and_delivery", &RoutingModel::AddPickupAndDelivery)
