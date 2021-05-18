@@ -43,27 +43,7 @@ void init_bin_packing(Rice::Module& m) {
     .define_method("best_solution_contains?", &KnapsackSolver::BestSolutionContains)
     .define_method(
       "init",
-      [](KnapsackSolver& self, Array rb_values, Array rb_weights, Array rb_capacities) {
-        std::vector<int64_t> values;
-        for (std::size_t i = 0; i < rb_values.size(); ++i) {
-          values.push_back(Rice::detail::From_Ruby<int64_t>().convert(rb_values[i].value()));
-        }
-
-        std::vector<std::vector<int64_t>> weights;
-        for (std::size_t i = 0; i < rb_weights.size(); ++i) {
-          Array rb_w = Array(rb_weights[i]);
-          std::vector<int64_t> w;
-          for (std::size_t j = 0; j < rb_w.size(); ++j) {
-            w.push_back(Rice::detail::From_Ruby<int64_t>().convert(rb_w[j].value()));
-          }
-          weights.push_back(w);
-        }
-
-        std::vector<int64_t> capacities;
-        for (std::size_t i = 0; i < rb_capacities.size(); ++i) {
-          capacities.push_back(Rice::detail::From_Ruby<int64_t>().convert(rb_capacities[i].value()));
-        }
-
+       [](KnapsackSolver& self, std::vector<int64_t> values, std::vector<std::vector<int64_t>> weights, std::vector<int64_t> capacities) {
         self.Init(values, weights, capacities);
       });
 }
