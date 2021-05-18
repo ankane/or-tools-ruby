@@ -32,7 +32,7 @@ namespace Rice::detail
   {
     static MPSolver::OptimizationProblemType convert(VALUE x)
     {
-      std::string s = Symbol(x).str();
+      auto s = Symbol(x).str();
       if (s == "glop") {
         return MPSolver::OptimizationProblemType::GLOP_LINEAR_PROGRAMMING;
       } else if (s == "cbc") {

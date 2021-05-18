@@ -25,8 +25,7 @@ namespace Rice::detail
   public:
     KnapsackSolver::SolverType convert(VALUE x)
     {
-      Object obj(x);
-      std::string s = Symbol(obj).str();
+      auto s = Symbol(x).str();
       if (s == "branch_and_bound") {
         return KnapsackSolver::KNAPSACK_MULTIDIMENSION_BRANCH_AND_BOUND_SOLVER;
       } else {

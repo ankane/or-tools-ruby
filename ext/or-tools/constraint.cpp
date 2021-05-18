@@ -54,7 +54,7 @@ namespace Rice::detail
           auto cvar = (Array) var;
           // TODO clean up
           Object o = cvar[0];
-          std::string type = ((String) o.call("class").call("name")).str();
+          auto type = ((String) o.call("class").call("name")).str();
           if (type == "ORTools::BoolVar") {
             expr.AddTerm(From_Ruby<BoolVar>().convert(cvar[0].value()), From_Ruby<int64_t>().convert(cvar[1].value()));
           } else if (type == "Integer") {
@@ -64,7 +64,7 @@ namespace Rice::detail
           }
         }
       } else {
-        std::string type = ((String) x.call("class").call("name")).str();
+        auto type = ((String) x.call("class").call("name")).str();
         if (type == "ORTools::BoolVar") {
           expr = From_Ruby<BoolVar>().convert(x.value());
         } else {
@@ -82,7 +82,7 @@ class IntVarSpan {
   std::vector<IntVar> vec;
   public:
     IntVarSpan(Object x) {
-      Array a = Array(x);
+      auto a = Array(x);
       vec.reserve(a.size());
       for (std::size_t i = 0; i < a.size(); ++i) {
         vec.push_back(Rice::detail::From_Ruby<IntVar>().convert(a[i].value()));
@@ -120,7 +120,7 @@ class IntervalVarSpan {
   std::vector<IntervalVar> vec;
   public:
     IntervalVarSpan(Object x) {
-      Array a = Array(x);
+      auto a = Array(x);
       vec.reserve(a.size());
       for (std::size_t i = 0; i < a.size(); ++i) {
         vec.push_back(Rice::detail::From_Ruby<IntervalVar>().convert(a[i].value()));
@@ -158,7 +158,7 @@ class LinearExprSpan {
   std::vector<LinearExpr> vec;
   public:
     LinearExprSpan(Object x) {
-      Array a = Array(x);
+      auto a = Array(x);
       vec.reserve(a.size());
       for (std::size_t i = 0; i < a.size(); ++i) {
         vec.push_back(Rice::detail::From_Ruby<LinearExpr>().convert(a[i].value()));
@@ -196,7 +196,7 @@ class BoolVarSpan {
   std::vector<BoolVar> vec;
   public:
     BoolVarSpan(Object x) {
-      Array a = Array(x);
+      auto a = Array(x);
       vec.reserve(a.size());
       for (std::size_t i = 0; i < a.size(); ++i) {
         if (((Object) a[i]).is_a(rb_cSatIntVar)) {
