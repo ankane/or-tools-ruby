@@ -78,7 +78,7 @@ module ORTools
 
       # min known neighbors rule
       same_table_by_person = Hash.new { |hash, key| hash[key] = [] }
-      same_table.each do |(g1, g2, t), v|
+      same_table.each do |(g1, g2, _t), v|
         next unless @connections_for[g1][g2]
         same_table_by_person[g1] << v
         same_table_by_person[g2] << v
