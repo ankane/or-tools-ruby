@@ -1,8 +1,6 @@
 require "mkmf-rice"
 
-raise "Missing stdc++" unless have_library("stdc++")
-
-$CXXFLAGS << " -std=c++17 -DUSE_CBC"
+$CXXFLAGS << " -std=c++17 $(optflags) -DUSE_CBC"
 
 # or-tools warnings
 $CXXFLAGS << " -Wno-sign-compare -Wno-shorten-64-to-32 -Wno-ignored-qualifiers"
