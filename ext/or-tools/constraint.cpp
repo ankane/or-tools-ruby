@@ -50,22 +50,22 @@ namespace Rice::detail
         expr = From_Ruby<int64_t>().convert(x.call("to_i").value());
       } else if (x.respond_to("vars")) {
         Array vars = x.call("vars");
-        for(auto const& var: vars) {
-          auto cvar = (Array) var;
+        for (auto const& v : vars) {
           // TODO clean up
-          Object o = cvar[0];
-          auto type = ((String) o.call("class").call("name")).str();
-          if (type == "ORTools::BoolVar") {
-            expr.AddTerm(From_Ruby<BoolVar>().convert(cvar[0].value()), From_Ruby<int64_t>().convert(cvar[1].value()));
-          } else if (type == "Integer") {
-            expr.AddConstant(From_Ruby<int64_t>().convert(cvar[0].value()) * From_Ruby<int64_t>().convert(cvar[1].value()));
+          auto cvar = (Array) v;
+          Object var = cvar[0];
+          auto coeff = From_Ruby<int64_t>().convert(cvar[1].value());
+
+          if (var.is_a(rb_cBoolVar)) {
+            expr.AddTerm(From_Ruby<BoolVar>().convert(var.value()), coeff);
+          } else if (var.is_a(rb_cInteger)) {
+            expr.AddConstant(From_Ruby<int64_t>().convert(var.value()) * coeff);
           } else {
-            expr.AddTerm(From_Ruby<IntVar>().convert(cvar[0].value()), From_Ruby<int64_t>().convert(cvar[1].value()));
+            expr.AddTerm(From_Ruby<IntVar>().convert(var.value()), coeff);
           }
         }
       } else {
-        auto type = ((String) x.call("class").call("name")).str();
-        if (type == "ORTools::BoolVar") {
+        if (x.is_a(rb_cBoolVar)) {
           expr = From_Ruby<BoolVar>().convert(x.value());
         } else {
           expr = From_Ruby<IntVar>().convert(x.value());
