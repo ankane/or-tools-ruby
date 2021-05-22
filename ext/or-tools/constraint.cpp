@@ -50,7 +50,7 @@ namespace Rice::detail
         expr = From_Ruby<int64_t>().convert(x.call("to_i").value());
       } else if (x.respond_to("vars")) {
         Array vars = x.call("vars");
-        for (auto const& v : vars) {
+        for (const auto& v : vars) {
           // TODO clean up
           auto cvar = (Array) v;
           Object var = cvar[0];
@@ -369,7 +369,7 @@ void init_constraint(Rice::Module& m) {
       [](CpSolverResponse& self) {
         auto a = Array();
         auto assumptions = self.sufficient_assumptions_for_infeasibility();
-        for (auto const& v : assumptions) {
+        for (const auto& v : assumptions) {
           a.push(v);
         }
         return a;
