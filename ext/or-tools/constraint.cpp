@@ -75,46 +75,24 @@ namespace Rice::detail
       return expr;
     }
   };
-}
 
-// need a wrapper class since absl::Span doesn't own
-class BoolVarSpan {
-  std::vector<BoolVar> vec;
+  template<>
+  class From_Ruby<std::vector<BoolVar>>
+  {
   public:
-    BoolVarSpan(Object x) {
-      auto a = Array(x);
+    std::vector<BoolVar> convert(VALUE v)
+    {
+      auto a = Array(v);
+      std::vector<BoolVar> vec;
       vec.reserve(a.size());
-      for (std::size_t i = 0; i < a.size(); ++i) {
-        if (((Object) a[i]).is_a(rb_cSatIntVar)) {
-          vec.push_back(Rice::detail::From_Ruby<IntVar>().convert(a[i].value()).ToBoolVar());
+      for (const Object v : a) {
+        if (v.is_a(rb_cSatIntVar)) {
+          vec.push_back(From_Ruby<IntVar>().convert(v.value()).ToBoolVar());
         } else {
-          vec.push_back(Rice::detail::From_Ruby<BoolVar>().convert(a[i].value()));
+          vec.push_back(From_Ruby<BoolVar>().convert(v.value()));
         }
       }
-    }
-    operator absl::Span<const BoolVar>() {
-      return absl::Span<const BoolVar>(vec);
-    }
-};
-
-namespace Rice::detail
-{
-  template<>
-  struct Type<BoolVarSpan>
-  {
-    static bool verify()
-    {
-      return true;
-    }
-  };
-
-  template<>
-  class From_Ruby<BoolVarSpan>
-  {
-  public:
-    BoolVarSpan convert(VALUE x)
-    {
-      return BoolVarSpan(x);
+      return vec;
     }
   };
 }
@@ -134,7 +112,7 @@ void init_constraint(Rice::Module& m) {
           return self.OnlyEnforceIf(Rice::detail::From_Ruby<IntVar>().convert(literal).ToBoolVar());
         } else if (literal.is_a(rb_cArray)) {
           // TODO support IntVarSpan
-          return self.OnlyEnforceIf(Rice::detail::From_Ruby<BoolVarSpan>().convert(literal));
+          return self.OnlyEnforceIf(Rice::detail::From_Ruby<std::vector<BoolVar>>().convert(literal));
         } else {
           return self.OnlyEnforceIf(Rice::detail::From_Ruby<BoolVar>().convert(literal));
         }
@@ -198,17 +176,17 @@ void init_constraint(Rice::Module& m) {
       })
     .define_method(
       "add_bool_or",
-      [](CpModelBuilder& self, BoolVarSpan literals) {
+      [](CpModelBuilder& self, std::vector<BoolVar> literals) {
         return self.AddBoolOr(literals);
       })
     .define_method(
       "add_bool_and",
-      [](CpModelBuilder& self, BoolVarSpan literals) {
+      [](CpModelBuilder& self, std::vector<BoolVar> literals) {
         return self.AddBoolAnd(literals);
       })
     .define_method(
       "add_bool_xor",
-      [](CpModelBuilder& self, BoolVarSpan literals) {
+      [](CpModelBuilder& self, std::vector<BoolVar> literals) {
         return self.AddBoolXor(literals);
       })
     .define_method(
@@ -339,7 +317,7 @@ void init_constraint(Rice::Module& m) {
       })
     .define_method(
       "add_assumptions",
-      [](CpModelBuilder& self, BoolVarSpan literals) {
+      [](CpModelBuilder& self, std::vector<BoolVar> literals) {
         self.AddAssumptions(literals);
       })
     .define_method(
