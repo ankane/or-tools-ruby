@@ -38,5 +38,9 @@ class LinearTest < Minitest::Test
     assert_in_delta 6, x.solution_value
     assert_in_delta 4, y.solution_value
     assert_in_delta 34, opt_solution
+
+    assert_match "Obj: +3 V0 +4 V1", solver.export_model_as_lp_format(true)
+    assert_match "Obj: +3 x +4 y", solver.export_model_as_lp_format(false)
+    assert_match "OBJSENSE", solver.export_model_as_mps_format(true, true)
   end
 end

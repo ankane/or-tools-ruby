@@ -1,3 +1,7 @@
+## 0.5.2 (unreleased)
+
+- Added `export_model_as_lp_format` and `export_model_as_mps_format` to `Solver`
+
 ## 0.5.1 (2021-05-23)
 
 - Updated to Rice 4

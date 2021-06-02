@@ -197,5 +197,23 @@ void init_linear(Rice::Module& m) {
         } else {
           throw std::runtime_error("Unknown status");
         }
+      })
+    .define_method(
+      "export_model_as_lp_format",
+      [](MPSolver& self, bool obfuscate) {
+        std::string model_str;
+        if (!self.ExportModelAsLpFormat(obfuscate, &model_str)) {
+          throw std::runtime_error("Export failed");
+        }
+        return model_str;
+      })
+    .define_method(
+      "export_model_as_mps_format",
+      [](MPSolver& self, bool fixed_format, bool obfuscate) {
+        std::string model_str;
+        if (!self.ExportModelAsMpsFormat(fixed_format, obfuscate, &model_str)) {
+          throw std::runtime_error("Export failed");
+        }
+        return model_str;
       });
 }
