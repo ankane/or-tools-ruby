@@ -1,4 +1,4 @@
-## 0.5.2 (unreleased)
+## 0.5.2 (2021-07-07)
 
 - Added `export_model_as_lp_format` and `export_model_as_mps_format` to `Solver`
 
