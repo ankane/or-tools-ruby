@@ -163,19 +163,35 @@ void init_routing(Rice::Module& m) {
 
   // not to be confused with operations_research::sat::IntVar
   rb_cIntVar
+    .define_method("var?", &operations_research::IntVar::IsVar)
+    .define_method("value", &operations_research::IntVar::Value)
+    .define_method("remove_value", &operations_research::IntVar::RemoveValue)
+    .define_method("remove_interval", &operations_research::IntVar::RemoveInterval)
+    .define_method("remove_values", &operations_research::IntVar::RemoveValues)
+    .define_method("set_values", &operations_research::IntVar::SetValues)
+    .define_method("size", &operations_research::IntVar::Size)
+    .define_method("contains", &operations_research::IntVar::Contains)
+    .define_method("old_min", &operations_research::IntVar::OldMin)
+    .define_method("old_max", &operations_research::IntVar::OldMax)
     .define_method(
       "set_range",
       [](operations_research::IntVar& self, int64_t new_min, int64_t new_max) {
         self.SetRange(new_min, new_max);
       });
 
-  Rice::define_class_under<operations_research::IntervalVar>(m, "IntervalVar");
+  Rice::define_class_under<operations_research::IntervalVar>(m, "IntervalVar")
+    .define_method("start_min", &operations_research::IntervalVar::StartMin)
+    .define_method("start_max", &operations_research::IntervalVar::StartMax)
+    .define_method("old_start_min", &operations_research::IntervalVar::OldStartMin)
+    .define_method("old_start_max", &operations_research::IntervalVar::OldStartMax);
 
   Rice::define_class_under<RoutingDimension>(m, "RoutingDimension")
     .define_method("global_span_cost_coefficient=", &RoutingDimension::SetGlobalSpanCostCoefficient)
     .define_method("cumul_var", &RoutingDimension::CumulVar);
 
-  Rice::define_class_under<operations_research::Constraint>(m, "Constraint");
+  Rice::define_class_under<operations_research::Constraint>(m, "Constraint")
+    .define_method("post", &operations_research::Constraint::Post)
+    .define_method("debug_string", &operations_research::Constraint::DebugString);
 
   Rice::define_class_under<operations_research::Solver>(m, "Solver2")
     .define_method(

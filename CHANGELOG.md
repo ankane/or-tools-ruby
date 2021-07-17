@@ -1,3 +1,7 @@
+## 0.5.3 (unreleased)
+
+- Added more methods to `IntVar`, `IntervalVar`, and `Constraint`
+
 ## 0.5.2 (2021-07-07)
 
 - Added `export_model_as_lp_format` and `export_model_as_mps_format` to `Solver`
