@@ -4,12 +4,14 @@
 #include "ext.h"
 
 using operations_research::Assignment;
+using operations_research::ConstraintSolverParameters;
 using operations_research::DefaultRoutingSearchParameters;
 using operations_research::FirstSolutionStrategy;
 using operations_research::LocalSearchMetaheuristic;
 using operations_research::RoutingDimension;
 using operations_research::RoutingIndexManager;
 using operations_research::RoutingModel;
+using operations_research::RoutingModelParameters;
 using operations_research::RoutingNodeIndex;
 using operations_research::RoutingSearchParameters;
 
@@ -235,8 +237,33 @@ void init_routing(Rice::Module& m) {
         return self.MakeCumulative(intervals, demands, capacity, name);
       });
 
+  Rice::define_class_under<ConstraintSolverParameters>(m, "ConstraintSolverParameters")
+    .define_method(
+      "trace_propagation=",
+      [](ConstraintSolverParameters& self, bool value) {
+        self.set_trace_propagation(value);
+      })
+    .define_method(
+      "trace_search=",
+      [](ConstraintSolverParameters& self, bool value) {
+        self.set_trace_search(value);
+      });
+
+  Rice::define_class_under<RoutingModelParameters>(m, "RoutingModelParameters")
+    .define_method(
+      "solver_parameters",
+      [](RoutingModelParameters& self) {
+        return self.mutable_solver_parameters();
+      });
+
+  m.define_singleton_function(
+    "default_routing_model_parameters",
+    []() {
+      return operations_research::DefaultRoutingModelParameters();
+    });
+
   Rice::define_class_under<RoutingModel>(m, "RoutingModel")
-    .define_constructor(Rice::Constructor<RoutingModel, RoutingIndexManager>())
+    .define_constructor(Rice::Constructor<RoutingModel, RoutingIndexManager, RoutingModelParameters>(), Rice::Arg("index_manager"), Rice::Arg("parameters") = operations_research::DefaultRoutingModelParameters())
     .define_method(
       "register_transit_callback",
       [](RoutingModel& self, Object callback) {
