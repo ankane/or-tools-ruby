@@ -182,8 +182,18 @@ void init_routing(Rice::Module& m) {
   Rice::define_class_under<operations_research::IntervalVar>(m, "IntervalVar")
     .define_method("start_min", &operations_research::IntervalVar::StartMin)
     .define_method("start_max", &operations_research::IntervalVar::StartMax)
+    .define_method("set_start_min", &operations_research::IntervalVar::SetStartMin)
+    .define_method("set_start_max", &operations_research::IntervalVar::SetStartMax)
+    .define_method("set_start_range", &operations_research::IntervalVar::SetStartRange)
     .define_method("old_start_min", &operations_research::IntervalVar::OldStartMin)
-    .define_method("old_start_max", &operations_research::IntervalVar::OldStartMax);
+    .define_method("old_start_max", &operations_research::IntervalVar::OldStartMax)
+    .define_method("end_min", &operations_research::IntervalVar::EndMin)
+    .define_method("end_max", &operations_research::IntervalVar::EndMax)
+    .define_method("set_end_min", &operations_research::IntervalVar::SetEndMin)
+    .define_method("set_end_max", &operations_research::IntervalVar::SetEndMax)
+    .define_method("set_end_range", &operations_research::IntervalVar::SetEndRange)
+    .define_method("old_end_min", &operations_research::IntervalVar::OldEndMin)
+    .define_method("old_end_max", &operations_research::IntervalVar::OldEndMax);
 
   Rice::define_class_under<RoutingDimension>(m, "RoutingDimension")
     .define_method("global_span_cost_coefficient=", &RoutingDimension::SetGlobalSpanCostCoefficient)
