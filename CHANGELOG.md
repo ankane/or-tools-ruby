@@ -1,4 +1,4 @@
-## 0.5.3 (unreleased)
+## 0.5.3 (2021-08-02)
 
 - Added more methods to `IntVar`, `IntervalVar`, and `Constraint`
 - Added `RoutingModelParameters`
