@@ -6,8 +6,8 @@ module ORTools
 
     def_delegators :@response, :objective_value, :num_conflicts, :num_branches, :wall_time
 
-    def solve(model)
-      @response = _solve(model, parameters)
+    def solve(model, observer = nil)
+      @response = _solve(model, parameters, observer)
       @response.status
     end
 
@@ -20,13 +20,14 @@ module ORTools
     end
 
     def solve_with_solution_callback(model, observer)
-      @response = _solve_with_observer(model, parameters, observer, false)
-      @response.status
+      warn "[or-tools] solve_with_solution_callback is deprecated; use solve() with the callback argument."
+      solve(model, observer)
     end
 
     def search_for_all_solutions(model, observer)
-      @response = _solve_with_observer(model, parameters, observer, true)
-      @response.status
+      warn "[or-tools] search_for_all_solutions is deprecated; use solve() with enumerate_all_solutions = true."
+      parameters.enumerate_all_solutions = true
+      solve(model, observer)
     end
 
     def sufficient_assumptions_for_infeasibility

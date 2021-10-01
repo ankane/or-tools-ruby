@@ -2,6 +2,7 @@
 
 - Updated OR-Tools to 9.1
 - Added binary installation for Debian 11
+- Deprecated `solve_with_solution_callback` and `search_for_all_solutions`
 
 ## 0.5.3 (2021-08-02)
 

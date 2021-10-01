@@ -285,7 +285,7 @@ class ExamplesTest < Minitest::Test
     ### Solve model
     solver = ORTools::CpSolver.new
     solution_printer = WeddingChartPrinter.new(seats, names, num_tables, num_guests)
-    solver.solve_with_solution_callback(model, solution_printer)
+    solver.solve(model, solution_printer)
     assert_equal 276, solver.objective_value
   end
 end

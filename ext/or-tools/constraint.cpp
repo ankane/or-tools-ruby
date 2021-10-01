@@ -131,10 +131,16 @@ void init_constraint(Rice::Module& m) {
 
   Rice::define_class_under<SatParameters>(m, "SatParameters")
     .define_constructor(Rice::Constructor<SatParameters>())
-    .define_method("max_time_in_seconds=",
-    [](SatParameters& self, double value) {
-      self.set_max_time_in_seconds(value);
-    });
+    .define_method(
+      "max_time_in_seconds=",
+      [](SatParameters& self, double value) {
+        self.set_max_time_in_seconds(value);
+      })
+    .define_method(
+      "enumerate_all_solutions=",
+      [](SatParameters& self, bool value) {
+        self.set_enumerate_all_solutions(value);
+      });
 
   Rice::define_class_under<CpModelBuilder>(m, "CpModel")
     .define_constructor(Rice::Constructor<CpModelBuilder>())
@@ -377,33 +383,23 @@ void init_constraint(Rice::Module& m) {
 
   Rice::define_class_under(m, "CpSolver")
     .define_method(
-      "_solve_with_observer",
-      [](Object self, CpModelBuilder& model, SatParameters& parameters, Object callback, bool all_solutions) {
+      "_solve",
+      [](Object self, CpModelBuilder& model, SatParameters& parameters, Object callback) {
         Model m;
 
-        if (all_solutions) {
-          // set parameters for SearchForAllSolutions
-          parameters.set_enumerate_all_solutions(true);
+        if (!callback.is_nil()) {
+          // TODO figure out how to use callback with multiple cores
+          parameters.set_num_search_workers(1);
+
+          m.Add(NewFeasibleSolutionObserver(
+            [callback](const CpSolverResponse& r) {
+              // TODO find a better way to do this
+              callback.call("response=", r);
+              callback.call("on_solution_callback");
+            })
+          );
         }
 
-        // TODO figure out how to use callback with multiple cores
-        parameters.set_num_search_workers(1);
-
-        m.Add(NewSatParameters(parameters));
-
-        m.Add(NewFeasibleSolutionObserver(
-          [callback](const CpSolverResponse& r) {
-            // TODO find a better way to do this
-            callback.call("response=", r);
-            callback.call("on_solution_callback");
-          })
-        );
-        return SolveCpModel(model.Build(), &m);
-      })
-    .define_method(
-      "_solve",
-      [](Object self, CpModelBuilder& model, SatParameters& parameters) {
-        Model m;
         m.Add(NewSatParameters(parameters));
         return SolveCpModel(model.Build(), &m);
       })

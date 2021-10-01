@@ -2139,7 +2139,7 @@ model.add(seats[[0, 0]] == 1)
 # Solve model
 solver = ORTools::CpSolver.new
 solution_printer = WeddingChartPrinter.new(seats, names, num_tables, num_guests)
-solver.solve_with_solution_callback(model, solution_printer)
+solver.solve(model, solution_printer)
 
 puts "Statistics"
 puts "  - conflicts    : %i" % solver.num_conflicts
