@@ -206,7 +206,7 @@ class ShiftSchedulingSatTest < Minitest::Test
     status = solver.solve(model)
 
     assert_equal :feasible, status
-    assert_operator solver.objective_value, :<=, 253
+    assert_operator solver.objective_value, :<=, 300
 
     _assignments = num_employees.times.map do |e|
       num_days.times.map do |d|
