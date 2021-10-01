@@ -1,4 +1,4 @@
-## 0.5.4 (unreleased)
+## 0.5.4 (2021-10-01)
 
 - Updated OR-Tools to 9.1
 - Added binary installation for Debian 11
