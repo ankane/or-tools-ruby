@@ -117,8 +117,9 @@ class ConstraintTest < Minitest::Test
       n == t * base * base * base + r * base * base + u * base + e)
 
     solver = ORTools::CpSolver.new
+    solver.parameters.enumerate_all_solutions = true
     solution_printer = VarArraySolutionPrinter.new(letters)
-    status = solver.search_for_all_solutions(model, solution_printer)
+    status = solver.solve(model, solution_printer)
     assert_equal :optimal, status
 
     assert_equal 179, solver.num_conflicts
@@ -151,8 +152,9 @@ class ConstraintTest < Minitest::Test
     end
 
     solver = ORTools::CpSolver.new
+    solver.parameters.enumerate_all_solutions = true
     solution_printer = DiagramPrinter.new(queens)
-    status = solver.search_for_all_solutions(model, solution_printer)
+    status = solver.solve(model, solution_printer)
     assert_equal :optimal, status
     assert_equal 92, solution_printer.solution_count
   end

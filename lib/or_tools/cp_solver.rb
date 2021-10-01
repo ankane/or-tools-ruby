@@ -20,12 +20,12 @@ module ORTools
     end
 
     def solve_with_solution_callback(model, observer)
-      warn "[or-tools] solve_with_solution_callback is deprecated; use solve() with the callback argument."
+      warn "[or-tools] solve_with_solution_callback is deprecated; use solve(model, callback)"
       solve(model, observer)
     end
 
     def search_for_all_solutions(model, observer)
-      warn "[or-tools] search_for_all_solutions is deprecated; use solve() with enumerate_all_solutions = true."
+      warn "[or-tools] search_for_all_solutions is deprecated; use solve() with solver.parameters.enumerate_all_solutions = true"
       parameters.enumerate_all_solutions = true
       solve(model, observer)
     end

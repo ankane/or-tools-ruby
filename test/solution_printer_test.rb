@@ -8,9 +8,10 @@ class SolutionPrinterTest < Minitest::Test
     model.add_max_equality(y, [x, model.new_constant(0)])
 
     solver = ORTools::CpSolver.new
+    solver.parameters.enumerate_all_solutions = true
     solution_printer = ORTools::ObjectiveSolutionPrinter.new
     stdout, _ = capture_io do
-      solver.search_for_all_solutions(model, solution_printer)
+      solver.solve(model, solution_printer)
     end
     assert_equal 15, solution_printer.solution_count
     assert_match "Solution 14", stdout
@@ -23,9 +24,10 @@ class SolutionPrinterTest < Minitest::Test
     model.add_max_equality(y, [x, model.new_constant(0)])
 
     solver = ORTools::CpSolver.new
+    solver.parameters.enumerate_all_solutions = true
     solution_printer = ORTools::VarArraySolutionPrinter.new([x, y])
     stdout, _ = capture_io do
-      solver.search_for_all_solutions(model, solution_printer)
+      solver.solve(model, solution_printer)
     end
     assert_equal 15, solution_printer.solution_count
     assert_match "Solution 14", stdout
@@ -38,9 +40,10 @@ class SolutionPrinterTest < Minitest::Test
     model.add_max_equality(y, [x, model.new_constant(0)])
 
     solver = ORTools::CpSolver.new
+    solver.parameters.enumerate_all_solutions = true
     solution_printer = ORTools::VarArrayAndObjectiveSolutionPrinter.new([x, y])
     stdout, _ = capture_io do
-      solver.search_for_all_solutions(model, solution_printer)
+      solver.solve(model, solution_printer)
     end
     assert_equal 15, solution_printer.solution_count
     assert_match "Solution 14", stdout

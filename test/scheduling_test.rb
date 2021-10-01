@@ -78,12 +78,13 @@ class SchedulingTest < Minitest::Test
     end
 
     solver = ORTools::CpSolver.new
+    solver.parameters.enumerate_all_solutions = true
     # solver.parameters.linearization_level = 0
     solutions = []
     solution_printer = NursesPartialSolutionPrinter.new(
       shifts, num_nurses, num_days, num_shifts, solutions
     )
-    solver.search_for_all_solutions(model, solution_printer)
+    solver.solve(model, solution_printer)
 
     assert_equal 5184, solution_printer.solution_count
     assert_includes solutions, [[nil, 2, 0, 1], [1, 0, 2, nil], [0, 1, nil, 2]]
