@@ -186,7 +186,7 @@ class SchedulingTest < Minitest::Test
     end
 
     # finally print the solution found
-    assert_equal [[0, 3], [0, 4, 7], [5, 6, 8]], assigned_jobs.map { |_, job| job.map { |task| task[:start] } }
+    assert_equal [[0, 2], [0, 5, 7], [2, 4, 7]], assigned_jobs.map { |_, job| job.map { |task| task[:start] } }
     assert_equal 11, solver.objective_value
   end
 end

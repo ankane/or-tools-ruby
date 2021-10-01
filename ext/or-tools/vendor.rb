@@ -3,29 +3,32 @@ require "fileutils"
 require "net/http"
 require "tmpdir"
 
-version = "9.0.9048"
+version = "9.1.9490"
 
 if RbConfig::CONFIG["host_os"] =~ /darwin/i
-  filename = "or-tools_MacOsX-11.2.3_v#{version}.tar.gz"
-  checksum = "adf73a00d4ec49558b67be5ce3cfc8f30268da2253b35feb11d0d40700550bf6"
+  filename = "or-tools_MacOsX-11.6_v#{version}.tar.gz"
+  checksum = "97a2b113806c1b2d17f9b3f30571c9ee82722eb22e06bd124d94118f3a84da2c"
 else
   os = %x[lsb_release -is].chomp rescue nil
   os_version = %x[lsb_release -rs].chomp rescue nil
   if os == "Ubuntu" && os_version == "20.04"
-    filename = "or-tools_ubuntu-20.04_v#{version}.tar.gz"
-    checksum = "5565343c1c310d2885a40ce850ae7e3468299b3fee97ae8eed8425ce06bd4960"
+    filename = "or-tools_amd64_ubuntu-20.04_v#{version}.tar.gz"
+    checksum = "cf82e5c343ab74bef320b240a2c3937b07df945e60b91bbc771b477c0856c1bd"
   elsif os == "Ubuntu" && os_version == "18.04"
-    filename = "or-tools_ubuntu-18.04_v#{version}.tar.gz"
-    checksum = "08cf548d0179f7fa814bb7458be94cd1b8a3de14985e6a9faf6118a1d8571539"
+    filename = "or-tools_amd64_ubuntu-18.04_v#{version}.tar.gz"
+    checksum = "b641677cc3e1095b7e8efd9c5c948698f5e2c238d10d06f1abf0b0ee240addf2"
+  elsif os == "Debian" && os_version == "11"
+    filename = "or-tools_amd64_debian-11_v#{version}.tar.gz"
+    checksum = "de7e63988fc62c64718d8f8f37f98a1c589c89ebc46fc1f378da4b66ad385ff1"
   elsif os == "Debian" && os_version == "10"
-    filename = "or-tools_debian-10_v#{version}.tar.gz"
-    checksum = "063fb1d8765ae23b0bb25b9c561e904532713416fe0458f7db45a0f72190eb50"
+    filename = "or-tools_amd64_debian-10_v#{version}.tar.gz"
+    checksum = "80411caeccac079fe8ee6018ceae844f5f04d2deecacd3406d51354dea5435e4"
   elsif os == "CentOS" && os_version == "8"
-    filename = "or-tools_centos-8_v#{version}.tar.gz"
-    checksum = "c98212ed4fc699d8ae70c1f53cd1d8dacd28e52970336fab5b86dedf7406f215"
+    filename = "or-tools_amd64_centos-8_v#{version}.tar.gz"
+    checksum = "fe23b04dd7a20c5902fbf89bb626080296489a05e0bfb39225e71be5e9cee1ac"
   elsif os == "CentOS" && os_version == "7"
-    filename = "or-tools_centos-7_v#{version}.tar.gz"
-    checksum = "b992bda4614bbc703583b0e9edcd2ade54bacfb9909399b20c8aa95ff7197d68"
+    filename = "or-tools_amd64_centos-7_v#{version}.tar.gz"
+    checksum = "ef48363b27591c25f8702e085024aa7b5f5190ad94c859481116538f04c124f9"
   else
     platform =
       if Gem.win_platform?

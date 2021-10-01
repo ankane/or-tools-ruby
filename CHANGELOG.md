@@ -1,3 +1,8 @@
+## 0.5.4 (unreleased)
+
+- Updated OR-Tools to 9.1
+- Added binary installation for Debian 11
+
 ## 0.5.3 (2021-08-02)
 
 - Added more methods to `IntVar`, `IntervalVar`, and `Constraint`

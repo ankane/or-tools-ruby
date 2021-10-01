@@ -385,6 +385,10 @@ void init_constraint(Rice::Module& m) {
           // set parameters for SearchForAllSolutions
           parameters.set_enumerate_all_solutions(true);
         }
+
+        // TODO figure out how to use callback with multiple cores
+        parameters.set_num_search_workers(1);
+
         m.Add(NewSatParameters(parameters));
 
         m.Add(NewFeasibleSolutionObserver(
