@@ -26,8 +26,13 @@ module ORTools
 
     def search_for_all_solutions(model, observer)
       warn "[or-tools] search_for_all_solutions is deprecated; use solve() with solver.parameters.enumerate_all_solutions = true"
-      parameters.enumerate_all_solutions = true
-      solve(model, observer)
+      previous_value = parameters.enumerate_all_solutions
+      begin
+        parameters.enumerate_all_solutions = true
+        solve(model, observer)
+      ensure
+        parameters.enumerate_all_solutions = previous_value
+      end
     end
 
     def sufficient_assumptions_for_infeasibility

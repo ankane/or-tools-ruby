@@ -140,6 +140,11 @@ void init_constraint(Rice::Module& m) {
       "enumerate_all_solutions=",
       [](SatParameters& self, bool value) {
         self.set_enumerate_all_solutions(value);
+      })
+    .define_method(
+      "enumerate_all_solutions",
+      [](SatParameters& self) {
+        return self.enumerate_all_solutions();
       });
 
   Rice::define_class_under<CpModelBuilder>(m, "CpModel")
