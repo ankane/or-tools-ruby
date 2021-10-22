@@ -1,8 +1,8 @@
-# OR-Tools
+# OR-Tools Ruby
 
 [OR-Tools](https://github.com/google/or-tools) - operations research tools - for Ruby
 
-[![Build Status](https://github.com/ankane/or-tools/workflows/build/badge.svg?branch=master)](https://github.com/ankane/or-tools/actions)
+[![Build Status](https://github.com/ankane/or-tools-ruby/workflows/build/badge.svg?branch=master)](https://github.com/ankane/or-tools-ruby/actions)
 
 ## Installation
 
@@ -2203,22 +2203,22 @@ end
 
 ## History
 
-View the [changelog](https://github.com/ankane/or-tools/blob/master/CHANGELOG.md)
+View the [changelog](https://github.com/ankane/or-tools-ruby/blob/master/CHANGELOG.md)
 
 ## Contributing
 
 Everyone is encouraged to help improve this project. Here are a few ways you can help:
 
-- [Report bugs](https://github.com/ankane/or-tools/issues)
-- Fix bugs and [submit pull requests](https://github.com/ankane/or-tools/pulls)
+- [Report bugs](https://github.com/ankane/or-tools-ruby/issues)
+- Fix bugs and [submit pull requests](https://github.com/ankane/or-tools-ruby/pulls)
 - Write, clarify, or fix documentation
 - Suggest or add new features
 
 To get started with development:
 
 ```sh
-git clone https://github.com/ankane/or-tools.git
-cd or-tools
+git clone https://github.com/ankane/or-tools-ruby.git
+cd or-tools-ruby
 bundle install
 bundle exec rake compile
 bundle exec rake test
