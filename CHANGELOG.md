@@ -1,4 +1,4 @@
-## 0.6.0 (unreleased)
+## 0.6.0 (2021-12-16)
 
 - Updated OR-Tools to 9.2
 - Renamed `add_product_equality` to `add_multiplication_equality`
