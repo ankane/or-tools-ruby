@@ -287,6 +287,11 @@ void init_constraint(Rice::Module& m) {
         return self.AddModuloEquality(target, var, mod);
       })
     .define_method(
+      "add_multiplication_equality",
+      [](CpModelBuilder& self, IntVar target, std::vector<IntVar> vars) {
+        return self.AddMultiplicationEquality(target, vars);
+      })
+    .define_method(
       "add_no_overlap",
       [](CpModelBuilder& self, std::vector<IntervalVar> vars) {
         return self.AddNoOverlap(vars);

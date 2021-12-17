@@ -1,7 +1,8 @@
 ## 0.6.0 (unreleased)
 
 - Updated OR-Tools to 9.2
-- Removed `add_product_equality` and `scale_objective_by`
+- Renamed `add_product_equality` to `add_multiplication_equality`
+- Removed `scale_objective_by`
 
 ## 0.5.4 (2021-10-01)
 
