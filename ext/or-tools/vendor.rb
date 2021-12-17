@@ -3,32 +3,32 @@ require "fileutils"
 require "net/http"
 require "tmpdir"
 
-version = "9.1.9490"
+version = "9.2.9972"
 
 if RbConfig::CONFIG["host_os"] =~ /darwin/i
-  filename = "or-tools_MacOsX-11.6_v#{version}.tar.gz"
-  checksum = "97a2b113806c1b2d17f9b3f30571c9ee82722eb22e06bd124d94118f3a84da2c"
+  filename = "or-tools_MacOsX-12.0.1_v#{version}.tar.gz"
+  checksum = "796791a8ef84507d62e193e647cccb1c7725dae4f1474476e1777fe4a44ee3e0"
 else
   os = %x[lsb_release -is].chomp rescue nil
   os_version = %x[lsb_release -rs].chomp rescue nil
   if os == "Ubuntu" && os_version == "20.04"
     filename = "or-tools_amd64_ubuntu-20.04_v#{version}.tar.gz"
-    checksum = "cf82e5c343ab74bef320b240a2c3937b07df945e60b91bbc771b477c0856c1bd"
+    checksum = "985e3036eaecacfc8a0258ec2ebef429240491577d4e0896d68fc076e65451ec"
   elsif os == "Ubuntu" && os_version == "18.04"
     filename = "or-tools_amd64_ubuntu-18.04_v#{version}.tar.gz"
-    checksum = "b641677cc3e1095b7e8efd9c5c948698f5e2c238d10d06f1abf0b0ee240addf2"
+    checksum = "e36406c4fe8c111e1ace0ede9d0787ff0e98f11afd7db9cc074adfd0f55628a6"
   elsif os == "Debian" && os_version == "11"
     filename = "or-tools_amd64_debian-11_v#{version}.tar.gz"
-    checksum = "de7e63988fc62c64718d8f8f37f98a1c589c89ebc46fc1f378da4b66ad385ff1"
+    checksum = "bd49ee916213b2140ab255414d35a28f19dff7caf87632309753d3fc553f85dd"
   elsif os == "Debian" && os_version == "10"
     filename = "or-tools_amd64_debian-10_v#{version}.tar.gz"
-    checksum = "80411caeccac079fe8ee6018ceae844f5f04d2deecacd3406d51354dea5435e4"
+    checksum = "b152fee584f0c8228fe2ff21b74c789870ff9b7064e42ca26305c6b5653f0064"
   elsif os == "CentOS" && os_version == "8"
     filename = "or-tools_amd64_centos-8_v#{version}.tar.gz"
-    checksum = "fe23b04dd7a20c5902fbf89bb626080296489a05e0bfb39225e71be5e9cee1ac"
+    checksum = "66ed4bb800acf92c672f7e68acdf4ea27bbfdb17bbddc02f8326cd55a97305f6"
   elsif os == "CentOS" && os_version == "7"
     filename = "or-tools_amd64_centos-7_v#{version}.tar.gz"
-    checksum = "ef48363b27591c25f8702e085024aa7b5f5190ad94c859481116538f04c124f9"
+    checksum = "4a5c1b1639a2828cd7e1ba82a574ef37876557b59e8aab8b81811bb750d53035"
   else
     platform =
       if Gem.win_platform?

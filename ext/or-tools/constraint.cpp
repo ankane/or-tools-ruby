@@ -287,11 +287,6 @@ void init_constraint(Rice::Module& m) {
         return self.AddModuloEquality(target, var, mod);
       })
     .define_method(
-      "add_product_equality",
-      [](CpModelBuilder& self, IntVar target, std::vector<IntVar> vars) {
-        return self.AddProductEquality(target, vars);
-      })
-    .define_method(
       "add_no_overlap",
       [](CpModelBuilder& self, std::vector<IntervalVar> vars) {
         return self.AddNoOverlap(vars);
@@ -305,11 +300,6 @@ void init_constraint(Rice::Module& m) {
       "minimize",
       [](CpModelBuilder& self, LinearExpr expr) {
         self.Minimize(expr);
-      })
-    .define_method(
-      "scale_objective_by",
-      [](CpModelBuilder& self, double scaling) {
-        self.ScaleObjectiveBy(scaling);
       })
     .define_method(
       "add_hint",

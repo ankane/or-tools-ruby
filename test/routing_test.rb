@@ -627,7 +627,7 @@ class RoutingTest < Minitest::Test
     end
 
     assert_equal [[0, 8, 14, 16, 0], [0, 12, 13, 15, 11, 0], [0, 7, 1, 4, 3, 0], [0, 9, 5, 6, 2, 10, 0]], routes
-    assert_equal 90, total_time
+    assert_equal 98, total_time
   end
 
   def test_penalties

@@ -1,3 +1,7 @@
+## 0.6.0 (unreleased)
+
+- Updated OR-Tools to 9.2
+
 ## 0.5.4 (2021-10-01)
 
 - Updated OR-Tools to 9.1
