@@ -2205,7 +2205,7 @@ end
 
 ### Mac ARM
 
-Run:
+ARM binaries are not available for Mac yet, so use Homebrew to install OR-Tools before installing the gem.
 
 ```sh
 brew install or-tools
