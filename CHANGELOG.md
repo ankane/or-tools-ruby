@@ -1,3 +1,7 @@
+## 0.6.1 (unreleased)
+
+- Added installation instructions for Mac ARM
+
 ## 0.6.0 (2021-12-16)
 
 - Updated OR-Tools to 9.2

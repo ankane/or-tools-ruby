@@ -12,7 +12,7 @@ Add this line to your application’s Gemfile:
 gem 'or-tools'
 ```
 
-Installation can take a few minutes as OR-Tools downloads and builds.
+Installation can take a few minutes as OR-Tools downloads and builds. For Mac ARM, also follow [these instructions](#additional-instructions).
 
 ## Higher Level Interfaces
 
@@ -2199,6 +2199,17 @@ possible_tables.each do |table|
     p table
   end
 end
+```
+
+## Additional Instructions
+
+### Mac ARM
+
+Run:
+
+```sh
+brew install or-tools
+bundle config build.or-tools --with-or-tools-dir=/opt/homebrew
 ```
 
 ## History

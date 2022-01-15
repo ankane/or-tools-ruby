@@ -6,8 +6,19 @@ require "tmpdir"
 version = "9.2.9972"
 
 if RbConfig::CONFIG["host_os"] =~ /darwin/i
-  filename = "or-tools_MacOsX-12.0.1_v#{version}.tar.gz"
-  checksum = "796791a8ef84507d62e193e647cccb1c7725dae4f1474476e1777fe4a44ee3e0"
+  if RbConfig::CONFIG["host_cpu"] =~ /arm|aarch64/i
+    raise <<~MSG
+      Binary installation not available for this platform: Mac ARM
+
+      Run:
+      brew install or-tools
+      bundle config build.or-tools --with-or-tools-dir=/opt/homebrew
+
+    MSG
+  else
+    filename = "or-tools_MacOsX-12.0.1_v#{version}.tar.gz"
+    checksum = "796791a8ef84507d62e193e647cccb1c7725dae4f1474476e1777fe4a44ee3e0"
+  end
 else
   os = %x[lsb_release -is].chomp rescue nil
   os_version = %x[lsb_release -rs].chomp rescue nil
