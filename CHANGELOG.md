@@ -1,6 +1,7 @@
 ## 0.6.1 (unreleased)
 
 - Added installation instructions for Mac ARM
+- Removed dependency on `lsb_release` for binary installation on Linux
 
 ## 0.6.0 (2021-12-16)
 
