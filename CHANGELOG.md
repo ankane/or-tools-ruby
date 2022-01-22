@@ -1,4 +1,4 @@
-## 0.6.1 (unreleased)
+## 0.6.1 (2022-01-22)
 
 - Added installation instructions for Mac ARM
 - Removed dependency on `lsb_release` for binary installation on Linux
