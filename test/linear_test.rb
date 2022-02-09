@@ -44,6 +44,15 @@ class LinearTest < Minitest::Test
     assert_match "OBJSENSE", solver.export_model_as_mps_format(true, true)
   end
 
+  def test_type_error
+    solver = ORTools::Solver.new("LinearProgrammingExample", :glop)
+    x = solver.num_var(0, solver.infinity, "x")
+
+    assert_raises(TypeError) do
+      x * x
+    end
+  end
+
   def test_to_s
     solver = ORTools::Solver.new("LinearProgrammingExample", :glop)
     x = solver.num_var(0, solver.infinity, "x")
@@ -56,10 +65,6 @@ class LinearTest < Minitest::Test
     assert_equal "(x + y + 1 + 2)", solver.sum([x, y, 1, 2]).to_s
     assert_equal "((x + 1) + (y + 2))", (solver.sum([x, 1]) + solver.sum([y, 2])).to_s
     assert_equal "(2 * (x + (2 * y)))", ((x + y * 2) * 2).to_s
-    # TODO move
-    assert_raises(TypeError) do
-      x * x
-    end
   end
 
   def test_inspect
