@@ -55,6 +55,11 @@ class LinearTest < Minitest::Test
     assert_equal "(x + 1)", (x + 1).to_s
     assert_equal "(x + y + 1 + 2)", solver.sum([x, y, 1, 2]).to_s
     assert_equal "((x + 1) + (y + 2))", (solver.sum([x, 1]) + solver.sum([y, 2])).to_s
+    assert_equal "(2 * (x + (2 * y)))", ((x + y * 2) * 2).to_s
+    # TODO move
+    assert_raises(TypeError) do
+      x * x
+    end
   end
 
   def test_inspect
