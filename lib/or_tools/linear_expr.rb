@@ -1,5 +1,9 @@
 module ORTools
   class LinearExpr
+    def solution_value
+      coeffs.sum { |var, coeff| var.solution_value * coeff }
+    end
+
     def coeffs
       coeffs = Hash.new(0.0)
       stack = [[1.0, self]]
