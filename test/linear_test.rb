@@ -43,4 +43,15 @@ class LinearTest < Minitest::Test
     assert_match "Obj: +3 x +4 y", solver.export_model_as_lp_format(false)
     assert_match "OBJSENSE", solver.export_model_as_mps_format(true, true)
   end
+
+  def test_to_s
+    solver = ORTools::Solver.new("LinearProgrammingExample", :glop)
+    x = solver.num_var(0, solver.infinity, "x")
+    y = solver.num_var(0, solver.infinity, "y")
+
+    assert_equal "x", x.to_s
+    assert_equal "(x + (2 * y))", (x + y * 2).to_s
+    assert_equal "(x + (2 * y)) <= 14", (x + y * 2 <= 14).to_s
+    assert_equal "(x + 1)", (x + 1).to_s
+  end
 end

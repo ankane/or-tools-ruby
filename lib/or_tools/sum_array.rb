@@ -15,5 +15,9 @@ module ORTools
     def cast_to_lin_exp(v)
       v.is_a?(Numeric) ? Constant.new(v) : v
     end
+
+    def to_s
+      "(#{@array.map(&:to_s).join(" + ")})"
+    end
   end
 end

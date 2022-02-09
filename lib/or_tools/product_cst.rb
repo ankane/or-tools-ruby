@@ -8,6 +8,14 @@ module ORTools
       @coef = coef
     end
 
+    def to_s
+      if @coef == -1
+        "-#{@expr}"
+      else
+        "(#{@coef} * #{@expr})"
+      end
+    end
+
     def add_self_to_coeff_map_or_stack(coeffs, multiplier, stack)
       current_multiplier = multiplier * @coef
       if current_multiplier

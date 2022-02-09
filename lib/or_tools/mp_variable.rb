@@ -4,5 +4,13 @@ module ORTools
     def add_self_to_coeff_map_or_stack(coeffs, multiplier, stack)
       coeffs[self] += multiplier
     end
+
+    def to_s
+      name
+    end
+
+    def inspect
+      "#<ORTools::MPVariable @name=\"" + name + "\">";
+    end
   end
 end
