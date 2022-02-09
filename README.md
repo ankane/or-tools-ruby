@@ -9,7 +9,7 @@
 Add this line to your application’s Gemfile:
 
 ```ruby
-gem 'or-tools'
+gem "or-tools"
 ```
 
 Installation can take a few minutes as OR-Tools downloads and builds. For Mac ARM, also follow [these instructions](#additional-instructions).
