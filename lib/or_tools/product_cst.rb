@@ -4,7 +4,8 @@ module ORTools
 
     def initialize(expr, coef)
       @expr = cast_to_lin_exp(expr)
-      raise TypeError unless coef.is_a?(Numeric)
+      # TODO improve message
+      raise TypeError, "expected numeric" unless coef.is_a?(Numeric)
       @coef = coef
     end
 

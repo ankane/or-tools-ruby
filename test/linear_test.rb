@@ -48,9 +48,10 @@ class LinearTest < Minitest::Test
     solver = ORTools::Solver.new("LinearProgrammingExample", :glop)
     x = solver.num_var(0, solver.infinity, "x")
 
-    assert_raises(TypeError) do
+    error = assert_raises(TypeError) do
       x * x
     end
+    assert_equal "expected numeric", error.message
   end
 
   def test_to_s
