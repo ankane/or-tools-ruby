@@ -62,6 +62,10 @@ module ORTools
       end
     end
 
+    def to_s
+      "(empty)"
+    end
+
     def inspect
       "#<#{self.class.name} #{to_s}>"
     end
