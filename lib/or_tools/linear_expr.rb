@@ -61,5 +61,9 @@ module ORTools
         LinearConstraint.new(self - arg, -Float::INFINITY, 0.0)
       end
     end
+
+    def inspect
+      "#<#{self.class.name} #{to_s}>"
+    end
   end
 end

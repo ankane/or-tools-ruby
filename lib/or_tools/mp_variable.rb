@@ -8,9 +8,5 @@ module ORTools
     def to_s
       name
     end
-
-    def inspect
-      "#<ORTools::MPVariable @name=\"" + name + "\">";
-    end
   end
 end

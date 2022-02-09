@@ -55,4 +55,12 @@ class LinearTest < Minitest::Test
     assert_equal "(x + 1)", (x + 1).to_s
     assert_equal "(x + y + 1 + 2)", solver.sum([x, y, 1, 2]).to_s
   end
+
+  def test_inspect
+    solver = ORTools::Solver.new("LinearProgrammingExample", :glop)
+    x = solver.num_var(0, solver.infinity, "x")
+
+    assert_equal "#<ORTools::MPVariable x>", x.inspect
+    assert_equal "#<ORTools::SumArray (x + 1)>", (x + 1).inspect
+  end
 end
