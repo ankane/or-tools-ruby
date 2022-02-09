@@ -24,6 +24,10 @@ module ORTools
       end
     end
 
+    def inspect
+      "#<#{self.class.name} #{to_s}>"
+    end
+
     def extract(solver)
       coeffs = @expr.coeffs
       constant = coeffs.delete(OFFSET_KEY) || 0.0

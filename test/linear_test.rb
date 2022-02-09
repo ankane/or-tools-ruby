@@ -75,5 +75,6 @@ class LinearTest < Minitest::Test
     assert_equal "#<ORTools::MPVariable x>", x.inspect
     assert_equal "#<ORTools::SumArray (x + 1)>", (x + 1).inspect
     assert_equal "#<ORTools::LinearExpr (empty)>", ORTools::LinearExpr.new.inspect
+    assert_equal "#<ORTools::LinearConstraint (x + 1) == 1>", (x + 1 == 1).inspect
   end
 end
