@@ -46,86 +46,14 @@ namespace Rice::detail
 
 void init_linear(Rice::Module& m) {
   Rice::define_class_under<LinearRange>(m, "LinearRange");
+
+  // TODO remove in 0.7.0
   auto rb_cLinearExpr = Rice::define_class_under<LinearExpr>(m, "LinearExpr");
+  rb_cLinearExpr.define_constructor(Rice::Constructor<LinearExpr>());
 
-  Rice::define_class_under<MPVariable>(m, "MPVariable")
+  Rice::define_class_under<MPVariable, LinearExpr>(m, "MPVariable")
     .define_method("name", &MPVariable::name)
-    .define_method("solution_value", &MPVariable::solution_value)
-    .define_method(
-      "+",
-      [](MPVariable& self, LinearExpr& other) {
-        LinearExpr s(&self);
-        return s + other;
-      })
-    .define_method(
-      "-",
-      [](MPVariable& self, LinearExpr& other) {
-        LinearExpr s(&self);
-        return s - other;
-      })
-    .define_method(
-      "*",
-      [](MPVariable& self, double other) {
-        LinearExpr s(&self);
-        return s * other;
-      })
-    .define_method(
-      "inspect",
-      [](MPVariable& self) {
-        return "#<ORTools::MPVariable @name=\"" + self.name() + "\">";
-      });
-
-  rb_cLinearExpr
-    .define_constructor(Rice::Constructor<LinearExpr>())
-    .define_method(
-      "_add_linear_expr",
-      [](LinearExpr& self, LinearExpr& other) {
-        return self + other;
-      })
-    .define_method(
-      "_add_mp_variable",
-      [](LinearExpr& self, MPVariable &other) {
-        LinearExpr o(&other);
-        return self + o;
-      })
-    .define_method(
-      "_gte_double",
-      [](LinearExpr& self, double other) {
-        LinearExpr o(other);
-        return self >= o;
-      })
-    .define_method(
-      "_gte_linear_expr",
-      [](LinearExpr& self, LinearExpr& other) {
-        return self >= other;
-      })
-    .define_method(
-      "_lte_double",
-      [](LinearExpr& self, double other) {
-        LinearExpr o(other);
-        return self <= o;
-      })
-    .define_method(
-      "_lte_linear_expr",
-      [](LinearExpr& self, LinearExpr& other) {
-        return self <= other;
-      })
-    .define_method(
-      "==",
-      [](LinearExpr& self, double other) {
-        LinearExpr o(other);
-        return self == o;
-      })
-    .define_method(
-      "to_s",
-      [](LinearExpr& self) {
-        return self.ToString();
-      })
-    .define_method(
-      "inspect",
-      [](LinearExpr& self) {
-        return "#<ORTools::LinearExpr \"" + self.ToString() + "\">";
-      });
+    .define_method("solution_value", &MPVariable::solution_value);
 
   Rice::define_class_under<MPConstraint>(m, "MPConstraint")
     .define_method("set_coefficient", &MPConstraint::SetCoefficient);
@@ -133,7 +61,8 @@ void init_linear(Rice::Module& m) {
   Rice::define_class_under<MPObjective>(m, "MPObjective")
     .define_method("value", &MPObjective::Value)
     .define_method("set_coefficient", &MPObjective::SetCoefficient)
-    .define_method("set_maximization", &MPObjective::SetMaximization);
+    .define_method("set_maximization", &MPObjective::SetMaximization)
+    .define_method("set_minimization", &MPObjective::SetMinimization);
 
   Rice::define_class_under<MPSolver>(m, "Solver")
     .define_constructor(Rice::Constructor<MPSolver, std::string, MPSolver::OptimizationProblemType>())
@@ -155,21 +84,6 @@ void init_linear(Rice::Module& m) {
     .define_method("iterations", &MPSolver::iterations)
     .define_method("nodes", &MPSolver::nodes)
     .define_method("objective", &MPSolver::MutableObjective)
-    .define_method(
-      "maximize",
-      [](MPSolver& self, LinearExpr& expr) {
-        return self.MutableObjective()->MaximizeLinearExpr(expr);
-      })
-    .define_method(
-      "minimize",
-      [](MPSolver& self, LinearExpr& expr) {
-        return self.MutableObjective()->MinimizeLinearExpr(expr);
-      })
-    .define_method(
-      "add",
-      [](MPSolver& self, const LinearRange& range) {
-        return self.MakeRowConstraint(range);
-      })
     .define_method(
       "constraint",
       [](MPSolver& self, double lb, double ub) {

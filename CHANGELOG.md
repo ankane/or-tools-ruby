@@ -1,3 +1,7 @@
+## 0.6.2 (unreleased)
+
+- Fixed segfaults with `Solver`
+
 ## 0.6.1 (2022-01-22)
 
 - Added installation instructions for Mac ARM
