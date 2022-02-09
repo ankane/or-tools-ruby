@@ -103,6 +103,10 @@ class ExpressionTest < Minitest::Test
 
     # TODO
     # assert_equal File.binread("test/support/proto.txt"), output
+
+    assert_equal "x", x.to_s
+    assert_equal "x + y", (x + y).to_s
+    assert_equal "x + y == z", (x + y == z).to_s
   end
 
   # TODO add class

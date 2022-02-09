@@ -8,8 +8,13 @@ module ORTools
       @right = right
     end
 
-    def inspect
+    def to_s
       "#{left.inspect} #{operator} #{right.inspect}"
+    end
+
+    # TODO add class
+    def inspect
+      to_s
     end
   end
 end

@@ -18,9 +18,13 @@ module ORTools
       SatLinearExpr.new([[self, -1]])
     end
 
-    # for now
-    def inspect
+    def to_s
       name
+    end
+
+    # TODO add class
+    def inspect
+      to_s
     end
   end
 end

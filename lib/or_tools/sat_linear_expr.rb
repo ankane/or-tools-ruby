@@ -24,7 +24,7 @@ module ORTools
       end
     end
 
-    def inspect
+    def to_s
       vars.map do |v|
         k = v[0]
         k = k.respond_to?(:name) ? k.name : k.inspect
@@ -34,6 +34,11 @@ module ORTools
           "#{k} * #{v[1]}"
         end
       end.join(" + ").sub(" + -", " - ")
+    end
+
+    # TODO add class
+    def inspect
+      to_s
     end
 
     private
