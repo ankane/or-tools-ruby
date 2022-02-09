@@ -1,4 +1,4 @@
-## 0.6.2 (unreleased)
+## 0.6.2 (2022-02-09)
 
 - Fixed segfaults with `Solver`
 
