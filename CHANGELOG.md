@@ -1,3 +1,7 @@
+## 0.6.3 (unreleased)
+
+- Reduced gem size
+
 ## 0.6.2 (2022-02-09)
 
 - Fixed segfaults with `Solver`

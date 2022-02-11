@@ -123,10 +123,30 @@ raise "Bad checksum: #{download_checksum}" if download_checksum != checksum
 
 # extract - can't use Gem::Package#extract_tar_gz from RubyGems
 # since it limits filenames to 100 characters (doesn't support UStar format)
+extract_path = Dir.mktmpdir
+tar_args = Gem.win_platform? ? ["--force-local"] : []
+system "tar", "zxf", download_path, "-C", extract_path, "--strip-components=1", *tar_args
+
+# for space, only keep licenses, include, and shared library
 path = File.expand_path("../../tmp/or-tools", __dir__)
 FileUtils.mkdir_p(path)
-tar_args = Gem.win_platform? ? ["--force-local"] : []
-system "tar", "zxf", download_path, "-C", path, "--strip-components=1", *tar_args
+
+# licenses
+license_files = Dir.glob("**/*{LICENSE,LICENCE,NOTICE,COPYING}*", base: extract_path)
+raise "License not found" unless license_files.any?
+license_files.each do |file|
+  FileUtils.mkdir_p(File.join(path, File.dirname(file)))
+  FileUtils.cp(File.join(extract_path, file), File.join(path, file))
+end
+
+# include
+FileUtils.cp_r(File.join(extract_path, "include"), File.join(path, "include"))
+
+# shared library
+FileUtils.mkdir(File.join(path, "lib"))
+Dir.glob("lib/libortools.{dylib,so}", base: extract_path) do |file|
+  FileUtils.cp(File.join(extract_path, file), File.join(path, file))
+end
 
 # export
 $vendor_path = path
