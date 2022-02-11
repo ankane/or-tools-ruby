@@ -132,7 +132,7 @@ Dir.mktmpdir do |extract_path|
   system "tar", "zxf", download_path, "-C", extract_path, "--strip-components=1", *tar_args
 
   # licenses
-  license_files = Dir.glob("**/*{LICENSE,LICENCE,NOTICE,COPYING}*", base: extract_path)
+  license_files = Dir.glob("**/*{LICENSE,LICENCE,NOTICE,COPYING,license,licence,notice,copying}*", base: extract_path)
   raise "License not found" unless license_files.any?
   license_files.each do |file|
     FileUtils.mkdir_p(File.join(path, File.dirname(file)))
