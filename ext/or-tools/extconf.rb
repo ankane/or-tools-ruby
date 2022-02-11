@@ -25,12 +25,7 @@ end
 
 $INCFLAGS << " -I#{inc}"
 
-$LDFLAGS << " -Wl,-rpath,#{rpath}"
-$LDFLAGS << " -L#{lib}"
+$LDFLAGS.prepend("-Wl,-rpath,#{rpath} -L#{lib} ")
 raise "OR-Tools not found" unless have_library("ortools")
-
-Dir["#{lib}/libabsl_*.a"].each do |lib|
-  $LDFLAGS << " #{lib}"
-end
 
 create_makefile("or_tools/ext")
