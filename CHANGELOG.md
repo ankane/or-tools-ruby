@@ -1,4 +1,4 @@
-## 0.6.3 (unreleased)
+## 0.6.3 (2022-03-13)
 
 - Reduced gem size
 
