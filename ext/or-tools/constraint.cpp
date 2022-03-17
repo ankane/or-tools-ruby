@@ -57,11 +57,11 @@ namespace Rice::detail
           auto coeff = From_Ruby<int64_t>().convert(cvar[1].value());
 
           if (var.is_a(rb_cBoolVar)) {
-            expr.AddTerm(From_Ruby<BoolVar>().convert(var.value()), coeff);
+            expr += From_Ruby<BoolVar>().convert(var.value()) * coeff;
           } else if (var.is_a(rb_cInteger)) {
-            expr.AddConstant(From_Ruby<int64_t>().convert(var.value()) * coeff);
+            expr += From_Ruby<int64_t>().convert(var.value()) * coeff;
           } else {
-            expr.AddTerm(From_Ruby<IntVar>().convert(var.value()), coeff);
+            expr += From_Ruby<IntVar>().convert(var.value()) * coeff;
           }
         }
       } else {
@@ -253,42 +253,32 @@ void init_constraint(Rice::Module& m) {
       })
     .define_method(
       "add_min_equality",
-      [](CpModelBuilder& self, IntVar target, std::vector<IntVar> vars) {
+      [](CpModelBuilder& self, LinearExpr target, std::vector<LinearExpr> vars) {
         return self.AddMinEquality(target, vars);
       })
     .define_method(
-      "add_lin_min_equality",
-      [](CpModelBuilder& self, LinearExpr target, std::vector<LinearExpr> exprs) {
-        return self.AddLinMinEquality(target, exprs);
-      })
-    .define_method(
       "add_max_equality",
-      [](CpModelBuilder& self, IntVar target, std::vector<IntVar> vars) {
+      [](CpModelBuilder& self, LinearExpr target, std::vector<LinearExpr> vars) {
         return self.AddMaxEquality(target, vars);
       })
     .define_method(
-      "add_lin_max_equality",
-      [](CpModelBuilder& self, LinearExpr target, std::vector<LinearExpr> exprs) {
-        return self.AddLinMaxEquality(target, exprs);
-      })
-    .define_method(
       "add_division_equality",
-      [](CpModelBuilder& self, IntVar target, IntVar numerator, IntVar denominator) {
+      [](CpModelBuilder& self, LinearExpr target, LinearExpr numerator, LinearExpr denominator) {
         return self.AddDivisionEquality(target, numerator, denominator);
       })
     .define_method(
       "add_abs_equality",
-      [](CpModelBuilder& self, IntVar target, IntVar var) {
+      [](CpModelBuilder& self, LinearExpr target, LinearExpr var) {
         return self.AddAbsEquality(target, var);
       })
     .define_method(
       "add_modulo_equality",
-      [](CpModelBuilder& self, IntVar target, IntVar var, IntVar mod) {
+      [](CpModelBuilder& self, LinearExpr target, LinearExpr var, LinearExpr mod) {
         return self.AddModuloEquality(target, var, mod);
       })
     .define_method(
       "add_multiplication_equality",
-      [](CpModelBuilder& self, IntVar target, std::vector<IntVar> vars) {
+      [](CpModelBuilder& self, LinearExpr target, std::vector<LinearExpr> vars) {
         return self.AddMultiplicationEquality(target, vars);
       })
     .define_method(

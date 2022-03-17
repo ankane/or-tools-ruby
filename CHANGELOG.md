@@ -1,3 +1,10 @@
+## 0.7.0 (unreleased)
+
+- Updated OR-Tools to 9.3
+- Removed `add_lin_min_equality` (use `add_min_equality` instead)
+- Removed `add_lin_max_equality` (use `add_max_equality` instead)
+- Dropped support for Debian 10
+
 ## 0.6.3 (2022-03-13)
 
 - Reduced gem size
