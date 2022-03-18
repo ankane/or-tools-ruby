@@ -141,8 +141,12 @@ Dir.mktmpdir do |extract_path|
 
   # shared library
   FileUtils.mkdir(File.join(path, "lib"))
-  Dir.glob("lib/libortools.{dylib,so}", base: extract_path) do |file|
+  Dir.glob("lib/libortools.{dylib,so.9}", base: extract_path) do |file|
     FileUtils.cp(File.join(extract_path, file), File.join(path, file))
+  end
+  so_path = File.join(path, "lib/libortools.so.9")
+  if File.exist?(so_path)
+    File.symlink(so_path, File.join(path, "lib/libortools.so"))
   end
 end
 
