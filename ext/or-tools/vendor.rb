@@ -144,7 +144,7 @@ Dir.mktmpdir do |extract_path|
   Dir.glob("lib/libortools.{dylib,so.9}", base: extract_path) do |file|
     FileUtils.cp(File.join(extract_path, file), File.join(path, file))
   end
-  File.symlink("lib/libortools.so.9", "lib/libortools.so")
+  File.symlink(File.join(path, "lib/libortools.so.9"), File.join(path, "lib/libortools.so"))
 end
 
 # export
