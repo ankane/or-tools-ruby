@@ -32,8 +32,9 @@ else
   os_version = os_info["VERSION_ID"]
 
   if os == "ubuntu" && os_version == "20.04"
-    filename = "or-tools_amd64_ubuntu-20.04_v#{version}.tar.gz"
-    checksum = "91c3c4565c2e337f48696a3f578193912f1abefd62bc7b69e03daf1fe4f4df88"
+    # TODO remove sub in v9.4
+    filename = "or-tools_amd64_ubuntu-20.04_v#{version.sub(".10497", ".10502")}.tar.gz"
+    checksum = "3d1979967a2c9358b5bc956f2e6b608b00e89e13c71d48d075475ce4138b6d1c"
   elsif os == "ubuntu" && os_version == "18.04"
     filename = "or-tools_amd64_ubuntu-18.04_v#{version}.tar.gz"
     checksum = "6ba5cc153417267e8f8e15f8b6390b17f22de07bacc61f3740a4172ccd56c274"
