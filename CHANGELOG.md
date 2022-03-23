@@ -1,4 +1,4 @@
-## 0.7.0 (unreleased)
+## 0.7.0 (2022-03-23)
 
 - Updated OR-Tools to 9.3
 - Removed `add_lin_min_equality` (use `add_min_equality` instead)
