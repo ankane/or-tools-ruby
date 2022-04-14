@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.version       = ORTools::VERSION
   spec.summary       = "Operations research tools for Ruby"
   spec.homepage      = "https://github.com/ankane/or-tools-ruby"
-  spec.license       = "MIT"
+  spec.license       = "Apache-2.0"
 
   spec.author        = "Andrew Kane"
   spec.email         = "andrew@ankane.org"
