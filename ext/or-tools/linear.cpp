@@ -67,6 +67,12 @@ void init_linear(Rice::Module& m) {
   Rice::define_class_under<MPSolver>(m, "Solver")
     .define_constructor(Rice::Constructor<MPSolver, std::string, MPSolver::OptimizationProblemType>())
     .define_method(
+      "time_limit=",
+      [](MPSolver& self, double time_limit) {
+        // use milliseconds to match Python
+        self.SetTimeLimit(absl::Milliseconds(time_limit));
+      })
+    .define_method(
       "infinity",
       [](MPSolver& self) {
         return self.infinity();
