@@ -47,7 +47,7 @@ namespace Rice::detail
 void init_linear(Rice::Module& m) {
   Rice::define_class_under<LinearRange>(m, "LinearRange");
 
-  // TODO remove in 0.7.0
+  // TODO remove in 0.8.0
   auto rb_cLinearExpr = Rice::define_class_under<LinearExpr>(m, "LinearExpr");
   rb_cLinearExpr.define_constructor(Rice::Constructor<LinearExpr>());
 
