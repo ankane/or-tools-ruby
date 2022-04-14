@@ -81,6 +81,8 @@ void init_linear(Rice::Module& m) {
     .define_method("num_variables", &MPSolver::NumVariables)
     .define_method("num_constraints", &MPSolver::NumConstraints)
     .define_method("wall_time", &MPSolver::wall_time)
+    .define_method("enable_output", &MPSolver::EnableOutput)
+    .define_method("suppress_output", &MPSolver::SuppressOutput)
     .define_method("iterations", &MPSolver::iterations)
     .define_method("nodes", &MPSolver::nodes)
     .define_method("objective", &MPSolver::MutableObjective)

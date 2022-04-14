@@ -1,3 +1,7 @@
+## 0.7.1 (unreleased)
+
+- Added `enable_output` and `suppress_output` to `Solver`
+
 ## 0.7.0 (2022-03-23)
 
 - Updated OR-Tools to 9.3
