@@ -80,4 +80,10 @@ class LinearTest < Minitest::Test
     # prevent warning
     # assert_equal 0, x.solution_value
   end
+
+  # match Python behavior
+  def test_create_unknown
+    # TODO fix
+    # assert_nil ORTools::Solver.create("UNKNOWN")
+  end
 end
