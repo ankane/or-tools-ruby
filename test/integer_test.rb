@@ -1,7 +1,7 @@
 require_relative "test_helper"
 
 class IntegerTest < Minitest::Test
-  # https://developers.google.com/optimization/mip/integer_opt
+  # https://developers.google.com/optimization/mip/mip_example
   def test_solver
     solver = ORTools::Solver.create("CBC")
 

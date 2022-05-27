@@ -1,7 +1,7 @@
 require_relative "test_helper"
 
 class LinearTest < Minitest::Test
-  # https://developers.google.com/optimization/lp/glop
+  # https://developers.google.com/optimization/lp/lp_example
   def test_solver
     solver = ORTools::Solver.create("GLOP")
 

@@ -255,11 +255,11 @@ sudoku.solution
 
 Linear Optimization
 
-- [The Glop Linear Solver](#the-glop-linear-solver)
+- [Solving an LP Problem](#solving-an-lp-problem)
 
 Integer Optimization
 
-- [Mixed-Integer Programming](#mixed-integer-programming)
+- [Solving a MIP Problem](#solving-a-mip-problem)
 
 Constraint Optimization
 
@@ -308,9 +308,9 @@ Other Examples
 - [Wedding Seating Chart](#wedding-seating-chart)
 - [Set Partitioning](#set-partitioning)
 
-### The Glop Linear Solver
+### Solving an LP Problem
 
-[Guide](https://developers.google.com/optimization/lp/glop)
+[Guide](https://developers.google.com/optimization/lp/lp_example)
 
 ```ruby
 # declare the solver
@@ -344,9 +344,9 @@ else
 end
 ```
 
-### Mixed-Integer Programming
+### Solving a MIP Problem
 
-[Guide](https://developers.google.com/optimization/mip/integer_opt)
+[Guide](https://developers.google.com/optimization/mip/mip_example)
 
 ```ruby
 # declare the MIP solver
