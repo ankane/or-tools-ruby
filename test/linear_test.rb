@@ -28,6 +28,7 @@ class LinearTest < Minitest::Test
   end
 
   def test_type_error
+    # use new instead of create for now to test
     solver = ORTools::Solver.new("LinearProgrammingExample", :glop)
     x = solver.num_var(0, solver.infinity, "x")
 
@@ -38,7 +39,7 @@ class LinearTest < Minitest::Test
   end
 
   def test_to_s
-    solver = ORTools::Solver.new("LinearProgrammingExample", :glop)
+    solver = ORTools::Solver.create("GLOP")
     x = solver.num_var(0, solver.infinity, "x")
     y = solver.num_var(0, solver.infinity, "y")
 
@@ -52,7 +53,7 @@ class LinearTest < Minitest::Test
   end
 
   def test_inspect
-    solver = ORTools::Solver.new("LinearProgrammingExample", :glop)
+    solver = ORTools::Solver.create("GLOP")
     x = solver.num_var(0, solver.infinity, "x")
 
     assert_equal "#<ORTools::MPVariable x>", x.inspect

@@ -1409,53 +1409,40 @@ puts "Packed weights: #{packed_weights}"
 ```ruby
 # create the data
 data = {}
-weights = [48, 30, 42, 36, 36, 48, 42, 42, 36, 24, 30, 30, 42, 36, 36]
-values = [10, 30, 25, 50, 35, 30, 15, 40, 30, 35, 45, 10, 20, 30, 25]
-data[:weights] = weights
-data[:values] = values
-data[:items] = (0...weights.length).to_a
-data[:num_items] = weights.length
-num_bins = 5
-data[:bins] = (0...num_bins).to_a
+data[:weights] = [48, 30, 42, 36, 36, 48, 42, 42, 36, 24, 30, 30, 42, 36, 36]
+data[:values] = [10, 30, 25, 50, 35, 30, 15, 40, 30, 35, 45, 10, 20, 30, 25]
+data[:num_items] = data[:weights].length
+data[:all_items] = data[:num_items].times.to_a
 data[:bin_capacities] = [100, 100, 100, 100, 100]
+data[:num_bins] = data[:bin_capacities].length
+data[:all_bins] = data[:num_bins].times.to_a
 
 # declare the solver
-solver = ORTools::Solver.new("simple_mip_program", :cbc)
+solver = ORTools::Solver.create("CBC")
 
 # create the variables
-# x[i, j] = 1 if item i is packed in bin j
 x = {}
-data[:items].each do |i|
-  data[:bins].each do |j|
-    x[[i, j]] = solver.int_var(0, 1, "x_%i_%i" % [i, j])
+data[:all_items].each do |i|
+  data[:all_bins].each do |b|
+    x[[i, b]] = solver.bool_var("x_#{i}_#{b}")
   end
 end
 
-# define the constraints
-# each item can be in at most one bin
-data[:items].each do |i|
-  sum = ORTools::LinearExpr.new
-  data[:bins].each do |j|
-    sum += x[[i, j]]
-  end
-  solver.add(sum <= 1.0)
+# each item is assigned to at most one bin
+data[:all_items].each do |i|
+  solver.add(data[:all_bins].sum { |b| x[[i, b]] } <= 1)
 end
 
 # the amount packed in each bin cannot exceed its capacity
-data[:bins].each do |j|
-  weight = ORTools::LinearExpr.new
-  data[:items].each do |i|
-    weight += x[[i, j]] * data[:weights][i]
-  end
-  solver.add(weight <= data[:bin_capacities][j])
+data[:all_bins].each do |b|
+  solver.add(data[:all_items].sum { |i| x[[i, b]] * data[:weights][i] } <= data[:bin_capacities][b])
 end
 
-# define the objective
+# maximize total value of packed items
 objective = solver.objective
-
-data[:items].each do |i|
-  data[:bins].each do |j|
-    objective.set_coefficient(x[[i, j]], data[:values][i])
+data[:all_items].each do |i|
+  data[:all_bins].each do |b|
+    objective.set_coefficient(x[[i, b]], data[:values][i])
   end
 end
 objective.set_maximization
@@ -1466,12 +1453,12 @@ status = solver.solve
 if status == :optimal
   puts "Total packed value: #{objective.value}"
   total_weight = 0
-  data[:bins].each do |j|
+  data[:all_bins].each do |b|
     bin_weight = 0
     bin_value = 0
-    puts "Bin  #{j}\n\n"
-    data[:items].each do |i|
-      if x[[i, j]].solution_value > 0
+    puts "Bin #{b}\n\n"
+    data[:all_items].each do |i|
+      if x[[i, b]].solution_value > 0
         puts "Item #{i} - weight: #{data[:weights][i]}  value: #{data[:values][i]}"
         bin_weight += data[:weights][i]
         bin_value += data[:values][i]
