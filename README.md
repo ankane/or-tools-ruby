@@ -354,8 +354,8 @@ solver = ORTools::Solver.new("simple_mip_program", :cbc)
 
 # define the variables
 infinity = solver.infinity
-x = solver.int_var(0.0, infinity, "x")
-y = solver.int_var(0.0, infinity, "y")
+x = solver.int_var(0, infinity, "x")
+y = solver.int_var(0, infinity, "y")
 
 puts "Number of variables = #{solver.num_variables}"
 
