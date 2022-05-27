@@ -1502,7 +1502,7 @@ data[:bins] = data[:items]
 data[:bin_capacity] = 100
 
 # create the mip solver with the CBC backend
-solver = ORTools::Solver.new("simple_mip_program", :cbc)
+solver = ORTools::Solver.create("CBC")
 
 # variables
 # x[i, j] = 1 if item i is packed in bin j
@@ -1522,17 +1522,17 @@ end
 # constraints
 # each item must be in exactly one bin
 data[:items].each do |i|
-  solver.add(solver.sum(data[:bins].map { |j| x[[i, j]] }) == 1)
+  solver.add(data[:bins].sum { |j| x[[i, j]] } == 1)
 end
 
 # the amount packed in each bin cannot exceed its capacity
 data[:bins].each do |j|
-  sum = solver.sum(data[:items].map { |i| x[[i, j]] * data[:weights][i] })
+  sum = data[:items].sum { |i| x[[i, j]] * data[:weights][i] }
   solver.add(sum <= y[j] * data[:bin_capacity])
 end
 
 # objective: minimize the number of bins used
-solver.minimize(solver.sum(data[:bins].map { |j| y[j] }))
+solver.minimize(data[:bins].sum { |j| y[j] })
 
 # call the solver and print the solution
 if status == :optimal

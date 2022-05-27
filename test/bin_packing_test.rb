@@ -155,7 +155,7 @@ class BinPackingTest < Minitest::Test
     data[:bins] = data[:items]
     data[:bin_capacity] = 100
 
-    solver = ORTools::Solver.new("simple_mip_program", :cbc)
+    solver = ORTools::Solver.create("CBC")
 
     x = {}
     data[:items].each do |i|
@@ -170,15 +170,15 @@ class BinPackingTest < Minitest::Test
     end
 
     data[:items].each do |i|
-      solver.add(solver.sum(data[:bins].map { |j| x[[i, j]] }) == 1)
+      solver.add(data[:bins].sum { |j| x[[i, j]] } == 1)
     end
 
     data[:bins].each do |j|
-      sum = solver.sum(data[:items].map { |i| x[[i, j]] * data[:weights][i] })
+      sum = data[:items].sum { |i| x[[i, j]] * data[:weights][i] }
       solver.add(sum <= y[j] * data[:bin_capacity])
     end
 
-    solver.minimize(solver.sum(data[:bins].map { |j| y[j] }))
+    solver.minimize(data[:bins].sum { |j| y[j] })
 
     status = solver.solve
 
