@@ -308,6 +308,8 @@ Other Examples
 - [Wedding Seating Chart](#wedding-seating-chart)
 - [Set Partitioning](#set-partitioning)
 
+## Linear Optimization
+
 ### Solving an LP Problem
 
 [Guide](https://developers.google.com/optimization/lp/lp_example)
@@ -343,6 +345,8 @@ else
   puts "The problem does not have an optimal solution."
 end
 ```
+
+## Integer Optimization
 
 ### Solving a MIP Problem
 
@@ -381,6 +385,8 @@ else
   puts "The problem does not have an optimal solution."
 end
 ```
+
+## Constraint Optimization
 
 ### CP-SAT Solver
 
@@ -597,6 +603,8 @@ if status == :optimal
 end
 ```
 
+## Assignment
+
 ### Assignment with Teams of Workers
 
 [Guide](https://developers.google.com/optimization/assignment/assignment_teams#mip)
@@ -710,6 +718,8 @@ elsif solve_status == :possible_overflow
   puts "Some input costs are too large and may cause an integer overflow."
 end
 ```
+
+## Routing
 
 ### Traveling Salesperson Problem (TSP)
 
@@ -1360,6 +1370,8 @@ routing.solve(
 )
 ```
 
+## Bin Packing
+
 ### The Knapsack Problem
 
 [Guide](https://developers.google.com/optimization/bin/knapsack)
@@ -1551,6 +1563,8 @@ else
 end
 ```
 
+## Network Flows
+
 ### Maximum Flows
 
 [Guide](https://developers.google.com/optimization/flow/maxflow)
@@ -1681,6 +1695,8 @@ else
   puts "There was an issue with the min cost flow input."
 end
 ```
+
+## Scheduling
 
 ### Employee Scheduling
 
@@ -1885,6 +1901,8 @@ end
 puts "Optimal Schedule Length: %i" % solver.objective_value
 puts output
 ```
+
+## Other Examples
 
 ### Sudoku
 
