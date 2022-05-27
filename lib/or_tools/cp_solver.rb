@@ -12,6 +12,12 @@ module ORTools
     end
 
     def value(var)
+      # could also check solution_size == 0
+      unless [:feasible, :optimal].include?(@response.status)
+        # could return nil, but raise error like Python library
+        raise Error, "No solution found"
+      end
+
       if var.is_a?(BoolVar)
         _solution_boolean_value(@response, var)
       else

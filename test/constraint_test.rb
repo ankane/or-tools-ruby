@@ -172,4 +172,20 @@ class ConstraintTest < Minitest::Test
     status = solver.solve(model)
     assert_equal :unknown, status
   end
+
+  def test_infeasible_value
+    model = ORTools::CpModel.new
+
+    x = model.new_bool_var("x")
+    model.add(x > 1)
+
+    solver = ORTools::CpSolver.new
+    status = solver.solve(model)
+
+    assert_equal :infeasible, status
+    error = assert_raises(ORTools::Error) do
+      solver.value(x)
+    end
+    assert_equal "No solution found", error.message
+  end
 end
