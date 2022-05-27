@@ -66,6 +66,12 @@ void init_linear(Rice::Module& m) {
 
   Rice::define_class_under<MPSolver>(m, "Solver")
     .define_constructor(Rice::Constructor<MPSolver, std::string, MPSolver::OptimizationProblemType>())
+    .define_singleton_function(
+      "create",
+      [](const std::string& solver_id) {
+        std::unique_ptr<MPSolver> solver(MPSolver::CreateSolver(solver_id));
+        return solver;
+      })
     .define_method(
       "time_limit=",
       [](MPSolver& self, double time_limit) {

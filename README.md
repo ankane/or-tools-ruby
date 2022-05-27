@@ -314,7 +314,7 @@ Other Examples
 
 ```ruby
 # declare the solver
-solver = ORTools::Solver.new("LinearProgrammingExample", :glop)
+solver = ORTools::Solver.create("GLOP")
 
 # create the variables
 x = solver.num_var(0, solver.infinity, "x")

@@ -3,7 +3,7 @@ require_relative "test_helper"
 class LinearTest < Minitest::Test
   # https://developers.google.com/optimization/lp/glop
   def test_solver
-    solver = ORTools::Solver.new("LinearProgrammingExample", :glop)
+    solver = ORTools::Solver.create("GLOP")
 
     x = solver.num_var(0, solver.infinity, "x")
     y = solver.num_var(0, solver.infinity, "y")

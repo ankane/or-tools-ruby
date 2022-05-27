@@ -1,5 +1,6 @@
 ## 0.7.1 (unreleased)
 
+- Added `create` method for `Solver`
 - Added support for time limit for `Solver`
 - Added `enable_output` and `suppress_output` to `Solver`
 
