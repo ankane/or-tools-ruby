@@ -350,7 +350,7 @@ end
 
 ```ruby
 # declare the MIP solver
-solver = ORTools::Solver.new("simple_mip_program", :cbc)
+solver = ORTools::Solver.create("CBC")
 
 # define the variables
 infinity = solver.infinity
@@ -360,21 +360,13 @@ y = solver.int_var(0, infinity, "y")
 puts "Number of variables = #{solver.num_variables}"
 
 # define the constraints
-c0 = solver.constraint(-infinity, 17.5)
-c0.set_coefficient(x, 1)
-c0.set_coefficient(y, 7)
-
-c1 = solver.constraint(-infinity, 3.5)
-c1.set_coefficient(x, 1);
-c1.set_coefficient(y, 0);
+solver.add(x + 7 * y <= 17.5)
+solver.add(x <= 3.5)
 
 puts "Number of constraints = #{solver.num_constraints}"
 
 # define the objective
-objective = solver.objective
-objective.set_coefficient(x, 1)
-objective.set_coefficient(y, 10)
-objective.set_maximization
+solver.maximize(x + 10 * y)
 
 # call the solver
 status = solver.solve

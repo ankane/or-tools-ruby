@@ -3,7 +3,7 @@ require_relative "test_helper"
 class IntegerTest < Minitest::Test
   # https://developers.google.com/optimization/mip/integer_opt
   def test_solver
-    solver = ORTools::Solver.new("simple_mip_program", :cbc)
+    solver = ORTools::Solver.create("CBC")
 
     infinity = solver.infinity
     x = solver.int_var(0, infinity, "x")
@@ -11,23 +11,13 @@ class IntegerTest < Minitest::Test
 
     assert_equal 2, solver.num_variables
 
-    # solver.add(x + 7 * y <= 17.5)
-    c0 = solver.constraint(-infinity, 17.5)
-    c0.set_coefficient(x, 1)
-    c0.set_coefficient(y, 7)
+    solver.add(x + 7 * y <= 17.5)
 
-    # solver.add(x <= 3.5)
-    c1 = solver.constraint(-infinity, 3.5)
-    c1.set_coefficient(x, 1);
-    c1.set_coefficient(y, 0);
+    solver.add(x <= 3.5)
 
     assert_equal 2, solver.num_constraints
 
-    # solver.maximize(x + 10 * y)
-    objective = solver.objective
-    objective.set_coefficient(x, 1)
-    objective.set_coefficient(y, 10)
-    objective.set_maximization
+    solver.maximize(x + 10 * y)
 
     assert_equal :optimal, solver.solve
     assert_equal 23, solver.objective.value
