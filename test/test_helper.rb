@@ -8,6 +8,13 @@ require "time"
 class Minitest::Test
   def setup
     @output = StringIO.new("")
+    @output_checked = false
+  end
+
+  def teardown
+    if !@output.string.empty? && !@output_checked
+      warn "Captured output. Use VERBOSE=1 to show."
+    end
   end
 
   # not ideal, but useful for testing examples
@@ -18,5 +25,6 @@ class Minitest::Test
 
   def assert_output(expected)
     assert_equal expected, @output.string
+    @output_checked = true
   end
 end
