@@ -82,9 +82,9 @@ class AssignmentTest < Minitest::Test
     num_tasks = cost[1].length
 
     x = {}
-    num_workers.times do |worker|
-      num_tasks.times do |task|
-        x[[worker, task]] = solver.bool_var("x[#{worker},#{task}]")
+    num_workers.times do |i|
+      num_tasks.times do |j|
+        x[[i, j]] = solver.bool_var("x[#{i},#{j}]")
       end
     end
 
@@ -96,13 +96,13 @@ class AssignmentTest < Minitest::Test
       solver.add(num_workers.times.sum { |i| x[[i, j]] } == 1)
     end
 
-    solver.add(solver.sum(team1.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] } }) <= team_max)
-    solver.add(solver.sum(team2.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] } }) <= team_max)
+    solver.add(team1.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] } }.sum <= team_max)
+    solver.add(team2.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] } }.sum <= team_max)
 
     # create the objective
-    solver.minimize(solver.sum(
-      num_workers.times.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] * cost[i][j] } }
-    ))
+    solver.minimize(
+      num_workers.times.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] * cost[i][j] } }.sum
+    )
 
     status = solver.solve
     assert_equal :optimal, status
