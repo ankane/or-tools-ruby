@@ -47,7 +47,6 @@ class AssignmentTest < Minitest::Test
 
     # invoke the solver
     status = solver.solve
-    assert_equal :optimal, status
 
     # print the solution
     if status == :optimal || status == :feasible
@@ -63,6 +62,14 @@ class AssignmentTest < Minitest::Test
     else
       puts "No solution found."
     end
+
+    assert_output <<~EOS
+      Total cost = 265.0
+      Worker 0 assigned to task 3. Cost: 70
+      Worker 1 assigned to task 2. Cost: 55
+      Worker 2 assigned to task 1. Cost: 95
+      Worker 3 assigned to task 0. Cost: 45
+    EOS
   end
 
   # https://developers.google.com/optimization/assignment/assignment_teams#mip

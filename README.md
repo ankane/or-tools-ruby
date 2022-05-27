@@ -657,7 +657,6 @@ solver.minimize(objective_terms.sum)
 
 # invoke the solver
 status = solver.solve
-assert_equal :optimal, status
 
 # print the solution
 if status == :optimal || status == :feasible
