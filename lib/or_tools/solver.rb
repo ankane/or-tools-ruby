@@ -9,17 +9,25 @@ module ORTools
     end
 
     def maximize(expr)
-      expr.coeffs.each do |v, c|
-        objective.set_coefficient(v, c)
-      end
+      set_objective(expr)
       objective.set_maximization
     end
 
     def minimize(expr)
-      expr.coeffs.each do |v, c|
+      set_objective(expr)
+      objective.set_minimization
+    end
+
+    private
+
+    def set_objective(expr)
+      objective.clear
+      coeffs = expr.coeffs
+      offset = coeffs.delete(OFFSET_KEY)
+      objective.set_offset(offset) if offset
+      coeffs.each do |v, c|
         objective.set_coefficient(v, c)
       end
-      objective.set_minimization
     end
   end
 end

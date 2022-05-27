@@ -61,6 +61,14 @@ class LinearTest < Minitest::Test
     assert_equal "#<ORTools::LinearConstraint (x + 1) == 1>", (x + 1 == 1).inspect
   end
 
+  def test_offset
+    solver = ORTools::Solver.create("GLOP")
+    x = solver.num_var(0, 1, "x")
+    solver.minimize(x + 2)
+    assert_equal :optimal, solver.solve
+    assert_equal 2, solver.objective.value
+  end
+
   def test_infeasible_value
     solver = ORTools::Solver.create("GLOP")
 

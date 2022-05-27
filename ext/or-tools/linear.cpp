@@ -60,7 +60,9 @@ void init_linear(Rice::Module& m) {
 
   Rice::define_class_under<MPObjective>(m, "MPObjective")
     .define_method("value", &MPObjective::Value)
+    .define_method("clear", &MPObjective::Clear)
     .define_method("set_coefficient", &MPObjective::SetCoefficient)
+    .define_method("set_offset", &MPObjective::SetOffset)
     .define_method("set_maximization", &MPObjective::SetMaximization)
     .define_method("set_minimization", &MPObjective::SetMinimization);
 

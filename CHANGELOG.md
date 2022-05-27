@@ -3,6 +3,7 @@
 - Added `create` method for `Solver`
 - Added support for time limit for `Solver`
 - Added `enable_output` and `suppress_output` to `Solver`
+- Fixed error with offset with `Solver`
 - Fixed segfault with `CpSolver`
 
 ## 0.7.0 (2022-03-23)
