@@ -16,7 +16,7 @@ class LinearTest < Minitest::Test
 
     solver.maximize(3 * x + 4 * y)
 
-    solver.solve
+    assert_equal :optimal, solver.solve
 
     assert_in_delta 34, solver.objective.value
     assert_in_delta 6, x.solution_value
@@ -59,5 +59,17 @@ class LinearTest < Minitest::Test
     assert_equal "#<ORTools::SumArray (x + 1)>", (x + 1).inspect
     assert_equal "#<ORTools::LinearExpr (empty)>", ORTools::LinearExpr.new.inspect
     assert_equal "#<ORTools::LinearConstraint (x + 1) == 1>", (x + 1 == 1).inspect
+  end
+
+  def test_infeasible_value
+    solver = ORTools::Solver.create("GLOP")
+
+    x = solver.num_var(0, 1, "x")
+    solver.add(x >= 2)
+    status = solver.solve
+
+    assert_equal :infeasible, status
+    # prevent warning
+    # assert_equal 0, x.solution_value
   end
 end
