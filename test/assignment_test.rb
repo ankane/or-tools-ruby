@@ -1,8 +1,8 @@
 require_relative "test_helper"
 
 class AssignmentTest < Minitest::Test
-  # https://developers.google.com/optimization/assignment/simple_assignment
-  def test_assignment
+  # https://developers.google.com/optimization/assignment/linear_assignment
+  def test_linear_sum_assignment
     cost = [[ 90,  76, 75,  70],
             [ 35,  85, 55,  65],
             [125,  95, 90, 105],
@@ -63,9 +63,9 @@ class AssignmentTest < Minitest::Test
     assert_equal [70, 55, 95, 45], arcs.map { |i| min_cost_flow.unit_cost(i) }
   end
 
-  # https://developers.google.com/optimization/assignment/assignment_mip
-  def test_assignment_mip
-    solver = ORTools::Solver.new("SolveAssignmentProblemMIP", :cbc)
+  # https://developers.google.com/optimization/assignment/assignment_teams#mip
+  def test_assignment_teams
+    solver = ORTools::Solver.create("CBC")
 
     cost = [[90, 76, 75, 70],
             [35, 85, 55, 65],
@@ -80,30 +80,32 @@ class AssignmentTest < Minitest::Test
 
     num_workers = cost.length
     num_tasks = cost[1].length
-    x = {}
 
-    num_workers.times do |i|
-      num_tasks.times do |j|
-        x[[i, j]] = solver.bool_var("x[#{i},#{j}]")
+    x = {}
+    num_workers.times do |worker|
+      num_tasks.times do |task|
+        x[[worker, task]] = solver.bool_var("x[#{worker},#{task}]")
       end
     end
 
-    solver.minimize(solver.sum(
-      num_workers.times.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] * cost[i][j] } }
-    ))
-
     num_workers.times do |i|
-      solver.add(solver.sum(num_tasks.times.map { |j| x[[i, j]] }) <= 1)
+      solver.add(num_tasks.times.sum { |j| x[[i, j]] } <= 1)
     end
 
     num_tasks.times do |j|
-      solver.add(solver.sum(num_workers.times.map { |i| x[[i, j]] }) == 1)
+      solver.add(num_workers.times.sum { |i| x[[i, j]] } == 1)
     end
 
     solver.add(solver.sum(team1.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] } }) <= team_max)
     solver.add(solver.sum(team2.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] } }) <= team_max)
-    sol = solver.solve
-    assert_equal :optimal, sol
+
+    # create the objective
+    solver.minimize(solver.sum(
+      num_workers.times.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] * cost[i][j] } }
+    ))
+
+    status = solver.solve
+    assert_equal :optimal, status
 
     assert_equal 250, solver.objective.value
 

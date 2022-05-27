@@ -271,8 +271,8 @@ Constraint Optimization
 
 Assignment
 
-- [Assignment](#assignment)
-- [Assignment with Teams](#assignment-with-teams)
+- [Assignment with Teams of Workers](#assignment-with-teams-of-workers)
+- [Linear Sum Assignment Solver](#linear-sum-assignment-solver)
 
 Routing
 
@@ -597,58 +597,13 @@ if status == :optimal
 end
 ```
 
-### Assignment
+### Assignment with Teams of Workers
 
-[Guide](https://developers.google.com/optimization/assignment/assignment_example)
-
-```ruby
-# create the data
-cost = [[ 90,  76, 75,  70],
-        [ 35,  85, 55,  65],
-        [125,  95, 90, 105],
-        [ 45, 110, 95, 115]]
-
-rows = cost.length
-cols = cost[0].length
-
-# create the solver
-assignment = ORTools::LinearSumAssignment.new
-
-# add the costs to the solver
-rows.times do |worker|
-  cols.times do |task|
-    if cost[worker][task]
-      assignment.add_arc_with_cost(worker, task, cost[worker][task])
-    end
-  end
-end
-
-# invoke the solver
-solve_status = assignment.solve
-if solve_status == :optimal
-  puts "Total cost = #{assignment.optimal_cost}"
-  puts
-  assignment.num_nodes.times do |i|
-    puts "Worker %d assigned to task %d.  Cost = %d" % [
-      i,
-      assignment.right_mate(i),
-      assignment.assignment_cost(i)
-    ]
-  end
-elsif solve_status == :infeasible
-  puts "No assignment is possible."
-elsif solve_status == :possible_overflow
-  puts "Some input costs are too large and may cause an integer overflow."
-end
-```
-
-### Assignment with Teams
-
-[Guide](https://developers.google.com/optimization/assignment/assignment_teams)
+[Guide](https://developers.google.com/optimization/assignment/assignment_teams#mip)
 
 ```ruby
 # create the solver
-solver = ORTools::Solver.new("SolveAssignmentProblemMIP", :cbc)
+solver = ORTools::Solver.create("CBC")
 
 # create the data
 cost = [[90, 76, 75, 70],
@@ -709,6 +664,51 @@ end
 
 puts
 puts "Time = #{solver.wall_time} milliseconds"
+```
+
+### Linear Sum Assignment Solver
+
+[Guide](https://developers.google.com/optimization/assignment/linear_assignment)
+
+```ruby
+# create the data
+cost = [[ 90,  76, 75,  70],
+        [ 35,  85, 55,  65],
+        [125,  95, 90, 105],
+        [ 45, 110, 95, 115]]
+
+rows = cost.length
+cols = cost[0].length
+
+# create the solver
+assignment = ORTools::LinearSumAssignment.new
+
+# add the costs to the solver
+rows.times do |worker|
+  cols.times do |task|
+    if cost[worker][task]
+      assignment.add_arc_with_cost(worker, task, cost[worker][task])
+    end
+  end
+end
+
+# invoke the solver
+solve_status = assignment.solve
+if solve_status == :optimal
+  puts "Total cost = #{assignment.optimal_cost}"
+  puts
+  assignment.num_nodes.times do |i|
+    puts "Worker %d assigned to task %d.  Cost = %d" % [
+      i,
+      assignment.right_mate(i),
+      assignment.assignment_cost(i)
+    ]
+  end
+elsif solve_status == :infeasible
+  puts "No assignment is possible."
+elsif solve_status == :possible_overflow
+  puts "Some input costs are too large and may cause an integer overflow."
+end
 ```
 
 ### Traveling Salesperson Problem (TSP)
