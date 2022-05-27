@@ -72,6 +72,10 @@ void init_linear(Rice::Module& m) {
       "create",
       [](const std::string& solver_id) {
         std::unique_ptr<MPSolver> solver(MPSolver::CreateSolver(solver_id));
+        // TODO return nil to match Python
+        if (!solver) {
+          throw std::runtime_error("Unrecognized solver type");
+        }
         return solver;
       })
     .define_method(
