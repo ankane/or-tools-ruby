@@ -81,11 +81,8 @@ class LinearTest < Minitest::Test
     # assert_equal 0, x.solution_value
   end
 
-  # TODO return nil to match Python
+  # return nil to match Python
   def test_create_unknown
-    error = assert_raises do
-      ORTools::Solver.create("UNKNOWN")
-    end
-    assert_equal "Unrecognized solver type", error.message
+    assert_nil ORTools::Solver.create("UNKNOWN")
   end
 end

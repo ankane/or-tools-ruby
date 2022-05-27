@@ -72,11 +72,10 @@ void init_linear(Rice::Module& m) {
       "create",
       [](const std::string& solver_id) {
         std::unique_ptr<MPSolver> solver(MPSolver::CreateSolver(solver_id));
-        // TODO return nil to match Python
         if (!solver) {
-          throw std::runtime_error("Unrecognized solver type");
+          return Rice::Nil;
         }
-        return solver;
+        return Rice::Object(Rice::detail::To_Ruby<std::unique_ptr<MPSolver>>().convert(solver));
       })
     .define_method(
       "time_limit=",
