@@ -27,7 +27,11 @@ module ORTools
     end
 
     def *(other)
-      ProductCst.new(self, other)
+      if is_a?(Constant)
+        ProductCst.new(other, @val)
+      else
+        ProductCst.new(self, other)
+      end
     end
 
     def /(cst)
@@ -68,6 +72,14 @@ module ORTools
 
     def inspect
       "#<#{self.class.name} #{to_s}>"
+    end
+
+    def coerce(other)
+      if other.is_a?(Numeric)
+        [Constant.new(other), self]
+      else
+        raise TypeError, "#{self.class} can't be coerced into #{other.class}"
+      end
     end
   end
 end

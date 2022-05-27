@@ -321,23 +321,12 @@ x = solver.num_var(0, solver.infinity, "x")
 y = solver.num_var(0, solver.infinity, "y")
 
 # define the constraints
-constraint0 = solver.constraint(-solver.infinity, 14)
-constraint0.set_coefficient(x, 1)
-constraint0.set_coefficient(y, 2)
-
-constraint1 = solver.constraint(0, solver.infinity)
-constraint1.set_coefficient(x, 3)
-constraint1.set_coefficient(y, -1)
-
-constraint2 = solver.constraint(-solver.infinity, 2)
-constraint2.set_coefficient(x, 1)
-constraint2.set_coefficient(y, -1)
+solver.add(x + 2 * y <= 14)
+solver.add(3 * x - y >= 0)
+solver.add(x - y <= 2)
 
 # define the objective function
-objective = solver.objective
-objective.set_coefficient(x, 3)
-objective.set_coefficient(y, 4)
-objective.set_maximization
+solver.maximize(3 * x + 4 * y)
 
 # invoke the solver
 solver.solve
