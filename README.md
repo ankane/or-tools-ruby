@@ -14,12 +14,71 @@ gem "or-tools"
 
 Installation can take a few minutes as OR-Tools downloads and builds. For Mac ARM, also follow [these instructions](#additional-instructions).
 
-## Higher Level Interfaces
+## Guides
+
+Higher Level Interfaces
 
 - [Scheduling](#scheduling)
 - [Seating](#seating)
 - [Traveling Salesperson Problem (TSP)](#traveling-salesperson-problem-tsp)
 - [Sudoku](#sudoku)
+
+Linear Optimization
+
+- [Solving an LP Problem](#solving-an-lp-problem)
+
+Integer Optimization
+
+- [Solving a MIP Problem](#solving-a-mip-problem)
+
+Constraint Optimization
+
+- [CP-SAT Solver](#cp-sat-solver)
+- [Solving an Optimization Problem](#solving-an-optimization-problem)
+- [Cryptarithmetic](#cryptarithmetic)
+- [The N-queens Problem](#the-n-queens-problem)
+- [Setting Solver Limits](#setting-solver-limits)
+
+Assignment
+
+- [Assignment with Teams of Workers](#assignment-with-teams-of-workers)
+- [Linear Sum Assignment Solver](#linear-sum-assignment-solver)
+
+Routing
+
+- [Traveling Salesperson Problem (TSP)](#traveling-salesperson-problem-tsp-1)
+- [Vehicle Routing Problem (VRP)](#vehicle-routing-problem-vrp)
+- [Capacity Constraints](#capacity-constraints)
+- [Pickups and Deliveries](#pickups-and-deliveries)
+- [Time Window Constraints](#time-window-constraints)
+- [Resource Constraints](#resource-constraints)
+- [Penalties and Dropping Visits](#penalties-and-dropping-visits)
+- [Routing Options](#routing-options)
+
+Bin Packing
+
+- [The Knapsack Problem](#the-knapsack-problem)
+- [Multiple Knapsacks](#multiple-knapsacks)
+- [Bin Packing Problem](#bin-packing-problem)
+
+Network Flows
+
+- [Maximum Flows](#maximum-flows)
+- [Minimum Cost Flows](#minimum-cost-flows)
+- [Assignment as a Min Cost Flow Problem](#assignment-as-a-min-cost-flow-problem)
+
+Scheduling
+
+- [Employee Scheduling](#employee-scheduling)
+- [The Job Shop Problem](#the-job-shop-problem)
+
+Other Examples
+
+- [Sudoku](#sudoku-1)
+- [Wedding Seating Chart](#wedding-seating-chart)
+- [Set Partitioning](#set-partitioning)
+
+## Higher Level Interfaces
 
 ### Scheduling
 
@@ -250,63 +309,6 @@ grid = [
 sudoku = ORTools::Sudoku.new(grid, x: true, anti_knight: true, magic_square: true)
 sudoku.solution
 ```
-
-## Guides
-
-Linear Optimization
-
-- [Solving an LP Problem](#solving-an-lp-problem)
-
-Integer Optimization
-
-- [Solving a MIP Problem](#solving-a-mip-problem)
-
-Constraint Optimization
-
-- [CP-SAT Solver](#cp-sat-solver)
-- [Solving an Optimization Problem](#solving-an-optimization-problem)
-- [Cryptarithmetic](#cryptarithmetic)
-- [The N-queens Problem](#the-n-queens-problem)
-- [Setting Solver Limits](#setting-solver-limits)
-
-Assignment
-
-- [Assignment with Teams of Workers](#assignment-with-teams-of-workers)
-- [Linear Sum Assignment Solver](#linear-sum-assignment-solver)
-
-Routing
-
-- [Traveling Salesperson Problem (TSP)](#traveling-salesperson-problem-tsp-1)
-- [Vehicle Routing Problem (VRP)](#vehicle-routing-problem-vrp)
-- [Capacity Constraints](#capacity-constraints)
-- [Pickups and Deliveries](#pickups-and-deliveries)
-- [Time Window Constraints](#time-window-constraints)
-- [Resource Constraints](#resource-constraints)
-- [Penalties and Dropping Visits](#penalties-and-dropping-visits)
-- [Routing Options](#routing-options)
-
-Bin Packing
-
-- [The Knapsack Problem](#the-knapsack-problem)
-- [Multiple Knapsacks](#multiple-knapsacks)
-- [Bin Packing Problem](#bin-packing-problem)
-
-Network Flows
-
-- [Maximum Flows](#maximum-flows)
-- [Minimum Cost Flows](#minimum-cost-flows)
-- [Assignment as a Min Cost Flow Problem](#assignment-as-a-min-cost-flow-problem)
-
-Scheduling
-
-- [Employee Scheduling](#employee-scheduling)
-- [The Job Shop Problem](#the-job-shop-problem)
-
-Other Examples
-
-- [Sudoku](#sudoku-1)
-- [Wedding Seating Chart](#wedding-seating-chart)
-- [Set Partitioning](#set-partitioning)
 
 ## Linear Optimization
 
