@@ -319,26 +319,29 @@ solver = ORTools::Solver.create("GLOP")
 # create the variables
 x = solver.num_var(0, solver.infinity, "x")
 y = solver.num_var(0, solver.infinity, "y")
+puts "Number of variables = #{solver.num_variables}"
 
 # define the constraints
 solver.add(x + 2 * y <= 14)
 solver.add(3 * x - y >= 0)
 solver.add(x - y <= 2)
+puts "Number of constraints = #{solver.num_constraints}"
 
 # define the objective function
 solver.maximize(3 * x + 4 * y)
 
 # invoke the solver
-solver.solve
+status = solver.solve
 
 # display the solution
-opt_solution = 3 * x.solution_value + 4 * y.solution_value
-puts "Number of variables = #{solver.num_variables}"
-puts "Number of constraints = #{solver.num_constraints}"
-puts "Solution:"
-puts "x = #{x.solution_value}"
-puts "y = #{y.solution_value}"
-puts "Optimal objective value = #{opt_solution}"
+if status == :optimal
+  puts "Solution:"
+  puts "Objective value = #{solver.objective.value}"
+  puts "x = #{x.solution_value}"
+  puts "y = #{y.solution_value}"
+else
+  puts "The problem does not have an optimal solution."
+end
 ```
 
 ### Mixed-Integer Programming

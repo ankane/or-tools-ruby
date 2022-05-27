@@ -7,20 +7,20 @@ class LinearTest < Minitest::Test
 
     x = solver.num_var(0, solver.infinity, "x")
     y = solver.num_var(0, solver.infinity, "y")
+    assert_equal 2, solver.num_variables
 
     solver.add(x + 2 * y <= 14)
     solver.add(3 * x - y >= 0)
     solver.add(x - y <= 2)
+    assert_equal 3, solver.num_constraints
+
     solver.maximize(3 * x + 4 * y)
 
     solver.solve
 
-    opt_solution = 3 * x.solution_value + 4 * y.solution_value
-    assert_equal 2, solver.num_variables
-    assert_equal 3, solver.num_constraints
+    assert_in_delta 34, solver.objective.value
     assert_in_delta 6, x.solution_value
     assert_in_delta 4, y.solution_value
-    assert_in_delta 34, opt_solution
 
     assert_match "Obj: +3 V0 +4 V1", solver.export_model_as_lp_format(true)
     assert_match "Obj: +3 x +4 y", solver.export_model_as_lp_format(false)
