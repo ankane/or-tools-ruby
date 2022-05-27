@@ -31,7 +31,7 @@ class AssignmentTest < Minitest::Test
       solver.add(num_tasks.times.sum { |j| x[[i, j]] } <= 1)
     end
 
-    # Each task is assigned to exactly one worker
+    # each task is assigned to exactly one worker
     num_tasks.times do |j|
       solver.add(num_workers.times.sum { |i| x[[i, j]] } == 1)
     end
