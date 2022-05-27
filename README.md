@@ -41,6 +41,7 @@ Constraint Optimization
 
 Assignment
 
+- [Solving an Assignment Problem](#solving-an-assignment-problem)
 - [Assignment with Teams of Workers](#assignment-with-teams-of-workers)
 - [Linear Sum Assignment Solver](#linear-sum-assignment-solver)
 
@@ -606,6 +607,73 @@ end
 ```
 
 ## Assignment
+
+### Solving an Assignment Problem
+
+[Guide](https://developers.google.com/optimization/assignment/assignment_example)
+
+```ruby
+# create the data
+costs = [
+  [90, 80, 75, 70],
+  [35, 85, 55, 65],
+  [125, 95, 90, 95],
+  [45, 110, 95, 115],
+  [50, 100, 90, 100]
+]
+num_workers = costs.length
+num_tasks = costs[0].length
+
+# create the solver
+solver = ORTools::Solver.create("CBC")
+
+# create the variables
+x = {}
+num_workers.times do |i|
+  num_tasks.times do |j|
+    x[[i, j]] = solver.int_var(0, 1, "")
+  end
+end
+
+# create the constraints
+# each worker is assigned to at most 1 task
+num_workers.times do |i|
+  solver.add(num_tasks.times.sum { |j| x[[i, j]] } <= 1)
+end
+
+# Each task is assigned to exactly one worker
+num_tasks.times do |j|
+  solver.add(num_workers.times.sum { |i| x[[i, j]] } == 1)
+end
+
+# create the objective function
+objective_terms = []
+num_workers.times do |i|
+  num_tasks.times do |j|
+    objective_terms << (costs[i][j] * x[[i, j]])
+  end
+end
+solver.minimize(objective_terms.sum)
+
+# invoke the solver
+status = solver.solve
+assert_equal :optimal, status
+
+# print the solution
+if status == :optimal || status == :feasible
+  puts "Total cost = #{solver.objective.value}"
+  num_workers.times do |i|
+    num_tasks.times do |j|
+      # test if x[i,j] is 1 (with tolerance for floating point arithmetic)
+      if x[[i, j]].solution_value > 0.5
+        puts "Worker #{i} assigned to task #{j}. Cost: #{costs[i][j]}"
+      end
+    end
+  end
+else
+  puts "No solution found."
+end
+```
 
 ### Assignment with Teams of Workers
 
