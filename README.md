@@ -1651,7 +1651,7 @@ end
 
 ### Assignment as a Min Cost Flow Problem
 
-[Guide](https://developers.google.com/optimization/assignment/assignment_min_cost_flow)
+[Guide](https://developers.google.com/optimization/flow/assignment_min_cost_flow)
 
 ```ruby
 # create the solver
