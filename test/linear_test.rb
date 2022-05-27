@@ -77,8 +77,7 @@ class LinearTest < Minitest::Test
     status = solver.solve
 
     assert_equal :infeasible, status
-    # prevent warning
-    # assert_equal 0, x.solution_value
+    assert_equal 0, x.solution_value
   end
 
   # return nil to match Python

@@ -1,6 +1,10 @@
 #include <ortools/base/version.h>
+#include <ortools/init/init.h>
 
 #include "ext.h"
+
+using operations_research::CppBridge;
+using operations_research::CppFlags;
 
 void init_assignment(Rice::Module& m);
 void init_bin_packing(Rice::Module& m);
@@ -28,4 +32,11 @@ void Init_ext()
   init_linear(m);
   init_network_flows(m);
   init_routing(m);
+
+  // fix logging warning
+  CppBridge::InitLogging("");
+  CppFlags flags = CppFlags();
+  flags.logtostderr = true;
+  flags.log_prefix = false;
+  CppBridge::SetFlags(flags);
 }
