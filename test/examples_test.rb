@@ -130,7 +130,7 @@ class ExamplesTest < Minitest::Test
       possible_tables += guests.combination(i).to_a
     end
 
-    solver = ORTools::Solver.new("Wedding Seating Model", :cbc)
+    solver = ORTools::Solver.create("CBC")
 
     # create a binary variable to state that a table setting is used
     x = {}
@@ -138,15 +138,15 @@ class ExamplesTest < Minitest::Test
       x[table] = solver.int_var(0, 1, "table #{table.join(", ")}")
     end
 
-    solver.minimize(solver.sum(possible_tables.map { |table| x[table] * happiness(table) }))
+    solver.minimize(possible_tables.sum { |table| x[table] * happiness(table) })
 
     # specify the maximum number of tables
-    solver.add(solver.sum(x.values) <= max_tables)
+    solver.add(x.values.sum <= max_tables)
 
     # a guest must seated at one and only one table
     guests.each do |guest|
       tables_with_guest = possible_tables.select { |table| table.include?(guest) }
-      solver.add(solver.sum(tables_with_guest.map { |table| x[table] }) == 1)
+      solver.add(tables_with_guest.sum { |table| x[table] } == 1)
     end
 
     status = solver.solve
