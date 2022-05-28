@@ -24,7 +24,7 @@ else
 end
 
 # find_header and find_library first check without adding path
-# which causes them to find system library
+# which can cause them to find system library
 $INCFLAGS << " -I#{inc}"
 $LDFLAGS.prepend("-Wl,-rpath,#{rpath} -L#{lib} ")
 raise "OR-Tools not found" unless have_library("ortools")
