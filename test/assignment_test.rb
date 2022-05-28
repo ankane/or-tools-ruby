@@ -55,7 +55,7 @@ class AssignmentTest < Minitest::Test
         num_tasks.times do |j|
           # test if x[i,j] is 1 (with tolerance for floating point arithmetic)
           if x[[i, j]].solution_value > 0.5
-            puts "Worker #{i} assigned to task #{j}. Cost: #{costs[i][j]}"
+            puts "Worker #{i} assigned to task #{j}. Cost = #{costs[i][j]}"
           end
         end
       end
@@ -65,10 +65,10 @@ class AssignmentTest < Minitest::Test
 
     assert_output <<~EOS
       Total cost = 265.0
-      Worker 0 assigned to task 3. Cost: 70
-      Worker 1 assigned to task 2. Cost: 55
-      Worker 2 assigned to task 1. Cost: 95
-      Worker 3 assigned to task 0. Cost: 45
+      Worker 0 assigned to task 3. Cost = 70
+      Worker 1 assigned to task 2. Cost = 55
+      Worker 2 assigned to task 1. Cost = 95
+      Worker 3 assigned to task 0. Cost = 45
     EOS
   end
 

@@ -665,7 +665,7 @@ if status == :optimal || status == :feasible
     num_tasks.times do |j|
       # test if x[i,j] is 1 (with tolerance for floating point arithmetic)
       if x[[i, j]].solution_value > 0.5
-        puts "Worker #{i} assigned to task #{j}. Cost: #{costs[i][j]}"
+        puts "Worker #{i} assigned to task #{j}. Cost = #{costs[i][j]}"
       end
     end
   end
