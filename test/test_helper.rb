@@ -13,7 +13,7 @@ class Minitest::Test
 
   def teardown
     if !@output.string.empty? && !@output_checked
-      warn "Captured output. Use VERBOSE=1 to show."
+      warn "#{self.class.name}##{name}: Captured output. Use VERBOSE=1 to show."
     end
   end
 

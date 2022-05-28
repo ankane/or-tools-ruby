@@ -74,22 +74,26 @@ class AssignmentTest < Minitest::Test
 
   # https://developers.google.com/optimization/assignment/assignment_teams#mip
   def test_assignment_teams
-    solver = ORTools::Solver.create("CBC")
-
-    cost = [[90, 76, 75, 70],
-            [35, 85, 55, 65],
-            [125, 95, 90, 105],
-            [45, 110, 95, 115],
-            [60, 105, 80, 75],
-            [45, 65, 110, 95]]
+    # create the data
+    costs = [
+      [90, 76, 75, 70],
+      [35, 85, 55, 65],
+      [125, 95, 90, 105],
+      [45, 110, 95, 115],
+      [60, 105, 80, 75],
+      [45, 65, 110, 95]
+    ]
+    num_workers = costs.length
+    num_tasks = costs[1].length
 
     team1 = [0, 2, 4]
     team2 = [1, 3, 5]
     team_max = 2
 
-    num_workers = cost.length
-    num_tasks = cost[1].length
+    # create the solver
+    solver = ORTools::Solver.create("CBC")
 
+    # create the variables
     x = {}
     num_workers.times do |i|
       num_tasks.times do |j|
@@ -97,37 +101,50 @@ class AssignmentTest < Minitest::Test
       end
     end
 
+    # add the constraints
+    # each worker is assigned at most 1 task
     num_workers.times do |i|
       solver.add(num_tasks.times.sum { |j| x[[i, j]] } <= 1)
     end
 
+    # each task is assigned to exactly one worker
     num_tasks.times do |j|
       solver.add(num_workers.times.sum { |i| x[[i, j]] } == 1)
     end
 
+    # each team takes at most two tasks
     solver.add(team1.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] } }.sum <= team_max)
     solver.add(team2.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] } }.sum <= team_max)
 
     # create the objective
     solver.minimize(
-      num_workers.times.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] * cost[i][j] } }.sum
+      num_workers.times.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] * costs[i][j] } }.sum
     )
 
+    # invoke the solver
     status = solver.solve
-    assert_equal :optimal, status
 
-    assert_equal 250, solver.objective.value
-
-    assignments = []
-    num_workers.times do |i|
-      num_tasks.times do |j|
-        if x[[i, j]].solution_value > 0
-          assignments << [i, j]
+    # display the results
+    if status == :optimal || status == :feasible
+      puts "Total cost = #{solver.objective.value}"
+      num_workers.times do |worker|
+        num_tasks.times do |task|
+          if x[[worker, task]].solution_value > 0.5
+            puts "Worker #{worker} assigned to task #{task}. Cost = #{costs[worker][task]}"
+          end
         end
       end
+    else
+      puts "No solution found."
     end
 
-    assert_equal [[0, 2], [1, 0], [4, 3], [5, 1]], assignments
+    assert_output <<~EOS
+      Total cost = 250.0
+      Worker 0 assigned to task 2. Cost = 75
+      Worker 1 assigned to task 0. Cost = 35
+      Worker 4 assigned to task 3. Cost = 75
+      Worker 5 assigned to task 1. Cost = 65
+    EOS
   end
 
   # https://developers.google.com/optimization/assignment/linear_assignment

@@ -679,68 +679,69 @@ end
 [Guide](https://developers.google.com/optimization/assignment/assignment_teams#mip)
 
 ```ruby
-# create the solver
-solver = ORTools::Solver.create("CBC")
-
 # create the data
-cost = [[90, 76, 75, 70],
-        [35, 85, 55, 65],
-        [125, 95, 90, 105],
-        [45, 110, 95, 115],
-        [60, 105, 80, 75],
-        [45, 65, 110, 95]]
+costs = [
+  [90, 76, 75, 70],
+  [35, 85, 55, 65],
+  [125, 95, 90, 105],
+  [45, 110, 95, 115],
+  [60, 105, 80, 75],
+  [45, 65, 110, 95]
+]
+num_workers = costs.length
+num_tasks = costs[1].length
 
 team1 = [0, 2, 4]
 team2 = [1, 3, 5]
 team_max = 2
 
-# create the variables
-num_workers = cost.length
-num_tasks = cost[1].length
-x = {}
+# create the solver
+solver = ORTools::Solver.create("CBC")
 
+# create the variables
+x = {}
 num_workers.times do |i|
   num_tasks.times do |j|
     x[[i, j]] = solver.bool_var("x[#{i},#{j}]")
   end
 end
 
-# create the objective function
-solver.minimize(solver.sum(
-  num_workers.times.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] * cost[i][j] } }
-))
-
-# create the constraints
+# add the constraints
+# each worker is assigned at most 1 task
 num_workers.times do |i|
-  solver.add(solver.sum(num_tasks.times.map { |j| x[[i, j]] }) <= 1)
+  solver.add(num_tasks.times.sum { |j| x[[i, j]] } <= 1)
 end
 
+# each task is assigned to exactly one worker
 num_tasks.times do |j|
-  solver.add(solver.sum(num_workers.times.map { |i| x[[i, j]] }) == 1)
+  solver.add(num_workers.times.sum { |i| x[[i, j]] } == 1)
 end
 
-solver.add(solver.sum(team1.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] } }) <= team_max)
-solver.add(solver.sum(team2.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] } }) <= team_max)
+# each team takes at most two tasks
+solver.add(team1.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] } }.sum <= team_max)
+solver.add(team2.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] } }.sum <= team_max)
+
+# create the objective
+solver.minimize(
+  num_workers.times.flat_map { |i| num_tasks.times.map { |j| x[[i, j]] * costs[i][j] } }.sum
+)
 
 # invoke the solver
-sol = solver.solve
+status = solver.solve
 
-puts "Total cost = #{solver.objective.value}"
-puts
-num_workers.times do |i|
-  num_tasks.times do |j|
-    if x[[i, j]].solution_value > 0
-      puts "Worker %d assigned to task %d.  Cost = %d" % [
-        i,
-        j,
-        cost[i][j]
-      ]
+# display the results
+if status == :optimal || status == :feasible
+  puts "Total cost = #{solver.objective.value}"
+  num_workers.times do |worker|
+    num_tasks.times do |task|
+      if x[[worker, task]].solution_value > 0.5
+        puts "Worker #{worker} assigned to task #{task}. Cost = #{costs[worker][task]}"
+      end
     end
   end
+else
+  puts "No solution found."
 end
-
-puts
-puts "Time = #{solver.wall_time} milliseconds"
 ```
 
 ### Linear Sum Assignment Solver
