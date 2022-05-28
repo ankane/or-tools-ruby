@@ -69,13 +69,13 @@ void init_linear(Rice::Module& m) {
   Rice::define_class_under<MPSolver>(m, "Solver")
     .define_constructor(Rice::Constructor<MPSolver, std::string, MPSolver::OptimizationProblemType>())
     .define_singleton_function(
-      "create",
+      "_create",
       [](const std::string& solver_id) {
         std::unique_ptr<MPSolver> solver(MPSolver::CreateSolver(solver_id));
         if (!solver) {
-          return Rice::Nil;
+          throw std::runtime_error("Unrecognized solver type");
         }
-        return Rice::Object(Rice::detail::To_Ruby<std::unique_ptr<MPSolver>>().convert(solver));
+        return solver;
       })
     .define_method(
       "time_limit=",

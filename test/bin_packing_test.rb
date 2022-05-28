@@ -77,7 +77,7 @@ class BinPackingTest < Minitest::Test
     data[:all_bins] = data[:num_bins].times.to_a
 
     # declare the solver
-    solver = ORTools::Solver.create("CBC")
+    solver = ORTools::Solver.new("CBC")
 
     # create the variables
     x = {}
@@ -150,7 +150,7 @@ class BinPackingTest < Minitest::Test
     data[:bins] = data[:items]
     data[:bin_capacity] = 100
 
-    solver = ORTools::Solver.create("CBC")
+    solver = ORTools::Solver.new("CBC")
 
     x = {}
     data[:items].each do |i|

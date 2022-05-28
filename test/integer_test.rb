@@ -3,7 +3,7 @@ require_relative "test_helper"
 class IntegerTest < Minitest::Test
   # https://developers.google.com/optimization/mip/mip_example
   def test_solver
-    solver = ORTools::Solver.create("CBC")
+    solver = ORTools::Solver.new("CBC")
 
     infinity = solver.infinity
     x = solver.int_var(0, infinity, "x")

@@ -130,7 +130,7 @@ class ExamplesTest < Minitest::Test
       possible_tables += guests.combination(i).to_a
     end
 
-    solver = ORTools::Solver.create("CBC")
+    solver = ORTools::Solver.new("CBC")
 
     # create a binary variable to state that a table setting is used
     x = {}

@@ -15,7 +15,7 @@ class AssignmentTest < Minitest::Test
     num_tasks = costs[0].length
 
     # create the solver
-    solver = ORTools::Solver.create("CBC")
+    solver = ORTools::Solver.new("CBC")
 
     # create the variables
     x = {}
@@ -91,7 +91,7 @@ class AssignmentTest < Minitest::Test
     team_max = 2
 
     # create the solver
-    solver = ORTools::Solver.create("CBC")
+    solver = ORTools::Solver.new("CBC")
 
     # create the variables
     x = {}

@@ -319,7 +319,7 @@ sudoku.solution
 
 ```ruby
 # declare the solver
-solver = ORTools::Solver.create("GLOP")
+solver = ORTools::Solver.new("GLOP")
 
 # create the variables
 x = solver.num_var(0, solver.infinity, "x")
@@ -357,7 +357,7 @@ end
 
 ```ruby
 # declare the MIP solver
-solver = ORTools::Solver.create("CBC")
+solver = ORTools::Solver.new("CBC")
 
 # define the variables
 infinity = solver.infinity
@@ -625,7 +625,7 @@ num_workers = costs.length
 num_tasks = costs[0].length
 
 # create the solver
-solver = ORTools::Solver.create("CBC")
+solver = ORTools::Solver.new("CBC")
 
 # create the variables
 x = {}
@@ -696,7 +696,7 @@ team2 = [1, 3, 5]
 team_max = 2
 
 # create the solver
-solver = ORTools::Solver.create("CBC")
+solver = ORTools::Solver.new("CBC")
 
 # create the variables
 x = {}
@@ -1499,7 +1499,7 @@ data[:num_bins] = data[:bin_capacities].length
 data[:all_bins] = data[:num_bins].times.to_a
 
 # declare the solver
-solver = ORTools::Solver.create("CBC")
+solver = ORTools::Solver.new("CBC")
 
 # create the variables
 x = {}
@@ -1570,7 +1570,7 @@ data[:bins] = data[:items]
 data[:bin_capacity] = 100
 
 # create the mip solver with the CBC backend
-solver = ORTools::Solver.create("CBC")
+solver = ORTools::Solver.new("CBC")
 
 # variables
 # x[i, j] = 1 if item i is packed in bin j
@@ -2230,7 +2230,7 @@ possible_tables = []
   possible_tables += guests.combination(i).to_a
 end
 
-solver = ORTools::Solver.create("CBC")
+solver = ORTools::Solver.new("CBC")
 
 # create a binary variable to state that a table setting is used
 x = {}

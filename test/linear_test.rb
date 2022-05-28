@@ -3,7 +3,7 @@ require_relative "test_helper"
 class LinearTest < Minitest::Test
   # https://developers.google.com/optimization/lp/lp_example
   def test_solver
-    solver = ORTools::Solver.create("GLOP")
+    solver = ORTools::Solver.new("GLOP")
 
     x = solver.num_var(0, solver.infinity, "x")
     y = solver.num_var(0, solver.infinity, "y")
@@ -39,7 +39,7 @@ class LinearTest < Minitest::Test
   end
 
   def test_to_s
-    solver = ORTools::Solver.create("GLOP")
+    solver = ORTools::Solver.new("GLOP")
     x = solver.num_var(0, solver.infinity, "x")
     y = solver.num_var(0, solver.infinity, "y")
 
@@ -54,7 +54,7 @@ class LinearTest < Minitest::Test
   end
 
   def test_inspect
-    solver = ORTools::Solver.create("GLOP")
+    solver = ORTools::Solver.new("GLOP")
     x = solver.num_var(0, solver.infinity, "x")
 
     assert_equal "#<ORTools::MPVariable x>", x.inspect
@@ -64,7 +64,7 @@ class LinearTest < Minitest::Test
   end
 
   def test_offset
-    solver = ORTools::Solver.create("GLOP")
+    solver = ORTools::Solver.new("GLOP")
     x = solver.num_var(0, 1, "x")
     solver.minimize(x + 2)
     assert_equal :optimal, solver.solve
@@ -72,7 +72,7 @@ class LinearTest < Minitest::Test
   end
 
   def test_infeasible_value
-    solver = ORTools::Solver.create("GLOP")
+    solver = ORTools::Solver.new("GLOP")
 
     x = solver.num_var(0, 1, "x")
     solver.add(x >= 2)
@@ -82,8 +82,13 @@ class LinearTest < Minitest::Test
     assert_equal 0, x.solution_value
   end
 
-  # return nil to match Python
-  def test_create_unknown
-    assert_nil ORTools::Solver.create("UNKNOWN")
+  # Python returns nil,
+  # but since we use new (which should return instance of class),
+  # raising an exception seems better
+  def test_unrecognized_solver_type
+    error = assert_raises do
+      ORTools::Solver.new("UNKNOWN")
+    end
+    assert_equal "Unrecognized solver type", error.message
   end
 end

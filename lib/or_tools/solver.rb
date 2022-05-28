@@ -29,5 +29,17 @@ module ORTools
         objective.set_coefficient(v, c)
       end
     end
+
+    # hack to work with Rice constructor
+    m = Module.new do
+      def new(solver_id, *args)
+        if args.empty?
+          _create(solver_id)
+        else
+          super
+        end
+      end
+    end
+    singleton_class.prepend(m)
   end
 end
