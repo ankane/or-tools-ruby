@@ -1,4 +1,4 @@
-## 0.7.1 (unreleased)
+## 0.7.1 (2022-05-27)
 
 - Added support for time limit for `Solver`
 - Added `enable_output` and `suppress_output` to `Solver`
