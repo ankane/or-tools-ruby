@@ -1,3 +1,7 @@
+## 0.7.2 (unreleased)
+
+- Fixed library not loaded error on Mac
+
 ## 0.7.1 (2022-05-27)
 
 - Added support for time limit for `Solver`
