@@ -1,4 +1,4 @@
-## 0.7.2 (unreleased)
+## 0.7.2 (2022-05-28)
 
 - Fixed library not loaded error on Mac
 
