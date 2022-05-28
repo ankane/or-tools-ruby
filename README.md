@@ -750,41 +750,40 @@ end
 
 ```ruby
 # create the data
-cost = [[ 90,  76, 75,  70],
-        [ 35,  85, 55,  65],
-        [125,  95, 90, 105],
-        [ 45, 110, 95, 115]]
-
-rows = cost.length
-cols = cost[0].length
+costs = [
+  [90, 76, 75, 70],
+  [35, 85, 55, 65],
+  [125, 95, 90, 105],
+  [45, 110, 95, 115],
+]
+num_workers = costs.length
+num_tasks = costs[0].length
 
 # create the solver
 assignment = ORTools::LinearSumAssignment.new
 
-# add the costs to the solver
-rows.times do |worker|
-  cols.times do |task|
-    if cost[worker][task]
-      assignment.add_arc_with_cost(worker, task, cost[worker][task])
+# add the constraints
+num_workers.times do |worker|
+  num_tasks.times do |task|
+    if costs[worker][task]
+      assignment.add_arc_with_cost(worker, task, costs[worker][task])
     end
   end
 end
 
 # invoke the solver
-solve_status = assignment.solve
-if solve_status == :optimal
+status = assignment.solve
+
+# display the results
+case status
+when :optimal
   puts "Total cost = #{assignment.optimal_cost}"
-  puts
   assignment.num_nodes.times do |i|
-    puts "Worker %d assigned to task %d.  Cost = %d" % [
-      i,
-      assignment.right_mate(i),
-      assignment.assignment_cost(i)
-    ]
+    puts "Worker #{i} assigned to task #{assignment.right_mate(i)}. Cost = #{assignment.assignment_cost(i)}"
   end
-elsif solve_status == :infeasible
+when :infeasible
   puts "No assignment is possible."
-elsif solve_status == :possible_overflow
+when :possible_overflow
   puts "Some input costs are too large and may cause an integer overflow."
 end
 ```

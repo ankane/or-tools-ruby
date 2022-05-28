@@ -149,29 +149,50 @@ class AssignmentTest < Minitest::Test
 
   # https://developers.google.com/optimization/assignment/linear_assignment
   def test_linear_sum_assignment
-    cost = [[ 90,  76, 75,  70],
-            [ 35,  85, 55,  65],
-            [125,  95, 90, 105],
-            [ 45, 110, 95, 115]]
+    # create the data
+    costs = [
+      [90, 76, 75, 70],
+      [35, 85, 55, 65],
+      [125, 95, 90, 105],
+      [45, 110, 95, 115],
+    ]
+    num_workers = costs.length
+    num_tasks = costs[0].length
 
-    rows = cost.length
-    cols = cost[0].length
-
+    # create the solver
     assignment = ORTools::LinearSumAssignment.new
-    rows.times do |worker|
-      cols.times do |task|
-        if cost[worker][task]
-          assignment.add_arc_with_cost(worker, task, cost[worker][task])
+
+    # add the constraints
+    num_workers.times do |worker|
+      num_tasks.times do |task|
+        if costs[worker][task]
+          assignment.add_arc_with_cost(worker, task, costs[worker][task])
         end
       end
     end
 
-    assert_equal :optimal, assignment.solve
-    assert_equal 265, assignment.optimal_cost
-    assert_equal 4, assignment.num_nodes
+    # invoke the solver
+    status = assignment.solve
 
-    nodes = assignment.num_nodes.times
-    assert_equal [3, 2, 1, 0], nodes.map { |i| assignment.right_mate(i) }
-    assert_equal [70, 55, 95, 45], nodes.map { |i| assignment.assignment_cost(i) }
+    # display the results
+    case status
+    when :optimal
+      puts "Total cost = #{assignment.optimal_cost}"
+      assignment.num_nodes.times do |i|
+        puts "Worker #{i} assigned to task #{assignment.right_mate(i)}. Cost = #{assignment.assignment_cost(i)}"
+      end
+    when :infeasible
+      puts "No assignment is possible."
+    when :possible_overflow
+      puts "Some input costs are too large and may cause an integer overflow."
+    end
+
+    assert_output <<~EOS
+      Total cost = 265
+      Worker 0 assigned to task 3. Cost = 70
+      Worker 1 assigned to task 2. Cost = 55
+      Worker 2 assigned to task 1. Cost = 95
+      Worker 3 assigned to task 0. Cost = 45
+    EOS
   end
 end
