@@ -34,7 +34,7 @@ Integer Optimization
 Constraint Optimization
 
 - [CP-SAT Solver](#cp-sat-solver)
-- [Solving an Optimization Problem](#solving-an-optimization-problem)
+- [Solving a CP Problem](#solving-a-cp-problem)
 - [Cryptarithmetic](#cryptarithmetic)
 - [The N-queens Problem](#the-n-queens-problem)
 - [Setting Solver Limits](#setting-solver-limits)
@@ -413,16 +413,18 @@ solver = ORTools::CpSolver.new
 status = solver.solve(model)
 
 # display the first solution
-if status == :optimal
+if status == :optimal || status == :feasible
   puts "x = #{solver.value(x)}"
   puts "y = #{solver.value(y)}"
   puts "z = #{solver.value(z)}"
+else
+  puts "No solution found."
 end
 ```
 
-### Solving an Optimization Problem
+### Solving a CP Problem
 
-[Guide](https://developers.google.com/optimization/cp/integer_opt_cp)
+[Guide](https://developers.google.com/optimization/cp/cp_example)
 
 ```ruby
 # declare the model
@@ -446,12 +448,14 @@ model.maximize(x*2 + y*2 + z*3)
 solver = ORTools::CpSolver.new
 status = solver.solve(model)
 
-if status == :optimal
+# display the solution
+if status == :optimal || status == :feasible
   puts "Maximum of objective function: #{solver.objective_value}"
-  puts
-  puts "x value: #{solver.value(x)}"
-  puts "y value: #{solver.value(y)}"
-  puts "z value: #{solver.value(z)}"
+  puts "x = #{solver.value(x)}"
+  puts "y = #{solver.value(y)}"
+  puts "z = #{solver.value(z)}"
+else
+  puts "No solution found."
 end
 ```
 

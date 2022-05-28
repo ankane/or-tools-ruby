@@ -50,46 +50,77 @@ end
 class ConstraintTest < Minitest::Test
   # https://developers.google.com/optimization/cp/cp_solver
   def test_cp_sat_solver
+    # declare the model
     model = ORTools::CpModel.new
 
+    # create the variables
     num_vals = 3
     x = model.new_int_var(0, num_vals - 1, "x")
     y = model.new_int_var(0, num_vals - 1, "y")
     z = model.new_int_var(0, num_vals - 1, "z")
 
+    # create the constraint
     model.add(x != y)
 
+    # call the solver
     solver = ORTools::CpSolver.new
     status = solver.solve(model)
 
-    assert_equal :optimal, status
-    assert_equal 1, solver.value(x)
-    assert_equal 0, solver.value(y)
-    assert_equal 0, solver.value(z)
+    # display the first solution
+    if status == :optimal || status == :feasible
+      puts "x = #{solver.value(x)}"
+      puts "y = #{solver.value(y)}"
+      puts "z = #{solver.value(z)}"
+    else
+      puts "No solution found."
+    end
+
+    assert_output <<~EOS
+      x = 1
+      y = 0
+      z = 0
+    EOS
   end
 
-  # https://developers.google.com/optimization/cp/integer_opt_cp
+  # https://developers.google.com/optimization/cp/cp_example
   def test_optimization
+    # declare the model
     model = ORTools::CpModel.new
+
+    # create the variables
     var_upper_bound = [50, 45, 37].max
     x = model.new_int_var(0, var_upper_bound, "x")
     y = model.new_int_var(0, var_upper_bound, "y")
     z = model.new_int_var(0, var_upper_bound, "z")
 
+    # define the constraints
     model.add(x*2 + y*7 + z*3 <= 50)
     model.add(x*3 - y*5 + z*7 <= 45)
     model.add(x*5 + y*2 - z*6 <= 37)
 
+    # define the objective function
     model.maximize(x*2 + y*2 + z*3)
 
+    # call the solver
     solver = ORTools::CpSolver.new
     status = solver.solve(model)
 
-    assert_equal :optimal, status
-    assert_equal 35, solver.objective_value
-    assert_equal 7, solver.value(x)
-    assert_equal 3, solver.value(y)
-    assert_equal 5, solver.value(z)
+    # display the solution
+    if status == :optimal || status == :feasible
+      puts "Maximum of objective function: #{solver.objective_value}"
+      puts "x = #{solver.value(x)}"
+      puts "y = #{solver.value(y)}"
+      puts "z = #{solver.value(z)}"
+    else
+      puts "No solution found."
+    end
+
+    assert_output <<~EOS
+      Maximum of objective function: 35.0
+      x = 7
+      y = 3
+      z = 5
+    EOS
   end
 
   # https://developers.google.com/optimization/cp/cryptarithmetic
