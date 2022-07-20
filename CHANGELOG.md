@@ -1,3 +1,7 @@
+## 0.7.3 (unreleased)
+
+- Added `register_transit_matrix` to `RoutingModel`
+
 ## 0.7.2 (2022-05-28)
 
 - Fixed library not loaded error on Mac

@@ -264,6 +264,7 @@ void init_routing(Rice::Module& m) {
 
   Rice::define_class_under<RoutingModel>(m, "RoutingModel")
     .define_constructor(Rice::Constructor<RoutingModel, RoutingIndexManager, RoutingModelParameters>(), Rice::Arg("index_manager"), Rice::Arg("parameters") = operations_research::DefaultRoutingModelParameters())
+    .define_method("register_transit_matrix", &RoutingModel::RegisterTransitMatrix)
     .define_method(
       "register_transit_callback",
       [](RoutingModel& self, Object callback) {
