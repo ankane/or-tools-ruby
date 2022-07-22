@@ -1,6 +1,7 @@
 ## 0.7.3 (unreleased)
 
-- Added `register_transit_matrix` to `RoutingModel`
+- Added `add_constant_dimension`, `add_constant_dimension_with_slack`, and `register_transit_matrix` to `RoutingModel`
+- Added methods for soft bounds to `RoutingDimension`
 
 ## 0.7.2 (2022-05-28)
 

@@ -199,6 +199,14 @@ void init_routing(Rice::Module& m) {
 
   Rice::define_class_under<RoutingDimension>(m, "RoutingDimension")
     .define_method("global_span_cost_coefficient=", &RoutingDimension::SetGlobalSpanCostCoefficient)
+    .define_method("set_cumul_var_soft_upper_bound", &RoutingDimension::SetCumulVarSoftUpperBound)
+    .define_method("cumul_var_soft_upper_bound?", &RoutingDimension::HasCumulVarSoftUpperBound)
+    .define_method("cumul_var_soft_upper_bound", &RoutingDimension::GetCumulVarSoftUpperBound)
+    .define_method("cumul_var_soft_upper_bound_coefficient", &RoutingDimension::GetCumulVarSoftUpperBoundCoefficient)
+    .define_method("set_cumul_var_soft_lower_bound", &RoutingDimension::SetCumulVarSoftLowerBound)
+    .define_method("cumul_var_soft_lower_bound?", &RoutingDimension::HasCumulVarSoftLowerBound)
+    .define_method("cumul_var_soft_lower_bound", &RoutingDimension::GetCumulVarSoftLowerBound)
+    .define_method("cumul_var_soft_lower_bound_coefficient", &RoutingDimension::GetCumulVarSoftLowerBoundCoefficient)
     .define_method("cumul_var", &RoutingDimension::CumulVar);
 
   Rice::define_class_under<operations_research::Constraint>(m, "Constraint")
@@ -319,6 +327,8 @@ void init_routing(Rice::Module& m) {
       [](RoutingModel& self, std::vector<int> evaluator_indices, int64_t slack_max, int64_t capacity, bool fix_start_cumul_to_zero, const std::string& name) {
         self.AddDimensionWithVehicleTransits(evaluator_indices, slack_max, capacity, fix_start_cumul_to_zero, name);
       })
+    .define_method("add_constant_dimension_with_slack", &RoutingModel::AddConstantDimensionWithSlack)
+    .define_method("add_constant_dimension", &RoutingModel::AddConstantDimension)
     .define_method(
       "add_disjunction",
       [](RoutingModel& self, std::vector<int64_t> indices, int64_t penalty) {
