@@ -55,6 +55,19 @@ namespace Rice::detail
   };
 }
 
+namespace Rice::detail
+{
+  template<>
+  class To_Ruby<std::pair<int, bool>>
+  {
+  public:
+    VALUE convert(std::pair<int, bool> const & x)
+    {
+      return rb_ary_new3(2, To_Ruby<int>().convert(x.first), To_Ruby<bool>().convert(x.second));
+    }
+  };
+}
+
 void init_routing(Rice::Module& m) {
   auto rb_cRoutingSearchParameters = Rice::define_class_under<RoutingSearchParameters>(m, "RoutingSearchParameters");
   auto rb_cIntVar = Rice::define_class_under<operations_research::IntVar>(m, "IntVar");
