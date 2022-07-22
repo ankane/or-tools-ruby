@@ -9,6 +9,7 @@ using operations_research::DefaultRoutingSearchParameters;
 using operations_research::FirstSolutionStrategy;
 using operations_research::LocalSearchMetaheuristic;
 using operations_research::RoutingDimension;
+using operations_research::RoutingDisjunctionIndex;
 using operations_research::RoutingIndexManager;
 using operations_research::RoutingModel;
 using operations_research::RoutingModelParameters;
@@ -222,6 +223,8 @@ void init_routing(Rice::Module& m) {
     .define_method("cumul_var_soft_lower_bound_coefficient", &RoutingDimension::GetCumulVarSoftLowerBoundCoefficient)
     .define_method("cumul_var", &RoutingDimension::CumulVar);
 
+  Rice::define_class_under<RoutingDisjunctionIndex>(m, "RoutingDisjunctionIndex");
+
   Rice::define_class_under<operations_research::Constraint>(m, "Constraint")
     .define_method("post", &operations_research::Constraint::Post)
     .define_method("debug_string", &operations_research::Constraint::DebugString);
@@ -330,23 +333,14 @@ void init_routing(Rice::Module& m) {
     .define_method("set_fixed_cost_of_vehicle", &RoutingModel::SetFixedCostOfVehicle)
     .define_method("fixed_cost_of_vehicle", &RoutingModel::GetFixedCostOfVehicle)
     .define_method("add_dimension", &RoutingModel::AddDimension)
-    .define_method(
-      "add_dimension_with_vehicle_capacity",
-      [](RoutingModel& self, int evaluator_index, int64_t slack_max, std::vector<int64_t> vehicle_capacities, bool fix_start_cumul_to_zero, const std::string& name) {
-        self.AddDimensionWithVehicleCapacity(evaluator_index, slack_max, vehicle_capacities, fix_start_cumul_to_zero, name);
-      })
-    .define_method(
-      "add_dimension_with_vehicle_transits",
-      [](RoutingModel& self, std::vector<int> evaluator_indices, int64_t slack_max, int64_t capacity, bool fix_start_cumul_to_zero, const std::string& name) {
-        self.AddDimensionWithVehicleTransits(evaluator_indices, slack_max, capacity, fix_start_cumul_to_zero, name);
-      })
+    .define_method("add_dimension_with_vehicle_transits", &RoutingModel::AddDimensionWithVehicleTransits)
+    .define_method("add_dimension_with_vehicle_capacity", &RoutingModel::AddDimensionWithVehicleCapacity)
+    .define_method("add_dimension_with_vehicle_transit_and_capacity", &RoutingModel::AddDimensionWithVehicleTransitAndCapacity)
     .define_method("add_constant_dimension_with_slack", &RoutingModel::AddConstantDimensionWithSlack)
     .define_method("add_constant_dimension", &RoutingModel::AddConstantDimension)
-    .define_method(
-      "add_disjunction",
-      [](RoutingModel& self, std::vector<int64_t> indices, int64_t penalty) {
-        self.AddDisjunction(indices, penalty);
-      })
+    .define_method("add_vector_dimension", &RoutingModel::AddVectorDimension)
+    .define_method("add_matrix_dimension", &RoutingModel::AddMatrixDimension)
+    .define_method("add_disjunction", &RoutingModel::AddDisjunction, Rice::Arg("indices"), Rice::Arg("penalty"), Rice::Arg("max_cardinality") = (int64_t)1)
     .define_method("add_pickup_and_delivery", &RoutingModel::AddPickupAndDelivery)
     .define_method("solver", &RoutingModel::solver)
     .define_method("start", &RoutingModel::Start)
