@@ -326,7 +326,6 @@ void init_routing(Rice::Module& m) {
           throw std::runtime_error("Unknown solver status");
         }
       })
-    .define_method("vehicle_var", &RoutingModel::VehicleVar)
     .define_method("set_arc_cost_evaluator_of_all_vehicles", &RoutingModel::SetArcCostEvaluatorOfAllVehicles)
     .define_method("set_arc_cost_evaluator_of_vehicle", &RoutingModel::SetArcCostEvaluatorOfVehicle)
     .define_method("set_fixed_cost_of_all_vehicles", &RoutingModel::SetFixedCostOfAllVehicles)
@@ -351,7 +350,16 @@ void init_routing(Rice::Module& m) {
     .define_method("next", &RoutingModel::Next)
     .define_method("vehicle_used?", &RoutingModel::IsVehicleUsed)
     .define_method("next_var", &RoutingModel::NextVar)
+    .define_method("active_var", &RoutingModel::ActiveVar)
+    .define_method("active_vehicle_var", &RoutingModel::ActiveVehicleVar)
+    .define_method("vehicle_route_considered_var", &RoutingModel::VehicleRouteConsideredVar)
+    .define_method("vehicle_var", &RoutingModel::VehicleVar)
+    .define_method("resource_var", &RoutingModel::ResourceVar)
+    .define_method("cost_var", &RoutingModel::CostVar)
     .define_method("arc_cost_for_vehicle", &RoutingModel::GetArcCostForVehicle)
+    .define_method("costs_are_homogeneous_across_vehicles?", &RoutingModel::CostsAreHomogeneousAcrossVehicles)
+    .define_method("homogeneous_cost", &RoutingModel::GetHomogeneousCost)
+    .define_method("arc_cost_for_first_solution", &RoutingModel::GetArcCostForFirstSolution)
     .define_method("mutable_dimension", &RoutingModel::GetMutableDimension)
     .define_method("add_variable_minimized_by_finalizer", &RoutingModel::AddVariableMinimizedByFinalizer)
     .define_method(
