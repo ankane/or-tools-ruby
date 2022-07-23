@@ -212,6 +212,17 @@ void init_routing(Rice::Module& m) {
     .define_method("old_end_max", &operations_research::IntervalVar::OldEndMax);
 
   Rice::define_class_under<RoutingDimension>(m, "RoutingDimension")
+    .define_method("transit_value", &RoutingDimension::GetTransitValue)
+    // TODO GetTransitValueFromClass
+    .define_method("cumul_var", &RoutingDimension::CumulVar)
+    .define_method("transit_var", &RoutingDimension::TransitVar)
+    .define_method("fixed_transit_var", &RoutingDimension::FixedTransitVar)
+    .define_method("slack_var", &RoutingDimension::SlackVar)
+    .define_method("set_span_upper_bound_for_vehicle", &RoutingDimension::SetSpanUpperBoundForVehicle)
+    .define_method("set_span_cost_coefficient_for_vehicle", &RoutingDimension::SetSpanCostCoefficientForVehicle)
+    .define_method("set_span_cost_coefficient_for_all_vehicles", &RoutingDimension::SetSpanCostCoefficientForAllVehicles)
+    .define_method("set_global_span_cost_coefficient", &RoutingDimension::SetGlobalSpanCostCoefficient)
+    // alias
     .define_method("global_span_cost_coefficient=", &RoutingDimension::SetGlobalSpanCostCoefficient)
     .define_method("set_cumul_var_soft_upper_bound", &RoutingDimension::SetCumulVarSoftUpperBound)
     .define_method("cumul_var_soft_upper_bound?", &RoutingDimension::HasCumulVarSoftUpperBound)
@@ -220,8 +231,7 @@ void init_routing(Rice::Module& m) {
     .define_method("set_cumul_var_soft_lower_bound", &RoutingDimension::SetCumulVarSoftLowerBound)
     .define_method("cumul_var_soft_lower_bound?", &RoutingDimension::HasCumulVarSoftLowerBound)
     .define_method("cumul_var_soft_lower_bound", &RoutingDimension::GetCumulVarSoftLowerBound)
-    .define_method("cumul_var_soft_lower_bound_coefficient", &RoutingDimension::GetCumulVarSoftLowerBoundCoefficient)
-    .define_method("cumul_var", &RoutingDimension::CumulVar);
+    .define_method("cumul_var_soft_lower_bound_coefficient", &RoutingDimension::GetCumulVarSoftLowerBoundCoefficient);
 
   Rice::define_class_under<RoutingDisjunctionIndex>(m, "RoutingDisjunctionIndex");
 
