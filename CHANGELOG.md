@@ -1,4 +1,4 @@
-## 0.7.3 (unreleased)
+## 0.7.3 (2022-07-23)
 
 - Added more methods to `RoutingModel` and  `RoutingDimension`
 
