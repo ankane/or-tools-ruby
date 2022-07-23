@@ -58,13 +58,13 @@ namespace Rice::detail
 
 namespace Rice::detail
 {
-  template<>
-  class To_Ruby<std::pair<int, bool>>
+  template<class T, class U>
+  class To_Ruby<std::pair<T, U>>
   {
   public:
-    VALUE convert(std::pair<int, bool> const & x)
+    VALUE convert(std::pair<T, U> const & x)
     {
-      return rb_ary_new3(2, To_Ruby<int>().convert(x.first), To_Ruby<bool>().convert(x.second));
+      return rb_ary_new3(2, To_Ruby<T>().convert(x.first), To_Ruby<U>().convert(x.second));
     }
   };
 }
@@ -346,15 +346,15 @@ void init_routing(Rice::Module& m) {
     .define_method("number_of_disjunctions", &RoutingModel::GetNumberOfDisjunctions)
     .define_method("mandatory_disjunctions?", &RoutingModel::HasMandatoryDisjunctions)
     .define_method("max_cardinality_constrained_disjunctions?", &RoutingModel::HasMaxCardinalityConstrainedDisjunctions)
-    // TODO GetPerfectBinaryDisjunctions
+    .define_method("perfect_binary_disjunctions", &RoutingModel::GetPerfectBinaryDisjunctions)
     .define_method("ignore_disjunctions_already_forced_to_zero", &RoutingModel::IgnoreDisjunctionsAlreadyForcedToZero)
     .define_method("add_soft_same_vehicle_constraint", &RoutingModel::AddSoftSameVehicleConstraint)
     .define_method("set_allowed_vehicles_for_index", &RoutingModel::SetAllowedVehiclesForIndex)
     .define_method("vehicle_allowed_for_index?", &RoutingModel::IsVehicleAllowedForIndex)
     .define_method("add_pickup_and_delivery", &RoutingModel::AddPickupAndDelivery)
     .define_method("add_pickup_and_delivery_sets", &RoutingModel::AddPickupAndDeliverySets)
-    // TODO GetPickupIndexPairs
-    // TODO GetDeliveryIndexPairs
+    .define_method("pickup_index_pairs", &RoutingModel::GetPickupIndexPairs)
+    .define_method("delivery_index_pairs", &RoutingModel::GetDeliveryIndexPairs)
     // TODO SetPickupAndDeliveryPolicyOfAllVehicles
     // TODO SetPickupAndDeliveryPolicyOfVehicle
     // TODO GetPickupAndDeliveryPolicyOfVehicle
