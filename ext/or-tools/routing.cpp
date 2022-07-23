@@ -315,10 +315,19 @@ void init_routing(Rice::Module& m) {
     .define_method("add_constant_dimension", &RoutingModel::AddConstantDimension)
     .define_method("add_vector_dimension", &RoutingModel::AddVectorDimension)
     .define_method("add_matrix_dimension", &RoutingModel::AddMatrixDimension)
+    // TODO AddDimensionDependentDimensionWithVehicleCapacity
+    // .define_method("make_path_spans_and_total_slacks", &RoutingModel::MakePathSpansAndTotalSlacks)
     .define_method("all_dimension_names", &RoutingModel::GetAllDimensionNames)
     // .define_method("dimensions", &RoutingModel::GetDimensions)
-    .define_method("mutable_dimension", &RoutingModel::GetMutableDimension)
+    // .define_method("dimensions_with_soft_or_span_costs", &RoutingModel::GetDimensionsWithSoftOrSpanCosts)
+    // .define_method("dimension_or_die", &RoutingModel::GetDimensionOrDie)
     .define_method("dimension?", &RoutingModel::HasDimension)
+    .define_method("mutable_dimension", &RoutingModel::GetMutableDimension)
+    .define_method("set_primary_constrained_dimension", &RoutingModel::SetPrimaryConstrainedDimension)
+    .define_method("primary_constrained_dimension", &RoutingModel::GetPrimaryConstrainedDimension)
+    .define_method("add_resource_group", &RoutingModel::AddResourceGroup)
+    .define_method("dimension_resource_group_indices", &RoutingModel::GetDimensionResourceGroupIndices)
+    .define_method("dimension_resource_group_index", &RoutingModel::GetDimensionResourceGroupIndex)
     .define_method("add_disjunction", &RoutingModel::AddDisjunction, Rice::Arg("indices"), Rice::Arg("penalty"), Rice::Arg("max_cardinality") = (int64_t)1)
     .define_method("disjunction_indices", &RoutingModel::GetDisjunctionIndices)
     .define_method("disjunction_penalty", &RoutingModel::GetDisjunctionPenalty)
@@ -412,5 +421,6 @@ void init_routing(Rice::Module& m) {
     .define_method("solver", &RoutingModel::solver)
     .define_method("nodes", &RoutingModel::nodes)
     .define_method("vehicles", &RoutingModel::vehicles)
-    .define_method("size", &RoutingModel::Size);
+    .define_method("size", &RoutingModel::Size)
+    .define_method("matching_model?", &RoutingModel::IsMatchingModel);
 }
