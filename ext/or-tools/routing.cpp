@@ -298,6 +298,7 @@ void init_routing(Rice::Module& m) {
 
   Rice::define_class_under<RoutingModel>(m, "RoutingModel")
     .define_constructor(Rice::Constructor<RoutingModel, RoutingIndexManager, RoutingModelParameters>(), Rice::Arg("index_manager"), Rice::Arg("parameters") = operations_research::DefaultRoutingModelParameters())
+    .define_method("register_unary_transit_vector", &RoutingModel::RegisterUnaryTransitVector)
     .define_method(
       "register_unary_transit_callback",
       [](RoutingModel& self, Object callback) {
@@ -410,6 +411,22 @@ void init_routing(Rice::Module& m) {
           throw std::runtime_error("Unknown solver status");
         }
       })
+    .define_method("apply_locks", &RoutingModel::ApplyLocks)
+    .define_method("apply_locks_to_all_vehicles", &RoutingModel::ApplyLocksToAllVehicles)
+    .define_method("pre_assignment", &RoutingModel::PreAssignment)
+    .define_method("mutable_pre_assignment", &RoutingModel::MutablePreAssignment)
+    .define_method("write_assignment", &RoutingModel::WriteAssignment)
+    .define_method("read_assignment", &RoutingModel::ReadAssignment)
+    .define_method("restore_assignment", &RoutingModel::RestoreAssignment)
+    .define_method("read_assignment_from_routes", &RoutingModel::ReadAssignmentFromRoutes)
+    .define_method("routes_to_assignment", &RoutingModel::RoutesToAssignment)
+    .define_method("assignment_to_routes", &RoutingModel::AssignmentToRoutes)
+    .define_method("compact_assignment", &RoutingModel::CompactAssignment)
+    .define_method("compact_and_check_assignment", &RoutingModel::CompactAndCheckAssignment)
+    .define_method("add_to_assignment", &RoutingModel::AddToAssignment)
+    .define_method("add_interval_to_assignment", &RoutingModel::AddIntervalToAssignment)
+    // TODO PackCumulsOfOptimizerDimensionsFromAssignment
+    // TODO AddLocalSearchFilter
     .define_method("start", &RoutingModel::Start)
     .define_method("end", &RoutingModel::End)
     .define_method("start?", &RoutingModel::IsStart)
@@ -428,6 +445,10 @@ void init_routing(Rice::Module& m) {
     .define_method("costs_are_homogeneous_across_vehicles?", &RoutingModel::CostsAreHomogeneousAcrossVehicles)
     .define_method("homogeneous_cost", &RoutingModel::GetHomogeneousCost)
     .define_method("arc_cost_for_first_solution", &RoutingModel::GetArcCostForFirstSolution)
+    .define_method("cost_classes_count", &RoutingModel::GetCostClassesCount)
+    .define_method("non_zero_cost_classes_count", &RoutingModel::GetNonZeroCostClassesCount)
+    .define_method("vehicle_classes_count", &RoutingModel::GetVehicleClassesCount)
+    .define_method("arc_is_more_constrained_than_arc?", &RoutingModel::ArcIsMoreConstrainedThanArc)
     .define_method("solver", &RoutingModel::solver)
     .define_method("nodes", &RoutingModel::nodes)
     .define_method("vehicles", &RoutingModel::vehicles)
