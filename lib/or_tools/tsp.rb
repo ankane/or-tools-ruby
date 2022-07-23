@@ -22,13 +22,7 @@ module ORTools
       manager = ORTools::RoutingIndexManager.new(locations.size, 1, 0)
       routing = ORTools::RoutingModel.new(manager)
 
-      distance_callback = lambda do |from_index, to_index|
-        from_node = manager.index_to_node(from_index)
-        to_node = manager.index_to_node(to_index)
-        distance_matrix[from_node][to_node]
-      end
-
-      transit_callback_index = routing.register_transit_callback(distance_callback)
+      transit_callback_index = routing.register_transit_matrix(distance_matrix)
       routing.set_arc_cost_evaluator_of_all_vehicles(transit_callback_index)
       assignment = routing.solve(first_solution_strategy: :path_cheapest_arc)
 
