@@ -288,6 +288,15 @@ void init_routing(Rice::Module& m) {
 
   Rice::define_class_under<RoutingModel>(m, "RoutingModel")
     .define_constructor(Rice::Constructor<RoutingModel, RoutingIndexManager, RoutingModelParameters>(), Rice::Arg("index_manager"), Rice::Arg("parameters") = operations_research::DefaultRoutingModelParameters())
+    .define_method(
+      "register_unary_transit_callback",
+      [](RoutingModel& self, Object callback) {
+        return self.RegisterUnaryTransitCallback(
+          [callback](int64_t from_index) -> int64_t {
+            return Rice::detail::From_Ruby<int64_t>().convert(callback.call("call", from_index));
+          }
+        );
+      })
     .define_method("register_transit_matrix", &RoutingModel::RegisterTransitMatrix)
     .define_method(
       "register_transit_callback",
@@ -298,18 +307,74 @@ void init_routing(Rice::Module& m) {
           }
         );
       })
-    .define_method(
-      "register_unary_transit_callback",
-      [](RoutingModel& self, Object callback) {
-        return self.RegisterUnaryTransitCallback(
-          [callback](int64_t from_index) -> int64_t {
-            return Rice::detail::From_Ruby<int64_t>().convert(callback.call("call", from_index));
-          }
-        );
-      })
+    .define_method("add_dimension", &RoutingModel::AddDimension)
+    .define_method("add_dimension_with_vehicle_transits", &RoutingModel::AddDimensionWithVehicleTransits)
+    .define_method("add_dimension_with_vehicle_capacity", &RoutingModel::AddDimensionWithVehicleCapacity)
+    .define_method("add_dimension_with_vehicle_transit_and_capacity", &RoutingModel::AddDimensionWithVehicleTransitAndCapacity)
+    .define_method("add_constant_dimension_with_slack", &RoutingModel::AddConstantDimensionWithSlack)
+    .define_method("add_constant_dimension", &RoutingModel::AddConstantDimension)
+    .define_method("add_vector_dimension", &RoutingModel::AddVectorDimension)
+    .define_method("add_matrix_dimension", &RoutingModel::AddMatrixDimension)
+    .define_method("all_dimension_names", &RoutingModel::GetAllDimensionNames)
+    // .define_method("dimensions", &RoutingModel::GetDimensions)
+    .define_method("mutable_dimension", &RoutingModel::GetMutableDimension)
+    .define_method("dimension?", &RoutingModel::HasDimension)
+    .define_method("add_disjunction", &RoutingModel::AddDisjunction, Rice::Arg("indices"), Rice::Arg("penalty"), Rice::Arg("max_cardinality") = (int64_t)1)
+    .define_method("disjunction_indices", &RoutingModel::GetDisjunctionIndices)
+    .define_method("disjunction_penalty", &RoutingModel::GetDisjunctionPenalty)
+    .define_method("disjunction_max_cardinality", &RoutingModel::GetDisjunctionMaxCardinality)
+    .define_method("number_of_disjunctions", &RoutingModel::GetNumberOfDisjunctions)
+    .define_method("mandatory_disjunctions?", &RoutingModel::HasMandatoryDisjunctions)
+    .define_method("max_cardinality_constrained_disjunctions?", &RoutingModel::HasMaxCardinalityConstrainedDisjunctions)
+    // TODO GetPerfectBinaryDisjunctions
+    .define_method("ignore_disjunctions_already_forced_to_zero", &RoutingModel::IgnoreDisjunctionsAlreadyForcedToZero)
+    .define_method("add_soft_same_vehicle_constraint", &RoutingModel::AddSoftSameVehicleConstraint)
+    .define_method("set_allowed_vehicles_for_index", &RoutingModel::SetAllowedVehiclesForIndex)
+    .define_method("vehicle_allowed_for_index?", &RoutingModel::IsVehicleAllowedForIndex)
+    .define_method("add_pickup_and_delivery", &RoutingModel::AddPickupAndDelivery)
+    .define_method("add_pickup_and_delivery_sets", &RoutingModel::AddPickupAndDeliverySets)
+    // TODO GetPickupIndexPairs
+    // TODO GetDeliveryIndexPairs
+    // TODO SetPickupAndDeliveryPolicyOfAllVehicles
+    // TODO SetPickupAndDeliveryPolicyOfVehicle
+    // TODO GetPickupAndDeliveryPolicyOfVehicle
+    .define_method("num_of_singleton_nodes", &RoutingModel::GetNumOfSingletonNodes)
+    .define_method("unperformed_penalty", &RoutingModel::UnperformedPenalty)
+    .define_method("unperformed_penalty_or_value", &RoutingModel::UnperformedPenaltyOrValue)
     .define_method("depot", &RoutingModel::GetDepot)
-    .define_method("size", &RoutingModel::Size)
-    .define_method("status", [](RoutingModel& self) {
+    .define_method("set_maximum_number_of_active_vehicles", &RoutingModel::SetMaximumNumberOfActiveVehicles)
+    .define_method("maximum_number_of_active_vehicles", &RoutingModel::GetMaximumNumberOfActiveVehicles)
+    .define_method("set_arc_cost_evaluator_of_all_vehicles", &RoutingModel::SetArcCostEvaluatorOfAllVehicles)
+    .define_method("set_arc_cost_evaluator_of_vehicle", &RoutingModel::SetArcCostEvaluatorOfVehicle)
+    .define_method("set_fixed_cost_of_all_vehicles", &RoutingModel::SetFixedCostOfAllVehicles)
+    .define_method("set_fixed_cost_of_vehicle", &RoutingModel::SetFixedCostOfVehicle)
+    .define_method("fixed_cost_of_vehicle", &RoutingModel::GetFixedCostOfVehicle)
+    .define_method("set_amortized_cost_factors_of_all_vehicles", &RoutingModel::SetAmortizedCostFactorsOfAllVehicles)
+    .define_method("set_amortized_cost_factors_of_vehicle", &RoutingModel::SetAmortizedCostFactorsOfVehicle)
+    .define_method("amortized_linear_cost_factor_of_vehicles", &RoutingModel::GetAmortizedLinearCostFactorOfVehicles)
+    .define_method("amortized_quadratic_cost_factor_of_vehicles", &RoutingModel::GetAmortizedQuadraticCostFactorOfVehicles)
+    .define_method("set_vehicle_used_when_empty", &RoutingModel::SetVehicleUsedWhenEmpty)
+    .define_method("vehicle_used_when_empty?", &RoutingModel::IsVehicleUsedWhenEmpty)
+    .define_method("add_variable_minimized_by_finalizer", &RoutingModel::AddVariableMinimizedByFinalizer)
+    .define_method("add_variable_maximized_by_finalizer", &RoutingModel::AddVariableMaximizedByFinalizer)
+    .define_method("add_weighted_variable_minimized_by_finalizer", &RoutingModel::AddWeightedVariableMinimizedByFinalizer)
+    .define_method("add_weighted_variable_maximized_by_finalizer", &RoutingModel::AddWeightedVariableMaximizedByFinalizer)
+    .define_method("add_variable_target_to_finalizer", &RoutingModel::AddVariableTargetToFinalizer)
+    .define_method("add_weighted_variable_target_to_finalizer", &RoutingModel::AddWeightedVariableTargetToFinalizer)
+    .define_method("close_model", &RoutingModel::CloseModel)
+    .define_method(
+      "solve",
+      [](RoutingModel& self) {
+        return self.Solve();
+      })
+    .define_method(
+      "solve_with_parameters",
+      [](RoutingModel& self, const RoutingSearchParameters& search_parameters) {
+        return self.SolveWithParameters(search_parameters);
+      })
+    .define_method("compute_lower_bound", &RoutingModel::ComputeLowerBound)
+    .define_method("status",
+      [](RoutingModel& self) {
         auto status = self.status();
 
         if (status == RoutingModel::ROUTING_NOT_SOLVED) {
@@ -326,22 +391,6 @@ void init_routing(Rice::Module& m) {
           throw std::runtime_error("Unknown solver status");
         }
       })
-    .define_method("set_arc_cost_evaluator_of_all_vehicles", &RoutingModel::SetArcCostEvaluatorOfAllVehicles)
-    .define_method("set_arc_cost_evaluator_of_vehicle", &RoutingModel::SetArcCostEvaluatorOfVehicle)
-    .define_method("set_fixed_cost_of_all_vehicles", &RoutingModel::SetFixedCostOfAllVehicles)
-    .define_method("set_fixed_cost_of_vehicle", &RoutingModel::SetFixedCostOfVehicle)
-    .define_method("fixed_cost_of_vehicle", &RoutingModel::GetFixedCostOfVehicle)
-    .define_method("add_dimension", &RoutingModel::AddDimension)
-    .define_method("add_dimension_with_vehicle_transits", &RoutingModel::AddDimensionWithVehicleTransits)
-    .define_method("add_dimension_with_vehicle_capacity", &RoutingModel::AddDimensionWithVehicleCapacity)
-    .define_method("add_dimension_with_vehicle_transit_and_capacity", &RoutingModel::AddDimensionWithVehicleTransitAndCapacity)
-    .define_method("add_constant_dimension_with_slack", &RoutingModel::AddConstantDimensionWithSlack)
-    .define_method("add_constant_dimension", &RoutingModel::AddConstantDimension)
-    .define_method("add_vector_dimension", &RoutingModel::AddVectorDimension)
-    .define_method("add_matrix_dimension", &RoutingModel::AddMatrixDimension)
-    .define_method("add_disjunction", &RoutingModel::AddDisjunction, Rice::Arg("indices"), Rice::Arg("penalty"), Rice::Arg("max_cardinality") = (int64_t)1)
-    .define_method("add_pickup_and_delivery", &RoutingModel::AddPickupAndDelivery)
-    .define_method("solver", &RoutingModel::solver)
     .define_method("start", &RoutingModel::Start)
     .define_method("end", &RoutingModel::End)
     .define_method("start?", &RoutingModel::IsStart)
@@ -360,11 +409,8 @@ void init_routing(Rice::Module& m) {
     .define_method("costs_are_homogeneous_across_vehicles?", &RoutingModel::CostsAreHomogeneousAcrossVehicles)
     .define_method("homogeneous_cost", &RoutingModel::GetHomogeneousCost)
     .define_method("arc_cost_for_first_solution", &RoutingModel::GetArcCostForFirstSolution)
-    .define_method("mutable_dimension", &RoutingModel::GetMutableDimension)
-    .define_method("add_variable_minimized_by_finalizer", &RoutingModel::AddVariableMinimizedByFinalizer)
-    .define_method(
-      "solve_with_parameters",
-      [](RoutingModel& self, const RoutingSearchParameters& search_parameters) {
-        return self.SolveWithParameters(search_parameters);
-      });
+    .define_method("solver", &RoutingModel::solver)
+    .define_method("nodes", &RoutingModel::nodes)
+    .define_method("vehicles", &RoutingModel::vehicles)
+    .define_method("size", &RoutingModel::Size);
 }
