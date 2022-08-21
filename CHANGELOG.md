@@ -1,8 +1,9 @@
-## 0.7.4 (unreleased)
+## 0.8.0 (unreleased)
 
 - Updated OR-Tools to 9.4
 - Added binary installation for Mac ARM
 - Restored support for Debian 10
+- Dropped support for Ruby < 2.7
 
 ## 0.7.3 (2022-07-23)
 
