@@ -18,13 +18,7 @@ void Init_ext()
 {
   auto m = Rice::define_module("ORTools");
 
-  // TODO use operations_research::OrToolsVersionString() in 0.8.0
-  m.define_singleton_function(
-    "lib_version",
-    []() {
-      return std::to_string(operations_research::OrToolsMajorVersion()) + "."
-        + std::to_string(operations_research::OrToolsMinorVersion());
-    });
+  m.define_singleton_function("lib_version", &operations_research::OrToolsVersionString);
 
   init_assignment(m);
   init_bin_packing(m);
