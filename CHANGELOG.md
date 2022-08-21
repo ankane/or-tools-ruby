@@ -1,4 +1,4 @@
-## 0.8.0 (unreleased)
+## 0.8.0 (2022-08-21)
 
 - Updated OR-Tools to 9.4
 - Added binary installation for Mac ARM
