@@ -4,21 +4,15 @@ require "fileutils"
 require "net/http"
 require "tmpdir"
 
-version = "9.3.10497"
+version = "9.4.1874"
 
 if RbConfig::CONFIG["host_os"] =~ /darwin/i
   if RbConfig::CONFIG["host_cpu"] =~ /arm|aarch64/i
-    raise <<~MSG
-      Binary installation not available for this platform: Mac ARM
-
-      Run:
-      brew install or-tools
-      bundle config build.or-tools --with-or-tools-dir=/opt/homebrew
-
-    MSG
+    filename = "or-tools_arm64_MacOsX-12.5_cpp_v#{version}.tar.gz"
+    checksum = "ebc185bcb0a056a2704fb1c5175d5c11cc21a7e0634be65139cea55bb6a021ce"
   else
-    filename = "or-tools_MacOsX-12.2.1_v#{version}.tar.gz"
-    checksum = "33941702c59983897935eef06d91aca6c89ed9a8f5f4de3a9dfe489e97d7ca8c"
+    filename = "or-tools_x86_64_MacOsX-12.5_cpp_v#{version}.tar.gz"
+    checksum = "d03c706b51a6ef7aa77886dc3f135baaac52c00803bb548c286fbdeb4a419acd"
   end
 else
   # try /etc/os-release with fallback to /usr/lib/os-release
@@ -32,21 +26,23 @@ else
   os_version = os_info["VERSION_ID"]
 
   if os == "ubuntu" && os_version == "20.04"
-    # TODO remove sub in v9.4
-    filename = "or-tools_amd64_ubuntu-20.04_v#{version.sub(".10497", ".10502")}.tar.gz"
-    checksum = "3d1979967a2c9358b5bc956f2e6b608b00e89e13c71d48d075475ce4138b6d1c"
+    filename = "or-tools_amd64_ubuntu-20.04_cpp_v#{version}.tar.gz"
+    checksum = "1b09f0f60b5aab83aeec468842e4a166cd3a4e7910e807f55bc7f96d5dffabdb"
   elsif os == "ubuntu" && os_version == "18.04"
-    filename = "or-tools_amd64_ubuntu-18.04_v#{version}.tar.gz"
-    checksum = "6ba5cc153417267e8f8e15f8b6390b17f22de07bacc61f3740a4172ccd56c274"
+    filename = "or-tools_amd64_ubuntu-18.04_cpp_v#{version}.tar.gz"
+    checksum = "ef73ebd4ca0f82a1179fdb2aded3c2a85dfe2ab275d91b8a5b147a653ca861ab"
   elsif os == "debian" && os_version == "11"
-    filename = "or-tools_amd64_debian-11_v#{version}.tar.gz"
-    checksum = "db0636bab909eabf06a7004f7572dca6fa152f3823c1365b0b7428405bf250e6"
+    filename = "or-tools_amd64_debian-11_cpp_v#{version}.tar.gz"
+    checksum = "651c62147f231fb90635c522e0a2c799e3de3991c2c75f7c6acb721e7b78946c"
+  elsif os == "debian" && os_version == "10"
+    filename = "or-tools_amd64_debian-10_cpp_v#{version}.tar.gz"
+    checksum = "36088bc6c6fbb96539245db7cddf498f77ae3e7b7c2cc8f6d7d89d76f90751fb"
   elsif os == "centos" && os_version == "8"
-    filename = "or-tools_amd64_centos-8_v#{version}.tar.gz"
-    checksum = "e5649069fd7a3e8228cc18b91e265a90562c5d03a0c962b0346911aada0aedc9"
+    filename = "or-tools_amd64_centos-8_cpp_v#{version}.tar.gz"
+    checksum = "da2cb303ae332d207592f21bb504e4e2e33dc1b1e8f5747d413c082d9d05504a"
   elsif os == "centos" && os_version == "7"
-    filename = "or-tools_amd64_centos-7_v#{version}.tar.gz"
-    checksum = "3bffdec8c09fc1345dcbd6a553437e2894014093fafb53e50adc7d4d776bb08b"
+    filename = "or-tools_amd64_centos-7_cpp_v#{version}.tar.gz"
+    checksum = "9eaf0178467f4d2fdbe496f62223809aa43e313548cc6cb716e661c00472b4ff"
   else
     platform =
       if Gem.win_platform?

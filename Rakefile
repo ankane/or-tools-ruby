@@ -25,13 +25,13 @@ task :update do
   require "open-uri"
   require "tmpdir"
 
-  version = "9.3.10497"
-  distributions = ["MacOsX-12.2.1", "ubuntu-20.04", "ubuntu-18.04", "debian-11", "centos-8", "centos-7"]
+  version = "9.4.1874"
+  distributions = ["x86_64_MacOsX-12.5", "arm64_MacOsX-12.5", "ubuntu-20.04", "ubuntu-18.04", "debian-11", "debian-10", "centos-8", "centos-7"]
 
   short_version = version.split(".").first(2).join(".")
   distributions.each do |dist|
     prefix = dist.include?("MacOsX") ? "" : "amd64_"
-    filename = "or-tools_#{prefix}#{dist}_v#{version}.tar.gz"
+    filename = "or-tools_#{prefix}#{dist}_cpp_v#{version}.tar.gz"
     url = "https://github.com/google/or-tools/releases/download/v#{short_version}/#{filename}"
     dest = "#{Dir.tmpdir}/#{filename}"
     unless File.exist?(dest)

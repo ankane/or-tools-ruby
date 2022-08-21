@@ -1,3 +1,9 @@
+## 0.7.4 (unreleased)
+
+- Updated OR-Tools to 9.4
+- Added binary installation for Mac ARM
+- Restored support for Debian 10
+
 ## 0.7.3 (2022-07-23)
 
 - Added more methods to `RoutingModel` and  `RoutingDimension`
