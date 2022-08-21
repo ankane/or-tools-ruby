@@ -382,11 +382,7 @@ void init_routing(Rice::Module& m) {
     .define_method("add_variable_target_to_finalizer", &RoutingModel::AddVariableTargetToFinalizer)
     .define_method("add_weighted_variable_target_to_finalizer", &RoutingModel::AddWeightedVariableTargetToFinalizer)
     .define_method("close_model", &RoutingModel::CloseModel)
-    .define_method(
-      "solve",
-      [](RoutingModel& self) {
-        return self.Solve();
-      })
+    // solve defined in Ruby
     .define_method(
       "solve_with_parameters",
       [](RoutingModel& self, const RoutingSearchParameters& search_parameters) {
