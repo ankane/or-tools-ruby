@@ -8,6 +8,8 @@ jobs:
       matrix:
         include:
         - ruby: 3.1
+          os: ubuntu-22.04
+        - ruby: "3.0"
           os: ubuntu-20.04
         - ruby: "3.0"
           os: macos-latest

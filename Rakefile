@@ -26,7 +26,7 @@ task :update do
   require "tmpdir"
 
   version = "9.4.1874"
-  distributions = ["x86_64_MacOsX-12.5", "arm64_MacOsX-12.5", "ubuntu-20.04", "ubuntu-18.04", "debian-11", "debian-10", "centos-8", "centos-7"]
+  distributions = ["x86_64_MacOsX-12.5", "arm64_MacOsX-12.5", "ubuntu-22.04", "ubuntu-20.04", "ubuntu-18.04", "debian-11", "debian-10", "centos-8", "centos-7"]
 
   short_version = version.split(".").first(2).join(".")
   distributions.each do |dist|

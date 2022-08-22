@@ -1,3 +1,7 @@
+## 0.8.1 (unreleased)
+
+- Added binary installation for Ubuntu 22.04
+
 ## 0.8.0 (2022-08-21)
 
 - Updated OR-Tools to 9.4
