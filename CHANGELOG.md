@@ -1,4 +1,4 @@
-## 0.8.1 (unreleased)
+## 0.8.1 (2022-08-22)
 
 - Added binary installation for Ubuntu 22.04
 
