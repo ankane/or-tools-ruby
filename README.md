@@ -14,7 +14,7 @@ gem "or-tools"
 
 Installation can take a few minutes as OR-Tools downloads and builds.
 
-## Guides
+## Getting Started
 
 Higher Level Interfaces
 
