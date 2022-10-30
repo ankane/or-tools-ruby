@@ -298,8 +298,18 @@ void init_constraint(Rice::Module& m) {
       })
     .define_method(
       "add_hint",
-      [](CpModelBuilder& self, IntVar var, int64_t value) {
-        self.AddHint(var, value);
+      [](CpModelBuilder& self, Object var, Object value) {
+        if (var.is_a(rb_cBoolVar)) {
+          self.AddHint(
+            Rice::detail::From_Ruby<BoolVar>().convert(var.value()),
+            Rice::detail::From_Ruby<bool>().convert(value.value())
+          );
+        } else {
+          self.AddHint(
+            Rice::detail::From_Ruby<IntVar>().convert(var.value()),
+            Rice::detail::From_Ruby<int64_t>().convert(value.value())
+          );
+        }
       })
     .define_method(
       "clear_hints",

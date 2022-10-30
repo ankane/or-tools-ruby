@@ -219,4 +219,18 @@ class ConstraintTest < Minitest::Test
     end
     assert_equal "No solution found", error.message
   end
+
+  def test_add_hint
+    model = ORTools::CpModel.new
+
+    x = model.new_int_var(0, 1, "x")
+    y = model.new_bool_var("y")
+
+    model.add_hint(x, 1)
+    model.add_hint(y, true)
+
+    assert_raises(TypeError) do
+      model.add_hint("z", 1)
+    end
+  end
 end
