@@ -1,6 +1,7 @@
 ## 0.8.2 (unreleased)
 
 - Added support for bool vars to `add_hint`
+- Added support for empty sums to `CpModel`
 
 ## 0.8.1 (2022-08-22)
 

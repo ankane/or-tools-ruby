@@ -233,4 +233,35 @@ class ConstraintTest < Minitest::Test
       model.add_hint("z", 1)
     end
   end
+
+  def test_sum_empty_true
+    model = ORTools::CpModel.new
+    model.add([].sum < 2)
+    expected = <<~EOS
+      constraints {
+        bool_or {
+          literals: 0
+        }
+      }
+    EOS
+    assert_match expected, model.inspect
+  end
+
+  def test_sum_empty_false
+    model = ORTools::CpModel.new
+    model.add([].sum > 2)
+    expected = <<~EOS
+      constraints {
+      }
+    EOS
+    assert_match expected, model.inspect
+  end
+
+  def test_add_not_supported
+    model = ORTools::CpModel.new
+    error = assert_raises(TypeError) do
+      model.add("x")
+    end
+    assert_equal "Not supported: CpModel#add(x)", error.message
+  end
 end
