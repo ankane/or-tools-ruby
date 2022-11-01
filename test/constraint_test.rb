@@ -238,13 +238,17 @@ class ConstraintTest < Minitest::Test
     model = ORTools::CpModel.new
     model.add([].sum < 2)
     expected = <<~EOS
+      variables {
+        domain: 1
+        domain: 1
+      }
       constraints {
         bool_or {
           literals: 0
         }
       }
     EOS
-    assert_match expected, model.inspect
+    assert_equal expected, model.inspect
   end
 
   def test_sum_empty_false
@@ -254,7 +258,7 @@ class ConstraintTest < Minitest::Test
       constraints {
       }
     EOS
-    assert_match expected, model.inspect
+    assert_equal expected, model.inspect
   end
 
   def test_add_not_supported
