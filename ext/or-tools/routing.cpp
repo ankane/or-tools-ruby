@@ -388,6 +388,11 @@ void init_routing(Rice::Module& m) {
       [](RoutingModel& self, const RoutingSearchParameters& search_parameters) {
         return self.SolveWithParameters(search_parameters);
       })
+    .define_method(
+      "solve_from_assignment_with_parameters",
+      [](RoutingModel& self, const Assignment* assignment, const RoutingSearchParameters& search_parameters) {
+        return self.SolveFromAssignmentWithParameters(assignment, search_parameters);
+      })
     .define_method("compute_lower_bound", &RoutingModel::ComputeLowerBound)
     .define_method("status",
       [](RoutingModel& self) {
