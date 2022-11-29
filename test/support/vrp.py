@@ -1,6 +1,13 @@
-"""Vehicles Routing Problem (VRP)."""
+"""Simple Vehicles Routing Problem (VRP).
 
-from __future__ import print_function
+   This is a sample using the routing library python wrapper to solve a VRP
+   problem.
+   A description of the problem can be found here:
+   http://en.wikipedia.org/wiki/Vehicle_routing_problem.
+
+   Distances are in meters.
+"""
+
 from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
 
@@ -85,6 +92,7 @@ def create_data_model():
 
 def print_solution(data, manager, routing, solution):
     """Prints solution on console."""
+    print(f'Objective: {solution.ObjectiveValue()}')
     max_route_distance = 0
     for vehicle_id in range(data['num_vehicles']):
         index = routing.Start(vehicle_id)
@@ -104,9 +112,8 @@ def print_solution(data, manager, routing, solution):
 
 
 
-
 def main():
-    """Solve the CVRP problem."""
+    """Entry point of the program."""
     # Instantiate the data problem.
     data = create_data_model()
 
@@ -153,6 +160,8 @@ def main():
     # Print solution on console.
     if solution:
         print_solution(data, manager, routing, solution)
+    else:
+        print('No solution found !')
 
 
 if __name__ == '__main__':

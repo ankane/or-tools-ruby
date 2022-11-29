@@ -119,19 +119,19 @@ class RoutingTest < Minitest::Test
       max_route_distance = [route_distance, max_route_distance].max
     end
 
-    assert_equal [0, 8, 6, 2, 5, 0], routes[0]
-    assert_equal 1552, distances[0]
+    assert_equal [0, 9, 10, 2, 6, 5, 0], routes[0]
+    assert_equal 1712, distances[0]
 
-    assert_equal [0, 7, 1, 4, 3, 0], routes[1]
-    assert_equal 1552, distances[1]
+    assert_equal [0, 16, 14, 8, 0], routes[1]
+    assert_equal 1484, distances[1]
 
-    assert_equal [0, 9, 10, 16, 14, 0], routes[2]
+    assert_equal [0, 7, 1, 4, 3, 0], routes[2]
     assert_equal 1552, distances[2]
 
-    assert_equal [0, 12, 11, 15, 13, 0], routes[3]
+    assert_equal [0, 13, 15, 11, 12, 0], routes[3]
     assert_equal 1552, distances[3]
 
-    assert_equal 1552, max_route_distance
+    assert_equal 1712, max_route_distance
   end
 
   def test_vrp_starts_ends
@@ -198,11 +198,11 @@ class RoutingTest < Minitest::Test
       max_route_distance = [route_distance, max_route_distance].max
     end
 
-    assert_equal [1, 6, 5, 0], routes[0]
+    assert_equal [1, 5, 6, 8, 0], routes[0]
     assert_equal 1232, distances[0]
 
-    assert_equal [2, 10, 8, 9, 0], routes[1]
-    assert_equal 1256, distances[1]
+    assert_equal [2, 10, 9, 0], routes[1]
+    assert_equal 936, distances[1]
 
     assert_equal [15, 3, 4, 7, 0], routes[2]
     assert_equal 1256, distances[2]
