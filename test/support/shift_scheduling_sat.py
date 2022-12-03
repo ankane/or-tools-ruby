@@ -165,7 +165,6 @@ def add_soft_sum_constraint(model, works, hard_min, soft_min, min_cost,
     if soft_min > hard_min and min_cost > 0:
         delta = model.NewIntVar(-len(works), len(works), '')
         model.Add(delta == soft_min - sum_var)
-        # TODO(user): Compare efficiency with only excess >= soft_min - sum_var.
         excess = model.NewIntVar(0, 7, prefix + ': under_sum')
         model.AddMaxEquality(excess, [delta, 0])
         cost_variables.append(excess)

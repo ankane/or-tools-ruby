@@ -300,7 +300,6 @@ class ShiftSchedulingSatTest < Minitest::Test
     if soft_min > hard_min && min_cost.positive?
       delta = model.new_int_var(-works.size, works.size, '')
       model.add(delta + sum_var == soft_min)
-      # TODO(user): Compare efficiency with only excess >= soft_min - sum_var.
       excess = model.new_int_var(0, 7, "#{prefix}: under_sum")
       model.add_max_equality(excess, [delta, model.new_constant(0)])
       cost_variables << excess
