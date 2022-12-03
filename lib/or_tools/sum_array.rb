@@ -17,7 +17,7 @@ module ORTools
     end
 
     def to_s
-      "#{@array.map(&:to_s).reject { |v| v == "0" }.join(" + ")}"
+      "#{@array.map(&:to_s).reject { |v| v == "0" }.join(" + ")}".gsub(" + -", " - ")
     end
   end
 end

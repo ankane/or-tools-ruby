@@ -53,6 +53,7 @@ class LinearTest < Minitest::Test
     assert_equal "2 * (x + 2 * y)", (2 * [x, 2 * y].sum).to_s
     assert_equal "-x", (-x).to_s
     assert_equal "-x", [-x].sum.to_s
+    assert_equal "x - 2", [x, -2].sum.to_s
   end
 
   def test_inspect
