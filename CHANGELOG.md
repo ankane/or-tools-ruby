@@ -1,4 +1,4 @@
-## 0.9.0 (unreleased)
+## 0.9.0 (2022-12-02)
 
 - Updated OR-Tools to 9.5
 - Added `solve_from_assignment_with_parameters` to `RoutingModel`
