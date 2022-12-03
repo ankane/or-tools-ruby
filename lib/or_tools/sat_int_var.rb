@@ -22,9 +22,8 @@ module ORTools
       name
     end
 
-    # TODO add class
     def inspect
-      to_s
+      "#<#{self.class.name} #{to_s}>"
     end
   end
 end

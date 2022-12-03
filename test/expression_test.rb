@@ -109,15 +109,14 @@ class ExpressionTest < Minitest::Test
     assert_equal "x + y == z", (x + y == z).to_s
   end
 
-  # TODO add class
   def test_inspect
     model = ORTools::CpModel.new
     x = model.new_int_var(0, 1, "x")
     y = model.new_int_var(0, 1, "y")
     z = model.new_int_var(0, 1, "z")
 
-    assert_equal "x", x.inspect
-    assert_equal "x + y", (x + y).inspect
-    assert_equal "x + y == z", (x + y == z).inspect
+    assert_equal "#<ORTools::SatIntVar x>", x.inspect
+    assert_equal "#<ORTools::SatLinearExpr x + y>", (x + y).inspect
+    assert_equal "#<ORTools::Comparison x + y == z>", (x + y == z).inspect
   end
 end

@@ -27,7 +27,7 @@ module ORTools
     def to_s
       vars.map do |v|
         k = v[0]
-        k = k.respond_to?(:name) ? k.name : k.inspect
+        k = k.respond_to?(:name) ? k.name : k.to_s
         if v[1] == 1
           k
         else
@@ -36,9 +36,8 @@ module ORTools
       end.join(" + ").sub(" + -", " - ")
     end
 
-    # TODO add class
     def inspect
-      to_s
+      "#<#{self.class.name} #{to_s}>"
     end
 
     private

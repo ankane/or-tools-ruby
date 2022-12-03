@@ -9,12 +9,11 @@ module ORTools
     end
 
     def to_s
-      "#{left.inspect} #{operator} #{right.inspect}"
+      "#{left} #{operator} #{right}"
     end
 
-    # TODO add class
     def inspect
-      to_s
+      "#<#{self.class.name} #{to_s}>"
     end
   end
 end
