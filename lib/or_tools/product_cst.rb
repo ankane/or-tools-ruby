@@ -13,7 +13,11 @@ module ORTools
       if @coef == -1
         "-#{@expr}"
       else
-        "(#{@coef} * #{@expr})"
+        expr = @expr.to_s
+        if expr.include?("+") || expr.include?("-")
+          expr = "(#{expr})"
+        end
+        "#{@coef} * #{expr}"
       end
     end
 

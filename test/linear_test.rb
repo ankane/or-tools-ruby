@@ -44,13 +44,15 @@ class LinearTest < Minitest::Test
     y = solver.num_var(0, solver.infinity, "y")
 
     assert_equal "x", x.to_s
-    assert_equal "(x + (2 * y))", (x + y * 2).to_s
-    assert_equal "(x + (2 * y)) <= 14", (x + y * 2 <= 14).to_s
-    assert_equal "(x + 1)", (x + 1).to_s
-    # TODO remove solver.sum
-    assert_equal "(x + y + 1 + 2)", solver.sum([x, y, 1, 2]).to_s
-    assert_equal "((x + 1) + (y + 2))", (solver.sum([x, 1]) + solver.sum([y, 2])).to_s
-    assert_equal "(2 * (x + (2 * y)))", ((x + y * 2) * 2).to_s
+    assert_equal "x + 2 * y", (x + 2 * y).to_s
+    assert_equal "x + 2 * y <= 14", (x + 2 * y <= 14).to_s
+    assert_equal "x + 1", (x + 1).to_s
+    assert_equal "x + y + 1 + 2", [x, y, 1, 2].sum.to_s
+    assert_equal "x + 1 + y + 2", ([x, 1].sum + [y, 2].sum).to_s
+    assert_equal "2 * (x + 2 * y)", (2 * (x + 2 * y)).to_s
+    assert_equal "2 * (x + 2 * y)", (2 * [x, 2 * y].sum).to_s
+    assert_equal "-x", (-x).to_s
+    assert_equal "-x", [-x].sum.to_s
   end
 
   def test_inspect
@@ -58,9 +60,9 @@ class LinearTest < Minitest::Test
     x = solver.num_var(0, solver.infinity, "x")
 
     assert_equal "#<ORTools::MPVariable x>", x.inspect
-    assert_equal "#<ORTools::SumArray (x + 1)>", (x + 1).inspect
+    assert_equal "#<ORTools::SumArray x + 1>", (x + 1).inspect
     assert_equal "#<ORTools::LinearExpr (empty)>", ORTools::LinearExpr.new.inspect
-    assert_equal "#<ORTools::LinearConstraint (x + 1) == 1>", (x + 1 == 1).inspect
+    assert_equal "#<ORTools::LinearConstraint x + 1 == 1>", (x + 1 == 1).inspect
   end
 
   def test_offset
