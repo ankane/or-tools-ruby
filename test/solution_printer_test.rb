@@ -26,11 +26,9 @@ class SolutionPrinterTest < Minitest::Test
     solver = ORTools::CpSolver.new
     solver.parameters.enumerate_all_solutions = true
     solution_printer = ORTools::VarArraySolutionPrinter.new([x, y])
-    stdout, _ = capture_io do
-      solver.solve(model, solution_printer)
-    end
+    solver.solve(model, solution_printer)
     assert_equal 15, solution_printer.solution_count
-    assert_match "Solution 14", stdout
+    p solver
   end
 
   def test_var_array_and_objective_solution_printer
