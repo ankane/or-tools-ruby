@@ -154,7 +154,7 @@ void init_constraint(Rice::Module& m) {
       [](CpModelBuilder& self, int64_t start, int64_t end, const std::string& name) {
         const operations_research::Domain domain(start, end);
         return self.NewIntVar(domain).WithName(name);
-      })
+      }, Rice::Return().keepAlive())
     .define_method(
       "new_bool_var",
       [](CpModelBuilder& self, const std::string& name) {
