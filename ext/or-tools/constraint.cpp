@@ -371,6 +371,11 @@ void init_constraint(Rice::Module& m) {
         }
       })
     .define_method(
+      "solution_info",
+      [](CpSolverResponse& self) {
+        return self.solution_info();
+      })
+    .define_method(
       "sufficient_assumptions_for_infeasibility",
       [](CpSolverResponse& self) {
         auto a = Array();

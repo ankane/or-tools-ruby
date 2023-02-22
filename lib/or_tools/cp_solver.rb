@@ -41,6 +41,10 @@ module ORTools
       end
     end
 
+    def solution_info
+      @response.solution_info
+    end
+
     def sufficient_assumptions_for_infeasibility
       @response.sufficient_assumptions_for_infeasibility
     end
