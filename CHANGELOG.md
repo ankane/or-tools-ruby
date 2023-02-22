@@ -1,3 +1,6 @@
+## 0.9.1 (unreleased)
+- Added `solution_info` to `CpSolver`
+
 ## 0.9.0 (2022-12-02)
 
 - Updated OR-Tools to 9.5
