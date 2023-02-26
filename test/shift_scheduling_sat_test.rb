@@ -208,7 +208,7 @@ class ShiftSchedulingSatTest < Minitest::Test
     # status = solver.solve_with_solution_callback(model, solution_printer)
     status = solver.solve(model)
 
-    assert_equal :feasible, status
+    assert_includes [:feasible, :optimal], status
     assert_operator solver.objective_value, :<=, 400
 
     _assignments = num_employees.times.map do |e|
