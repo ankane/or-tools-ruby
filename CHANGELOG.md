@@ -1,4 +1,4 @@
-## 0.9.1 (unreleased)
+## 0.9.1 (2023-03-11)
 
 - Added `solution_info` to `CpSolver`
 
