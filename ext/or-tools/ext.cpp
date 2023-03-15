@@ -30,7 +30,7 @@ void Init_ext()
   // fix logging warning
   CppBridge::InitLogging("");
   CppFlags flags = CppFlags();
-  flags.logtostderr = true;
+  flags.stderrthreshold = 2;
   flags.log_prefix = false;
   CppBridge::SetFlags(flags);
 }
