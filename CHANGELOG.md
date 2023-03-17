@@ -1,6 +1,6 @@
-## 0.10.1 (2023-03-17)
+## 0.10.1 (unreleased)
 
-- Add way to get upper and lower bounds of `SatIntVar`
+- Added `domain` method to `SatIntVar`
 
 ## 0.10.0 (2023-03-15)
 
