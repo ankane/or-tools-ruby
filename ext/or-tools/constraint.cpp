@@ -243,6 +243,11 @@ void init_constraint(Rice::Module& m) {
         return self.AddLinearConstraint(expr, Domain(lb, ub));
       })
     .define_method(
+      "add_linear_expression_in_domain",
+      [](CpModelBuilder& self, LinearExpr expr, Domain domain) {
+        return self.AddLinearConstraint(expr, domain);
+      })
+    .define_method(
       "add_not_equal",
       [](CpModelBuilder& self, LinearExpr x, LinearExpr y) {
         return self.AddNotEqual(x, y);
