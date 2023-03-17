@@ -1,6 +1,7 @@
 ## 0.10.1 (unreleased)
 
 - Added `domain` method to `SatIntVar`
+- Added `add_linear_constraint` method to `CpModel`
 
 ## 0.10.0 (2023-03-15)
 
