@@ -1,3 +1,7 @@
+## 0.10.1 (2023-03-17)
+
+- Add way to get upper and lower bounds of `SatIntVar`
+
 ## 0.10.0 (2023-03-15)
 
 - Updated OR-Tools to 9.6
