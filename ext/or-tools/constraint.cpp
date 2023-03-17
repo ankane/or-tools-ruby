@@ -3,6 +3,7 @@
 
 #include "ext.h"
 
+using operations_research::Domain;
 using operations_research::sat::BoolVar;
 using operations_research::sat::Constraint;
 using operations_research::sat::CpModelBuilder;
@@ -98,8 +99,13 @@ namespace Rice::detail
 }
 
 void init_constraint(Rice::Module& m) {
+  Rice::define_class_under<Domain>(m, "Domain")
+    .define_method("min", &Domain::Min)
+    .define_method("max", &Domain::Max);
+
   rb_cSatIntVar = Rice::define_class_under<IntVar>(m, "SatIntVar")
-    .define_method("name", &IntVar::Name);
+    .define_method("name", &IntVar::Name)
+    .define_method("domain", &IntVar::Domain);
 
   Rice::define_class_under<IntervalVar>(m, "SatIntervalVar")
     .define_method("name", &IntervalVar::Name);

@@ -234,6 +234,17 @@ class ConstraintTest < Minitest::Test
     end
   end
 
+  def test_int_var_domain
+    model = ORTools::CpModel.new
+
+    lower_bound = (0..9).to_a.sample
+    upper_bound = (10..19).to_a.sample
+    x = model.new_int_var(lower_bound, upper_bound, "x")
+
+    assert_equal lower_bound, x.domain.min
+    assert_equal upper_bound, x.domain.max
+  end
+
   def test_sum_empty_true
     model = ORTools::CpModel.new
     model.add([].sum < 2)
