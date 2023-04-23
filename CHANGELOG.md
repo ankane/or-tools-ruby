@@ -1,3 +1,7 @@
+## 0.10.2 (unreleased)
+
+- Added `stop_search` method
+
 ## 0.10.1 (2023-03-20)
 
 - Added `domain` method to `SatIntVar`
