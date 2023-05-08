@@ -403,21 +403,26 @@ void init_constraint(Rice::Module& m) {
       [](Object self, CpModelBuilder& model, SatParameters& parameters, Object callback) {
         Model m;
 
-        if (!callback.is_nil()) {
-          // TODO figure out how to use callback with multiple cores
-          parameters.set_num_search_workers(1);
+        std::vector<CpSolverResponse> responses;
 
+        if (!callback.is_nil()) {
           m.Add(NewFeasibleSolutionObserver(
-            [callback](const CpSolverResponse& r) {
-              // TODO find a better way to do this
-              callback.call("response=", r);
-              callback.call("on_solution_callback");
+            [&responses](const CpSolverResponse& response) {
+              // TODO use mutex
+              responses.push_back(response);
             })
           );
         }
 
         m.Add(NewSatParameters(parameters));
-        return SolveCpModel(model.Build(), &m);
+        auto result = SolveCpModel(model.Build(), &m);
+
+        for (auto &response : responses) {
+          callback.call("response=", response);
+          callback.call("on_solution_callback");
+        }
+
+        return result;
       })
     .define_method(
       "_solution_integer_value",
