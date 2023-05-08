@@ -1,3 +1,4 @@
+#include <mutex>
 #include <google/protobuf/text_format.h>
 #include <ortools/sat/cp_model.h>
 
@@ -404,11 +405,13 @@ void init_constraint(Rice::Module& m) {
         Model m;
 
         std::vector<CpSolverResponse> responses;
+        std::mutex mtx;
 
         if (!callback.is_nil()) {
           m.Add(NewFeasibleSolutionObserver(
-            [&responses](const CpSolverResponse& response) {
-              // TODO use mutex
+            [&](const CpSolverResponse& response) {
+              // TODO stream results
+              std::lock_guard<std::mutex> guard(mtx);
               responses.push_back(response);
             })
           );
