@@ -1,9 +1,11 @@
 #include <google/protobuf/text_format.h>
 #include <ortools/sat/cp_model.h>
+#include <ortools/util/time_limit.h>
 
 #include "ext.h"
 
 using operations_research::Domain;
+using operations_research::TimeLimit;
 using operations_research::sat::BoolVar;
 using operations_research::sat::Constraint;
 using operations_research::sat::CpModelBuilder;
@@ -407,11 +409,17 @@ void init_constraint(Rice::Module& m) {
           // TODO figure out how to use callback with multiple cores
           parameters.set_num_search_workers(1);
 
+          std::atomic<bool> stopped(false);
+          m.GetOrCreate<TimeLimit>()->RegisterExternalBooleanAsLimit(&stopped);
+
           m.Add(NewFeasibleSolutionObserver(
-            [&](const CpSolverResponse& r) {
+            [&callback, &stopped](const CpSolverResponse& r) {
               // TODO find a better way to do this
               callback.call("response=", r);
               callback.call("on_solution_callback");
+              if (callback.attr_get("@stopped")) {
+                stopped = true;
+              }
             })
           );
         }
