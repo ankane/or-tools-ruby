@@ -1,4 +1,6 @@
 #include <mutex>
+#include <deque>
+
 #include <google/protobuf/text_format.h>
 #include <ortools/sat/cp_model.h>
 
@@ -404,12 +406,13 @@ void init_constraint(Rice::Module& m) {
       [](Object self, CpModelBuilder& model, SatParameters& parameters, Object callback) {
         Model m;
 
-        std::vector<CpSolverResponse> responses;
+        std::deque<CpSolverResponse> responses;
         std::mutex mtx;
 
         if (!callback.is_nil()) {
           m.Add(NewFeasibleSolutionObserver(
             [&](const CpSolverResponse& response) {
+              // important! do not call any Ruby code here
               // TODO stream results
               std::lock_guard<std::mutex> guard(mtx);
               responses.push_back(response);
@@ -420,8 +423,8 @@ void init_constraint(Rice::Module& m) {
         m.Add(NewSatParameters(parameters));
         auto result = SolveCpModel(model.Build(), &m);
 
-        for (auto &response : responses) {
-          callback.call("response=", response);
+        for (; !responses.empty(); responses.pop_front()) {
+          callback.call("response=", responses.front());
           callback.call("on_solution_callback");
         }
 
