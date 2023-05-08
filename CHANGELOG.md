@@ -1,3 +1,7 @@
+## 0.10.2 (unreleased)
+
+- Fixed segfault with `CpSolver`
+
 ## 0.10.1 (2023-03-20)
 
 - Added `domain` method to `SatIntVar`
