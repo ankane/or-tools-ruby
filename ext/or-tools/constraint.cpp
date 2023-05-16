@@ -409,9 +409,12 @@ void init_constraint(Rice::Module& m) {
 
           m.Add(NewFeasibleSolutionObserver(
             [&callback](const CpSolverResponse& r) {
-              // TODO find a better way to do this
-              callback.call("response=", r);
-              callback.call("on_solution_callback");
+              // ensure Ruby thread
+              if (ruby_native_thread_p()) {
+                // TODO find a better way to do this
+                callback.iv_set("@response", r);
+                callback.call("on_solution_callback");
+              }
             })
           );
         }
