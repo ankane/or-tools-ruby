@@ -414,13 +414,13 @@ void init_constraint(Rice::Module& m) {
 
         if (!callback.is_nil()) {
           m.Add(NewFeasibleSolutionObserver(
-            [&](const CpSolverResponse& r) {
+            [&callback](const CpSolverResponse& r) {
               // ensure Ruby thread
               if (ruby_native_thread_p()) {
                 // TODO find a better way to do this
                 callback.iv_set("@response", r);
                 callback.call("on_solution_callback");
-                stopped = callback.attr_get("@stopped").test();
+                // stopped = callback.attr_get("@stopped").test();
               }
             })
           );
