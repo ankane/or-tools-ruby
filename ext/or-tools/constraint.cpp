@@ -419,7 +419,7 @@ void init_constraint(Rice::Module& m) {
                 // TODO find a better way to do this
                 callback.iv_set("@response", r);
                 callback.call("on_solution_callback");
-                stopped = callback.attr_get("@stopped").test();
+                stopped.store(callback.attr_get("@stopped").test());
               }
             })
           );
