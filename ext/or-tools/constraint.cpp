@@ -408,7 +408,7 @@ void init_constraint(Rice::Module& m) {
           parameters.set_num_search_workers(1);
 
           m.Add(NewFeasibleSolutionObserver(
-            [callback](const CpSolverResponse& r) {
+            [&callback](const CpSolverResponse& r) {
               // TODO find a better way to do this
               callback.call("response=", r);
               callback.call("on_solution_callback");
