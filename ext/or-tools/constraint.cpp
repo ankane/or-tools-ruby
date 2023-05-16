@@ -405,27 +405,27 @@ void init_constraint(Rice::Module& m) {
       [](Object self, CpModelBuilder& model, SatParameters& parameters, Object callback) {
         Model m;
 
+        // TODO figure out how to use callback with multiple cores
+        parameters.set_num_search_workers(1);
+        m.Add(NewSatParameters(parameters));
+
         std::atomic<bool> stopped(false);
         m.GetOrCreate<TimeLimit>()->RegisterExternalBooleanAsLimit(&stopped);
 
         if (!callback.is_nil()) {
-          // TODO figure out how to use callback with multiple cores
-          parameters.set_num_search_workers(1);
-
           m.Add(NewFeasibleSolutionObserver(
-            [&callback, &stopped](const CpSolverResponse& r) {
+            [&](const CpSolverResponse& r) {
               // ensure Ruby thread
               if (ruby_native_thread_p()) {
                 // TODO find a better way to do this
                 callback.iv_set("@response", r);
                 callback.call("on_solution_callback");
-                stopped.store(callback.attr_get("@stopped").test());
+                stopped = callback.attr_get("@stopped").test();
               }
             })
           );
         }
 
-        m.Add(NewSatParameters(parameters));
         return SolveCpModel(model.Build(), &m);
       })
     .define_method(
