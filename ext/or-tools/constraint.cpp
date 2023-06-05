@@ -412,7 +412,7 @@ void init_constraint(Rice::Module& m) {
               // ensure Ruby thread
               if (ruby_native_thread_p()) {
                 // TODO find a better way to do this
-                callback.iv_set("@response", r);
+                callback.call("response=", r);
                 callback.call("on_solution_callback");
               }
             })
