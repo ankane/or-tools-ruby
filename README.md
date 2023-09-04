@@ -1607,6 +1607,8 @@ end
 solver.minimize(data[:bins].sum { |j| y[j] })
 
 # call the solver and print the solution
+status = solver.solve
+
 if status == :optimal
   num_bins = 0
   data[:bins].each do |j|
