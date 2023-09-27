@@ -152,6 +152,14 @@ void init_constraint(Rice::Module& m) {
       "enumerate_all_solutions",
       [](SatParameters& self) {
         return self.enumerate_all_solutions();
+       })
+    .define_method("num_workers=",
+      [](SatParameters& self, int32_t value){
+        self.set_num_workers(value);
+      })
+    .define_method("cp_model_presolve=",
+      [](SatParameters& self, bool value) {
+        self.set_cp_model_presolve(value);
       });
 
   Rice::define_class_under<CpModelBuilder>(m, "CpModel")
