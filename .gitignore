@@ -9,3 +9,5 @@
 *.lock
 *.bundle
 *.so
+.tool-versions
+.vscode/settings.json
