@@ -102,7 +102,12 @@ void init_constraint(Rice::Module& m) {
   Rice::define_class_under<Domain>(m, "Domain")
     .define_constructor(Rice::Constructor<Domain, int64_t, int64_t>())
     .define_method("min", &Domain::Min)
-    .define_method("max", &Domain::Max);
+    .define_method("max", &Domain::Max)
+    .define_method("size", &Domain::Size)
+    .define_method("contains", 
+      [](Domain& self, int32_t value) {
+        return self.Contains(value);
+      });
 
   rb_cSatIntVar = Rice::define_class_under<IntVar>(m, "SatIntVar")
     .define_method("name", &IntVar::Name)
@@ -169,6 +174,11 @@ void init_constraint(Rice::Module& m) {
       [](CpModelBuilder& self, int64_t start, int64_t end, const std::string& name) {
         const operations_research::Domain domain(start, end);
         return self.NewIntVar(domain).WithName(name);
+      })
+    .define_method(
+      "new_int_var_with_integer_list_domain",
+      [](CpModelBuilder& self, std::vector<int64_t> values, const std::string& name) {
+        return self.NewIntVar(Domain::FromValues(values)).WithName(name);
       })
     .define_method(
       "new_bool_var",
