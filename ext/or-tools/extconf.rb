@@ -26,7 +26,10 @@ end
 # find_header and find_library first check without adding path
 # which can cause them to find system library
 $INCFLAGS << " -I#{inc}"
-$LDFLAGS.prepend("-Wl,-rpath,#{rpath} -L#{lib} ")
+# could support shared libraries for protobuf and abseil
+# but keep simple for now
+raise "libprotobuf.a not found" unless File.exist?("#{lib}/libprotobuf.a")
+$LDFLAGS.prepend("-Wl,-rpath,#{rpath} -L#{lib} #{lib}/libprotobuf.a ")
 raise "OR-Tools not found" unless have_library("ortools")
 
 create_makefile("or_tools/ext")

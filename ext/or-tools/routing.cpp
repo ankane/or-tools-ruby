@@ -353,8 +353,24 @@ void init_routing(Rice::Module& m) {
     .define_method("vehicle_allowed_for_index?", &RoutingModel::IsVehicleAllowedForIndex)
     .define_method("add_pickup_and_delivery", &RoutingModel::AddPickupAndDelivery)
     .define_method("add_pickup_and_delivery_sets", &RoutingModel::AddPickupAndDeliverySets)
-    .define_method("pickup_index_pairs", &RoutingModel::GetPickupIndexPairs)
-    .define_method("delivery_index_pairs", &RoutingModel::GetDeliveryIndexPairs)
+    .define_method(
+      "pickup_positions",
+      [](RoutingModel& self, int64_t node_index) {
+        std::vector<std::pair<int, int>> positions;
+        for (const auto& v : self.GetPickupPositions(node_index)) {
+          positions.emplace_back(v.pd_pair_index, v.alternative_index);
+        }
+        return positions;
+      })
+    .define_method(
+      "delivery_positions",
+      [](RoutingModel& self, int64_t node_index) {
+        std::vector<std::pair<int, int>> positions;
+        for (const auto& v : self.GetDeliveryPositions(node_index)) {
+          positions.emplace_back(v.pd_pair_index, v.alternative_index);
+        }
+        return positions;
+      })
     // TODO SetPickupAndDeliveryPolicyOfAllVehicles
     // TODO SetPickupAndDeliveryPolicyOfVehicle
     // TODO GetPickupAndDeliveryPolicyOfVehicle

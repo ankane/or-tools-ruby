@@ -13,5 +13,9 @@ module ORTools
       search_parameters.log_search = log_search unless log_search.nil?
       solve_with_parameters(search_parameters)
     end
+
+    # previous names
+    alias_method :pickup_index_pairs, :pickup_positions
+    alias_method :delivery_index_pairs, :delivery_positions
   end
 end

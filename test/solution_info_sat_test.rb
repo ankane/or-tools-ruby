@@ -13,6 +13,6 @@ class SolutionInfoSat < Minitest::Test
     solver = ORTools::CpSolver.new
     status = solver.solve(model)
     assert_equal :model_invalid, status
-    assert_match "The divisor cannot span across zero", solver.solution_info
+    assert_match "The domain of the divisor cannot contain 0", solver.solution_info
   end
 end

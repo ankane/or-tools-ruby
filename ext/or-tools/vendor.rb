@@ -4,15 +4,15 @@ require "fileutils"
 require "net/http"
 require "tmpdir"
 
-version = "9.6.2534"
+version = "9.8.3296"
 
 if RbConfig::CONFIG["host_os"] =~ /darwin/i
   if RbConfig::CONFIG["host_cpu"] =~ /arm|aarch64/i
-    filename = "or-tools_arm64_macOS-13.2.1_cpp_v#{version}.tar.gz"
-    checksum = "bb82c3b071e8ea5366a52137f400b280120221611758e38bf3d55c819f81c34b"
+    filename = "or-tools_arm64_macOS-14.1_cpp_v#{version}.tar.gz"
+    checksum = "253efad127c55b78967e3e3a3b4a573f9da0a2562c4f33f14fbf462ca58448f7"
   else
-    filename = "or-tools_x86_64_macOS-13.2.1_cpp_v#{version}.tar.gz"
-    checksum = "0957ed39792d5f6135edf86ed75e78fff5b2f36ec0ae63e30c46bd6a6a97797f"
+    filename = "or-tools_x86_64_macOS-14.1_cpp_v#{version}.tar.gz"
+    checksum = "fe48b022799c807baba79a2b13c29bf9d9614827ba082fc688559d0cab879a86"
   end
 else
   # try /etc/os-release with fallback to /usr/lib/os-release
@@ -27,25 +27,16 @@ else
 
   if os == "ubuntu" && os_version == "22.04"
     filename = "or-tools_amd64_ubuntu-22.04_cpp_v#{version}.tar.gz"
-    checksum = "e7960113b156b13e23a179ca09646845e762f452aa525bf9b12a40e5ae3c6ca4"
+    checksum = "2a332e95897ac6fc2cfd0122bcbc07cfd286d0f579111529cc99ac3076f5421a"
   elsif os == "ubuntu" && os_version == "20.04"
     filename = "or-tools_amd64_ubuntu-20.04_cpp_v#{version}.tar.gz"
-    checksum = "aff9714ee8ffd1c936024d6a754f697cf80d4fd5aafa4cf121a4dde114f3813f"
-  elsif os == "ubuntu" && os_version == "18.04"
-    filename = "or-tools_amd64_ubuntu-18.04_cpp_v#{version}.tar.gz"
-    checksum = "467713721be3fdc709cc7fd0c8d6ad99dda73cab1b9c5de3568336c6ebef6473"
+    checksum = "95789f8d93dfb298efecd1c0b888f9a148c011e1a20505b00c38452d68b01644"
   elsif os == "debian" && os_version == "11"
     filename = "or-tools_amd64_debian-11_cpp_v#{version}.tar.gz"
-    checksum = "4191e3e910156d6e9d6e69fb9ab6ed57c683f018b218b46cce91c7ece6549dc6"
-  elsif os == "debian" && os_version == "10"
-    filename = "or-tools_amd64_debian-10_cpp_v#{version}.tar.gz"
-    checksum = "f141f16cf92877ed5819e0104126a31c9c139c070de06d7f40c957a4e6ce9284"
-  elsif os == "centos" && os_version == "8"
-    filename = "or-tools_amd64_centos-8_cpp_v#{version}.tar.gz"
-    checksum = "05e2dfc5c82d5122e0c26ce4548cddcae2d474b3b18c024bc189dab887357157"
+    checksum = "e7dd81b13c53c739447254b8836ece55f8b92a107688cc9f3511705c9962fa2d"
   elsif os == "centos" && os_version == "7"
     filename = "or-tools_amd64_centos-7_cpp_v#{version}.tar.gz"
-    checksum = "96012ac1280a98d6a67e764494bf60971eece859dca95fb6470ffd4065af7444"
+    checksum = "d9f193572d3a38b3062ae4cb89afc654e662eb734a9361b1575d649b9530cf60"
   else
     platform =
       if Gem.win_platform?
@@ -146,6 +137,9 @@ Dir.mktmpdir do |extract_path|
     FileUtils.cp(File.join(extract_path, file), so_path)
     ext = file.end_with?(".dylib") ? "dylib" : "so"
     File.symlink(so_path, File.join(path, "lib/libortools.#{ext}"))
+  end
+  ["lib/libprotobuf.a"].each do |file|
+    FileUtils.cp(File.join(extract_path, file), File.join(path, file))
   end
 end
 

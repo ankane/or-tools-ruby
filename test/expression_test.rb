@@ -35,7 +35,7 @@ class ExpressionTest < Minitest::Test
 
     solver = ORTools::CpSolver.new
     assert_equal :optimal, solver.solve(model)
-    assert_equal(-7, solver.value(x))
+    assert_equal(0, solver.value(x))
     assert_equal 0, solver.value(y)
   end
 
