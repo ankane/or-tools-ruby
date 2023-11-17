@@ -1,3 +1,7 @@
+## 0.11.0 (unreleased)
+
+- Dropped support for Ruby < 3
+
 ## 0.10.1 (2023-03-20)
 
 - Added `domain` method to `SatIntVar`
