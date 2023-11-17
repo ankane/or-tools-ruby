@@ -1,4 +1,4 @@
-## 0.11.0 (unreleased)
+## 0.11.0 (2023-11-16)
 
 - Updated OR-Tools to 9.8
 - Dropped support for Ubuntu 18.04, Debian 10, and CentOS 8
