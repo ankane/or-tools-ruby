@@ -6,8 +6,11 @@ require "tmpdir"
 
 version = "9.8.3296"
 
+arch = RbConfig::CONFIG["host_cpu"]
+arm = arch =~ /arm|aarch64/i
+
 if RbConfig::CONFIG["host_os"] =~ /darwin/i
-  if RbConfig::CONFIG["host_cpu"] =~ /arm|aarch64/i
+  if arm
     filename = "or-tools_arm64_macOS-14.1_cpp_v#{version}.tar.gz"
     checksum = "253efad127c55b78967e3e3a3b4a573f9da0a2562c4f33f14fbf462ca58448f7"
   else
@@ -25,16 +28,16 @@ else
   os = os_info["ID"]
   os_version = os_info["VERSION_ID"]
 
-  if os == "ubuntu" && os_version == "22.04"
+  if os == "ubuntu" && os_version == "22.04" && x86_64
     filename = "or-tools_amd64_ubuntu-22.04_cpp_v#{version}.tar.gz"
     checksum = "2a332e95897ac6fc2cfd0122bcbc07cfd286d0f579111529cc99ac3076f5421a"
-  elsif os == "ubuntu" && os_version == "20.04"
+  elsif os == "ubuntu" && os_version == "20.04" && !arm
     filename = "or-tools_amd64_ubuntu-20.04_cpp_v#{version}.tar.gz"
     checksum = "95789f8d93dfb298efecd1c0b888f9a148c011e1a20505b00c38452d68b01644"
-  elsif os == "debian" && os_version == "11"
+  elsif os == "debian" && os_version == "11" && !arm
     filename = "or-tools_amd64_debian-11_cpp_v#{version}.tar.gz"
     checksum = "e7dd81b13c53c739447254b8836ece55f8b92a107688cc9f3511705c9962fa2d"
-  elsif os == "centos" && os_version == "7"
+  elsif os == "centos" && os_version == "7" && !arm
     filename = "or-tools_amd64_centos-7_cpp_v#{version}.tar.gz"
     checksum = "d9f193572d3a38b3062ae4cb89afc654e662eb734a9361b1575d649b9530cf60"
   else
@@ -42,7 +45,7 @@ else
       if Gem.win_platform?
         "Windows"
       elsif os || os_version
-        "#{os} #{os_version}"
+        "#{os} #{os_version} (#{arch})"
       else
         "Unknown"
       end
