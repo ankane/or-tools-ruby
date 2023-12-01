@@ -1,3 +1,7 @@
+## 0.11.1 (unreleased)
+
+- Added binary installation for Arch Linux
+
 ## 0.11.0 (2023-11-16)
 
 - Updated OR-Tools to 9.8
