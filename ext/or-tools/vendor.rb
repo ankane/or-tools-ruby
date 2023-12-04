@@ -51,7 +51,7 @@ else
       if Gem.win_platform?
         "Windows"
       elsif os || os_version
-        "#{os} #{os_version} (#{arch})"
+        "#{os} #{os_version} #{arch}"
       else
         "Unknown"
       end
