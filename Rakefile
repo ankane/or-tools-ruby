@@ -26,12 +26,11 @@ task :update do
   require "tmpdir"
 
   version = "9.8.3296"
-  distributions = ["arm64_macOS-14.1", "x86_64_macOS-14.1", "ubuntu-22.04", "ubuntu-20.04", "debian-11", "centos-7", "archlinux"]
+  distributions = ["arm64_macOS-14.1", "x86_64_macOS-14.1", "amd64_ubuntu-22.04", "amd64_ubuntu-20.04", "amd64_debian-11", "arm64_debian-11" "amd64_centos-7", "amd64_archlinux"]
 
   short_version = version.split(".").first(2).join(".")
   distributions.each do |dist|
-    prefix = dist.include?("macOS") ? "" : "amd64_"
-    filename = "or-tools_#{prefix}#{dist}_cpp_v#{version}.tar.gz"
+    filename = "or-tools_#{dist}_cpp_v#{version}.tar.gz"
     url = "https://github.com/google/or-tools/releases/download/v#{short_version}/#{filename}"
     dest = "#{Dir.tmpdir}/#{filename}"
     unless File.exist?(dest)

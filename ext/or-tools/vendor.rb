@@ -37,6 +37,9 @@ else
   elsif os == "debian" && os_version == "11" && !arm
     filename = "or-tools_amd64_debian-11_cpp_v#{version}.tar.gz"
     checksum = "e7dd81b13c53c739447254b8836ece55f8b92a107688cc9f3511705c9962fa2d"
+  elsif os == "debian" && os_version == "11" && arm
+    filename = "or-tools_arm64_debian-11_cpp_v#{version}.tar.gz"
+    checksum = "77a88d01eb612ffac0f6e030e30e58a3d171fe75d93a527ec55a06f9070332ab"
   elsif os == "centos" && os_version == "7" && !arm
     filename = "or-tools_amd64_centos-7_cpp_v#{version}.tar.gz"
     checksum = "d9f193572d3a38b3062ae4cb89afc654e662eb734a9361b1575d649b9530cf60"

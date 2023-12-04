@@ -1,6 +1,7 @@
 ## 0.11.1 (unreleased)
 
 - Added binary installation for Arch Linux
+- Added binary installation for Debian 11 ARM
 
 ## 0.11.0 (2023-11-16)
 
