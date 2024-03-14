@@ -1,9 +1,11 @@
 #include <google/protobuf/text_format.h>
 #include <ortools/sat/cp_model.h>
+#include <ortools/util/time_limit.h>
 
 #include "ext.h"
 
 using operations_research::Domain;
+using operations_research::TimeLimit;
 using operations_research::sat::BoolVar;
 using operations_research::sat::Constraint;
 using operations_research::sat::CpModelBuilder;
@@ -411,23 +413,27 @@ void init_constraint(Rice::Module& m) {
       [](Object self, CpModelBuilder& model, SatParameters& parameters, Object callback) {
         Model m;
 
-        if (!callback.is_nil()) {
-          // TODO figure out how to use callback with multiple cores
-          parameters.set_num_search_workers(1);
+        // TODO figure out how to use callback with multiple cores
+        parameters.set_num_search_workers(1);
+        m.Add(NewSatParameters(parameters));
 
+        std::atomic<bool> stopped(false);
+        m.GetOrCreate<TimeLimit>()->RegisterExternalBooleanAsLimit(&stopped);
+
+        if (!callback.is_nil()) {
           m.Add(NewFeasibleSolutionObserver(
-            [&callback](const CpSolverResponse& r) {
+            [&](const CpSolverResponse& r) {
               // ensure Ruby thread
               if (ruby_native_thread_p()) {
                 // TODO find a better way to do this
                 callback.call("response=", r);
                 callback.call("on_solution_callback");
+                stopped = callback.attr_get("@stopped").test();
               }
             })
           );
         }
 
-        m.Add(NewSatParameters(parameters));
         return SolveCpModel(model.Build(), &m);
       })
     .define_method(
