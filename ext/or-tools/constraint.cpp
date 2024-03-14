@@ -421,7 +421,7 @@ void init_constraint(Rice::Module& m) {
         // m.GetOrCreate<TimeLimit>()->RegisterExternalBooleanAsLimit(&stopped);
         std::atomic<bool>* stopped = new std::atomic<bool>;
         (*stopped) = false;
-        m.GetOrCreate<TimeLimit>()->RegisterExternalBooleanAsLimit(stopped);
+        // m.GetOrCreate<TimeLimit>()->RegisterExternalBooleanAsLimit(stopped);
 
         if (!callback.is_nil()) {
           m.Add(NewFeasibleSolutionObserver(
