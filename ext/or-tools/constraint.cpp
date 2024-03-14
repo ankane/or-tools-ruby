@@ -417,8 +417,11 @@ void init_constraint(Rice::Module& m) {
         parameters.set_num_search_workers(1);
         m.Add(NewSatParameters(parameters));
 
-        std::atomic<bool> stopped(false);
-        m.GetOrCreate<TimeLimit>()->RegisterExternalBooleanAsLimit(&stopped);
+        // std::atomic<bool> stopped(false);
+        // m.GetOrCreate<TimeLimit>()->RegisterExternalBooleanAsLimit(&stopped);
+        std::atomic<bool>* stopped = new std::atomic<bool>;
+        (*stopped) = false;
+        m.GetOrCreate<TimeLimit>()->RegisterExternalBooleanAsLimit(stopped);
 
         if (!callback.is_nil()) {
           m.Add(NewFeasibleSolutionObserver(
@@ -428,7 +431,7 @@ void init_constraint(Rice::Module& m) {
                 // TODO find a better way to do this
                 callback.call("response=", r);
                 callback.call("on_solution_callback");
-                stopped = callback.attr_get("@stopped").test();
+                (*stopped) = callback.attr_get("@stopped").test();
               }
             })
           );
