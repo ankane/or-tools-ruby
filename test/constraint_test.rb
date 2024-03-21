@@ -153,8 +153,8 @@ class ConstraintTest < Minitest::Test
     status = solver.solve(model, solution_printer)
     assert_equal :optimal, status
 
-    assert_equal 179, solver.num_conflicts
-    assert_equal 828, solver.num_branches
+    assert_equal 200, solver.num_conflicts
+    assert_equal 1564, solver.num_branches
     assert_equal 72, solution_printer.solution_count
   end
 

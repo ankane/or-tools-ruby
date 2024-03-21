@@ -4,18 +4,18 @@ require "fileutils"
 require "net/http"
 require "tmpdir"
 
-version = "9.8.3296"
+version = "9.9.3963"
 
 arch = RbConfig::CONFIG["host_cpu"]
 arm = arch =~ /arm|aarch64/i
 
 if RbConfig::CONFIG["host_os"] =~ /darwin/i
   if arm
-    filename = "or-tools_arm64_macOS-14.1_cpp_v#{version}.tar.gz"
-    checksum = "253efad127c55b78967e3e3a3b4a573f9da0a2562c4f33f14fbf462ca58448f7"
+    filename = "or-tools_arm64_macOS-14.3.1_cpp_v#{version}.tar.gz"
+    checksum = "d9cbb3168d948208f68193b5d4df5f68cfc80fa61350b1a0efd0810f5accd600"
   else
-    filename = "or-tools_x86_64_macOS-14.1_cpp_v#{version}.tar.gz"
-    checksum = "fe48b022799c807baba79a2b13c29bf9d9614827ba082fc688559d0cab879a86"
+    filename = "or-tools_x86_64_macOS-14.3.1_cpp_v#{version}.tar.gz"
+    checksum = "2fc0b9a9c26793de1626ff8e93f49458d600af85e991ec845d351d7f30ed786d"
   end
 else
   # try /etc/os-release with fallback to /usr/lib/os-release
@@ -30,22 +30,19 @@ else
 
   if os == "ubuntu" && os_version == "22.04" && !arm
     filename = "or-tools_amd64_ubuntu-22.04_cpp_v#{version}.tar.gz"
-    checksum = "2a332e95897ac6fc2cfd0122bcbc07cfd286d0f579111529cc99ac3076f5421a"
-  elsif os == "ubuntu" && os_version == "20.04" && !arm
-    filename = "or-tools_amd64_ubuntu-20.04_cpp_v#{version}.tar.gz"
-    checksum = "95789f8d93dfb298efecd1c0b888f9a148c011e1a20505b00c38452d68b01644"
+    checksum = "a611133f4e9b75661c637347ebadff79539807cf8966eb9c176c2c560aad0a84"
   elsif os == "debian" && os_version == "11" && !arm
     filename = "or-tools_amd64_debian-11_cpp_v#{version}.tar.gz"
-    checksum = "e7dd81b13c53c739447254b8836ece55f8b92a107688cc9f3511705c9962fa2d"
+    checksum = "58c9f32d62031aa6679feb671758b3213fbc081ff46e7f850fef26aca2bd55ff"
   elsif os == "debian" && os_version == "11" && arm
     filename = "or-tools_arm64_debian-11_cpp_v#{version}.tar.gz"
-    checksum = "77a88d01eb612ffac0f6e030e30e58a3d171fe75d93a527ec55a06f9070332ab"
+    checksum = "f308a06d89dce060f74e6fec4936b43f4bdf4874d18c131798697756200f4e7a"
   elsif os == "centos" && os_version == "7" && !arm
     filename = "or-tools_amd64_centos-7_cpp_v#{version}.tar.gz"
-    checksum = "d9f193572d3a38b3062ae4cb89afc654e662eb734a9361b1575d649b9530cf60"
+    checksum = "01715a3f6cd2b1f09b816061ced613eb7dc91524cc7c2268ce3faf783a9085ea"
   elsif os == "arch" && !arm
     filename = "or-tools_amd64_archlinux_cpp_v#{version}.tar.gz"
-    checksum = "803e4b78e7d05b8027a2a391183c8c7855bb758f74d9ced872cfa68e0b9d7d64"
+    checksum = "490e67af9f0dbf79b0dd24fc8c80631cd41bb1f94fceb5345d371426abf25897"
   else
     platform =
       if Gem.win_platform?

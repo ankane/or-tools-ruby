@@ -296,6 +296,8 @@ void init_routing(Rice::Module& m) {
       return operations_research::DefaultRoutingModelParameters();
     });
 
+  Rice::define_class_under<RoutingModel::ResourceGroup>(m, "ResourceGroup");
+
   Rice::define_class_under<RoutingModel>(m, "RoutingModel")
     .define_constructor(Rice::Constructor<RoutingModel, RoutingIndexManager, RoutingModelParameters>(), Rice::Arg("index_manager"), Rice::Arg("parameters") = operations_research::DefaultRoutingModelParameters())
     .define_method("register_unary_transit_vector", &RoutingModel::RegisterUnaryTransitVector)

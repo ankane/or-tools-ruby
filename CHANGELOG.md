@@ -1,3 +1,8 @@
+## 0.12.0 (unreleased)
+
+- Updated OR-Tools to 9.9
+- Dropped binary installation for Ubuntu 20.04
+
 ## 0.11.1 (2023-12-04)
 
 - Added binary installation for Arch Linux
