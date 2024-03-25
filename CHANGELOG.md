@@ -2,6 +2,7 @@
 
 - Updated OR-Tools to 9.9
 - Dropped binary installation for Ubuntu 20.04
+- Dropped support for Ruby < 3.1
 
 ## 0.11.1 (2023-12-04)
 
