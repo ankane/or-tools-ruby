@@ -161,6 +161,10 @@ void init_constraint(Rice::Module& m) {
       [](SatParameters& self, bool value) {
         self.set_cp_model_presolve(value);
       })
+    .define_method("random_seed",
+      [](SatParameters& self) {
+        return self.random_seed();
+      })
     .define_method("random_seed=",
       [](SatParameters& self, int32_t value) {
         self.set_random_seed(value);
