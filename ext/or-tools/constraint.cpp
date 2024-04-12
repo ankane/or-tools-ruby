@@ -351,6 +351,11 @@ void init_constraint(Rice::Module& m) {
         self.ClearAssumptions();
       })
     .define_method(
+      "export_to_file",
+      [](CpModelBuilder& self, const std::string& filename) {
+        return self.ExportToFile(filename);
+      })
+    .define_method(
       "to_s",
       [](CpModelBuilder& self) {
         std::string proto_string;

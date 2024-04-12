@@ -89,6 +89,17 @@ class ExpressionTest < Minitest::Test
     assert_equal true, solver.value(x)
   end
 
+  def test_export_to_file
+    model = ORTools::CpModel.new
+    x = model.new_int_var(0, 1, "x")
+
+    Dir.mktmpdir do |tmpdir|
+      assert_equal true, model.export_to_file("#{tmpdir}/model.txt")
+      assert_match "variables {", File.read("#{tmpdir}/model.txt")
+      assert_equal true, model.export_to_file("#{tmpdir}/model.bin")
+    end
+  end
+
   def test_to_s
     model = ORTools::CpModel.new
     x = model.new_int_var(0, 1, "x")

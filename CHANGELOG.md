@@ -1,6 +1,7 @@
 ## 0.12.0 (unreleased)
 
 - Updated OR-Tools to 9.9
+- Added `export_to_file` method to `CpModel`
 - Dropped binary installation for Ubuntu 20.04
 - Dropped support for Ruby < 3.1
 
