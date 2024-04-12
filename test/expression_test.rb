@@ -91,7 +91,7 @@ class ExpressionTest < Minitest::Test
 
   def test_export_to_file
     model = ORTools::CpModel.new
-    x = model.new_int_var(0, 1, "x")
+    model.new_int_var(0, 1, "x")
 
     Dir.mktmpdir do |tmpdir|
       assert_equal true, model.export_to_file("#{tmpdir}/model.txt")
