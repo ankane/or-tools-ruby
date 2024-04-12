@@ -160,6 +160,10 @@ void init_constraint(Rice::Module& m) {
     .define_method("cp_model_presolve=",
       [](SatParameters& self, bool value) {
         self.set_cp_model_presolve(value);
+      })
+    .define_method("random_seed=",
+      [](SatParameters& self, int32_t value) {
+        self.set_random_seed(value);
       });
 
   Rice::define_class_under<CpModelBuilder>(m, "CpModel")
