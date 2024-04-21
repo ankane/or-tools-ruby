@@ -9,7 +9,8 @@ jobs:
         include:
           - ruby: 3.3
             os: ubuntu-22.04
-          - ruby: 3.2
+          # TODO figure out issue with Ruby 3.2.3
+          - ruby: 3.2.2
             os: macos-14
           - ruby: 3.1
             os: macos-13
