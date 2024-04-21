@@ -2,7 +2,7 @@
 
 [OR-Tools](https://github.com/google/or-tools) - operations research tools - for Ruby
 
-[![Build Status](https://github.com/ankane/or-tools-ruby/workflows/build/badge.svg?branch=master)](https://github.com/ankane/or-tools-ruby/actions)
+[![Build Status](https://github.com/ankane/or-tools-ruby/actions/workflows/build.yml/badge.svg)](https://github.com/ankane/or-tools-ruby/actions)
 
 ## Installation
 
