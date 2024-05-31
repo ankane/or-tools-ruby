@@ -1,9 +1,10 @@
 ## 0.12.0 (unreleased)
 
-- Updated OR-Tools to 9.9
+- Updated OR-Tools to 9.10
 - Added `export_to_file` method to `CpModel`
 - Added `random_seed` and `random_seed=` methods to `SatParameters`
-- Dropped binary installation for Ubuntu 20.04
+- Added binary installation for Ubuntu 24.04
+- Dropped binary installation for Ubuntu 20.04 and Debian 11 ARM
 - Dropped support for Ruby < 3.1
 
 ## 0.11.1 (2023-12-04)
