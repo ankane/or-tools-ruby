@@ -445,12 +445,12 @@ void init_constraint(Rice::Module& m) {
       })
     .define_method(
       "_solution_integer_value",
-      [](Object self, CpSolverResponse& response, IntVar& x) {
+      [](Object self, const CpSolverResponse& response, IntVar x) {
         return SolutionIntegerValue(response, x);
       })
     .define_method(
       "_solution_boolean_value",
-      [](Object self, CpSolverResponse& response, BoolVar& x) {
+      [](Object self, const CpSolverResponse& response, BoolVar x) {
         return SolutionBooleanValue(response, x);
       });
 }
