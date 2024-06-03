@@ -1,4 +1,4 @@
-## 0.12.0 (unreleased)
+## 0.12.0 (2024-06-02)
 
 - Updated OR-Tools to 9.10
 - Added `export_to_file` method to `CpModel`
