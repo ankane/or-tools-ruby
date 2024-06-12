@@ -1,3 +1,7 @@
+## 0.12.1 (unreleased)
+
+- Removed dependency on `csv` gem
+
 ## 0.12.0 (2024-06-02)
 
 - Updated OR-Tools to 9.10

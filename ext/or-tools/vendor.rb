@@ -1,4 +1,3 @@
-require "csv"
 require "digest"
 require "fileutils"
 require "net/http"
@@ -23,7 +22,7 @@ else
   os_filename = File.exist?("/etc/os-release") ? "/etc/os-release" : "/usr/lib/os-release"
 
   # for safety, parse rather than source
-  os_info = CSV.read(os_filename, col_sep: "=").to_h rescue {}
+  os_info = File.readlines(os_filename, chomp: true).to_h { |v| v.split("=", 2) }.transform_values { |v| v.delete_prefix('"').delete_suffix('"') } rescue {}
 
   os = os_info["ID"]
   os_version = os_info["VERSION_ID"]
