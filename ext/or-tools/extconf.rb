@@ -19,7 +19,7 @@ else
 
   # make rpath relative
   # use double dollar sign and single quotes to escape properly
-  rpath_prefix = RbConfig::CONFIG["host_os"] =~ /darwin/ ? "@loader_path" : "$$ORIGIN"
+  rpath_prefix = RbConfig::CONFIG["host_os"].match?(/darwin/) ? "@loader_path" : "$$ORIGIN"
   rpath = "'#{rpath_prefix}/../../tmp/or-tools/lib'"
 end
 

@@ -7,7 +7,7 @@ module ORTools
     end
 
     def add_self_to_coeff_map_or_stack(coeffs, multiplier, stack)
-      @array.reverse.each do |arg|
+      @array.reverse_each do |arg|
         stack << [multiplier, arg]
       end
     end

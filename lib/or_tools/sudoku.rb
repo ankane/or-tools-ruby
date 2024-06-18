@@ -4,7 +4,7 @@ module ORTools
 
     def initialize(initial_grid, x: false, magic_square: false, anti_knight: false, anti_king: false, non_consecutive: false)
       raise ArgumentError, "Grid must be 9x9" unless initial_grid.size == 9 && initial_grid.all? { |r| r.size == 9 }
-      raise ArgumentError, "Grid must contain values between 0 and 9" unless initial_grid.flatten(1).all? { |v| (0..9).include?(v) }
+      raise ArgumentError, "Grid must contain values between 0 and 9" unless initial_grid.flatten(1).all? { |v| (0..9).cover?(v) }
 
       model = ORTools::CpModel.new
 

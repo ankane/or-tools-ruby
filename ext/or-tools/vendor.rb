@@ -6,9 +6,9 @@ require "tmpdir"
 version = "9.10.4067"
 
 arch = RbConfig::CONFIG["host_cpu"]
-arm = arch =~ /arm|aarch64/i
+arm = arch.match?(/arm|aarch64/i)
 
-if RbConfig::CONFIG["host_os"] =~ /darwin/i
+if RbConfig::CONFIG["host_os"].match?(/darwin/i)
   if arm
     filename = "or-tools_arm64_macOS-14.4.1_cpp_v#{version}.tar.gz"
     checksum = "5618bdaa2291ff27afa88e2352ad55cd0c4c6052184efb0f697de7b89d6b5ce2"
