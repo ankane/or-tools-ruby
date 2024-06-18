@@ -39,7 +39,7 @@ class SeatingTest < Minitest::Test
   def test_min_connections
     connections = [
       {people: ["A", "B", "C"], weight: 2},
-      {people: ["C", "D"], weight: 1},
+      {people: ["C", "D"], weight: 1}
     ]
     tables = [3, 3]
     seating = ORTools::Seating.new(connections: connections, tables: tables)

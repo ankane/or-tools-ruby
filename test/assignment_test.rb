@@ -154,7 +154,7 @@ class AssignmentTest < Minitest::Test
       [90, 76, 75, 70],
       [35, 85, 55, 65],
       [125, 95, 90, 105],
-      [45, 110, 95, 115],
+      [45, 110, 95, 115]
     ]
     num_workers = costs.length
     num_tasks = costs[0].length

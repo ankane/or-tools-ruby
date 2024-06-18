@@ -329,7 +329,7 @@ class RoutingTest < Minitest::Test
       [7, 8],
       [15, 11],
       [13, 12],
-      [16, 14],
+      [16, 14]
     ]
     data[:num_vehicles] = 4
     data[:depot] = 0
@@ -412,7 +412,7 @@ class RoutingTest < Minitest::Test
       [4, 8, 13, 9, 8, 7, 10, 3, 7, 4, 8, 3, 2, 0, 4, 5, 6],
       [5, 12, 9, 14, 12, 6, 6, 7, 3, 3, 4, 7, 6, 4, 0, 9, 2],
       [9, 10, 18, 6, 8, 12, 15, 8, 13, 9, 13, 3, 4, 5, 9, 0, 9],
-      [7, 14, 9, 16, 14, 8, 5, 10, 6, 5, 4, 10, 8, 6, 2, 9, 0],
+      [7, 14, 9, 16, 14, 8, 5, 10, 6, 5, 4, 10, 8, 6, 2, 9, 0]
     ]
     data[:time_windows] = [
       [0, 5],  # depot
@@ -431,7 +431,7 @@ class RoutingTest < Minitest::Test
       [5, 10],  # 13
       [7, 8],  # 14
       [10, 15],  # 15
-      [11, 15],  # 16
+      [11, 15]  # 16
     ]
     data[:num_vehicles] = 4
     data[:depot] = 0
@@ -539,7 +539,7 @@ class RoutingTest < Minitest::Test
       [5, 10],  # 13
       [7, 12],  # 14
       [10, 15],  # 15
-      [5, 15],  # 16
+      [5, 15]  # 16
     ]
     data[:num_vehicles] = 4
     data[:vehicle_load_time] = 5
