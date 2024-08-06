@@ -13,23 +13,18 @@ if inc || lib
   lib_dirs = lib.split(':')
   rpath = lib_dirs.join(':')
 
-  $INCFLAGS << " -I#{inc}"
-
-  lib_dirs.each do |lib_dir|
-    $LDFLAGS.prepend("-L#{lib_dir} ")
-  end
-
-  # Add rpath for all lib directories
-  $LDFLAGS.prepend("-Wl,-rpath,#{rpath} ")
-
-  # Check for libprotobuf.a in any of the lib directories
-  libprotobuf_found = lib_dirs.any? { |dir| File.exist?("#{dir}/libprotobuf.a") }
-  raise "libprotobuf.a not found" unless libprotobuf_found
-
-  # Add libprotobuf.a to LDFLAGS
-  $LDFLAGS << " #{lib_dirs.find { |dir| File.exist?("#{dir}/libprotobuf.a") }}/libprotobuf.a"
+  # Find the first lib directory containing libprotobuf.a
+  libprotobuf_dir = lib_dirs.find { |dir| File.exist?("#{dir}/libprotobuf.a") }
+  raise "libprotobuf.a not found" unless libprotobuf_dir
 
   raise "OR-Tools not found" unless have_library("ortools")
+
+  # -L flags for each lib directory
+  lib_dirs_flags = lib_dirs.map { |lib_dir| "-L#{lib_dir} " }.join
+
+  $INCFLAGS << " -I#{inc}"
+  ld_flags = "-Wl,-rpath,#{rpath} #{lib_dirs_flags} #{libprotobuf_dir}/libprotobuf.a "
+  $LDFLAGS.prepend(ld_flags)
 else
   # download
   require_relative "vendor"
