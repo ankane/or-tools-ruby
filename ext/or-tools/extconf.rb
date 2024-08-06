@@ -17,8 +17,6 @@ if inc || lib
   libprotobuf_dir = lib_dirs.find { |dir| File.exist?("#{dir}/libprotobuf.a") }
   raise "libprotobuf.a not found" unless libprotobuf_dir
 
-  raise "OR-Tools not found" unless have_library("ortools")
-
   # -L flags for each lib directory
   lib_dirs_flags = lib_dirs.map { |lib_dir| "-L#{lib_dir} " }.join
 
@@ -41,5 +39,5 @@ else
   $LDFLAGS.prepend("-Wl,-rpath,#{rpath} -L#{lib} #{lib}/libprotobuf.a ")
 end
 
-
+raise "OR-Tools not found" unless have_library("ortools")
 create_makefile("or_tools/ext")
