@@ -56,7 +56,7 @@ else
     # however, it's compiled with Visual Studio rather than MinGW (which RubyInstaller uses)
     raise <<~MSG
       Binary installation not available for this platform: #{platform}
-      OS: #{os}
+
       Build the OR-Tools C++ library from source, then run:
       bundle config build.or-tools --with-or-tools-dir=/path/to/or-tools
 
