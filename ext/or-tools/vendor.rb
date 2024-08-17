@@ -39,7 +39,7 @@ else
   elsif os == "centos" && os_version == "7" && !arm
     filename = "or-tools_amd64_centos-7_cpp_v#{version}.tar.gz"
     checksum = "537549145d259a1c1b10b0114bb3f417ca344b33643d51d5f3ee0dbaef9d1592"
-  elsif os == "arch" && !arm
+  elsif %w[arch manjaro].include?(os) && !arm
     filename = "or-tools_amd64_archlinux_cpp_v#{version}.tar.gz"
     checksum = "b29c4211648d7b075f1f684732d4a43eb03798923755496d83c082c4d83ff435"
   else
@@ -56,7 +56,7 @@ else
     # however, it's compiled with Visual Studio rather than MinGW (which RubyInstaller uses)
     raise <<~MSG
       Binary installation not available for this platform: #{platform}
-
+      OS: #{os}
       Build the OR-Tools C++ library from source, then run:
       bundle config build.or-tools --with-or-tools-dir=/path/to/or-tools
 
