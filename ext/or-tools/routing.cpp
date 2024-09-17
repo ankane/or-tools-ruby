@@ -309,7 +309,7 @@ void init_routing(Rice::Module& m) {
             return Rice::detail::From_Ruby<int64_t>().convert(callback.call("call", from_index));
           }
         );
-      })
+      }, Rice::Arg("callback").keepAlive())
     .define_method("register_transit_matrix", &RoutingModel::RegisterTransitMatrix)
     .define_method(
       "register_transit_callback",
@@ -319,7 +319,7 @@ void init_routing(Rice::Module& m) {
             return Rice::detail::From_Ruby<int64_t>().convert(callback.call("call", from_index, to_index));
           }
         );
-      })
+      }, Rice::Arg("callback").keepAlive())
     .define_method("add_dimension", &RoutingModel::AddDimension)
     .define_method("add_dimension_with_vehicle_transits", &RoutingModel::AddDimensionWithVehicleTransits)
     .define_method("add_dimension_with_vehicle_capacity", &RoutingModel::AddDimensionWithVehicleCapacity)
