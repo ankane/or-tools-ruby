@@ -1,4 +1,4 @@
-## 0.13.0 (unreleased)
+## 0.13.0 (2024-09-17)
 
 - Updated OR-Tools to 9.11
 - Restored binary installation for Ubuntu 20.04
