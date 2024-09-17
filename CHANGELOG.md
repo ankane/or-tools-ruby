@@ -1,5 +1,8 @@
-## 0.12.1 (unreleased)
+## 0.13.0 (unreleased)
 
+- Updated OR-Tools to 9.11
+- Restored binary installation for Ubuntu 20.04
+- Dropped binary installation for CentOS 7
 - Removed dependency on `csv` gem
 
 ## 0.12.0 (2024-06-02)
