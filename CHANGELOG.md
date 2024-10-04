@@ -1,3 +1,7 @@
+## 0.13.1 (unreleased)
+
+- Added binary installation for Debian 12
+
 ## 0.13.0 (2024-09-17)
 
 - Updated OR-Tools to 9.11
