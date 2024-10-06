@@ -21,4 +21,16 @@ class MathOptTest < Minitest::Test
       y: 1.0
     EOS
   end
+
+  def test_minimize
+    model = ORTools::MathOpt::Model.new("getting_started_lp")
+    x = model.add_variable(-1.0, 1.5, "x")
+    y = model.add_variable(0.0, 1.0, "y")
+    model.add_linear_constraint(x + y <= 1.5)
+    model.minimize(x + 2 * y)
+
+    result = model.solve
+
+    assert_equal -1, result.objective_value
+  end
 end
