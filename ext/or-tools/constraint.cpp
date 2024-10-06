@@ -418,6 +418,7 @@ void init_constraint(Rice::Module& m) {
         Model m;
 
         std::atomic<bool> stopped(false);
+        std::atomic<bool>* stopped2 = &stopped;
 
         if (!callback.is_nil()) {
           // TODO figure out how to use callback with multiple cores
@@ -434,7 +435,7 @@ void init_constraint(Rice::Module& m) {
               // TODO find a better way to do this
               callback.call("response=", r);
               callback.call("on_solution_callback");
-              stopped = callback.attr_get("@stopped");
+              *stopped2 = callback.attr_get("@stopped");
             })
           );
         }
