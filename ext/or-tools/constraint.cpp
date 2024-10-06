@@ -424,7 +424,7 @@ void init_constraint(Rice::Module& m) {
           // TODO figure out how to use callback with multiple cores
           parameters.set_num_search_workers(1);
 
-          m.GetOrCreate<TimeLimit>()->RegisterExternalBooleanAsLimit(&stopped);
+          m.GetOrCreate<TimeLimit>()->RegisterExternalBooleanAsLimit(stopped2);
 
           m.Add(NewFeasibleSolutionObserver(
             [&](const CpSolverResponse& r) {
