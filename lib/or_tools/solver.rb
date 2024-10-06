@@ -7,21 +7,17 @@ module ORTools
     def add(expr)
       left, op, const = Utils.index_constraint(expr)
 
-      case op
-      when :<=
-        lb = -infinity
-        ub = const
-      when :>=
-        lb = const
-        ub = infinity
-      when :==
-        lb = const
-        ub = const
-      else
-        raise "todo: #{op}"
-      end
-
-      constraint = constraint(lb, ub)
+      constraint =
+        case op
+        when :<=
+          self.constraint(-infinity, const)
+        when :>=
+          self.constraint(const, infinity)
+        when :==
+          self.constraint(const, const)
+        else
+          raise "todo: #{op}"
+        end
       left.each do |var, c|
         constraint.set_coefficient(var, c)
       end
