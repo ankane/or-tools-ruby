@@ -23,7 +23,6 @@ require_relative "or_tools/mp_variable"
 require_relative "or_tools/linear_constraint"
 require_relative "or_tools/product_cst"
 require_relative "or_tools/solver"
-require_relative "or_tools/sum_array"
 
 # routing
 require_relative "or_tools/int_var"

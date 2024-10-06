@@ -1,7 +1,7 @@
 module ORTools
   class Solver
     def sum(arr)
-      SumArray.new(arr)
+      LinearExpr.new(arr)
     end
 
     def add(expr)

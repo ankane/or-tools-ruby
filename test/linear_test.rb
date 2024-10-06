@@ -64,7 +64,7 @@ class LinearTest < Minitest::Test
     x = solver.num_var(0, solver.infinity, "x")
 
     assert_equal "#<ORTools::MPVariable x>", x.inspect
-    assert_equal "#<ORTools::SumArray x + 1>", (x + 1).inspect
+    assert_equal "#<ORTools::LinearExpr x + 1>", (x + 1).inspect
     assert_equal "#<ORTools::LinearExpr (empty)>", ORTools::LinearExpr.new.inspect
     assert_equal "#<ORTools::LinearConstraint x + 1 == 1>", (x + 1 == 1).inspect
   end
