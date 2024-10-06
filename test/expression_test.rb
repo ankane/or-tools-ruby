@@ -111,7 +111,7 @@ class ExpressionTest < Minitest::Test
     assert_match "variables", output
     assert_match "constraints", output
 
-    # TODO
+    # TODO match output (out of order)
     # assert_equal File.binread("test/support/proto.txt"), output
 
     assert_equal "x", x.to_s
