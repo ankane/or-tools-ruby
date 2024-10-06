@@ -55,6 +55,11 @@ void init_math_opt(Rice::Module& m) {
       [](Model& self, LinearConstraint constraint, double upper_bound) {
         self.set_upper_bound(constraint, upper_bound);
       })
+    .define_method(
+      "_set_lower_bound",
+      [](Model& self, LinearConstraint constraint, double upper_bound) {
+        self.set_lower_bound(constraint, upper_bound);
+      })
     .define_method("_set_coefficient", &Model::set_coefficient)
     .define_method(
       "_set_objective_coefficient",

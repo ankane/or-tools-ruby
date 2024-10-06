@@ -11,6 +11,11 @@ module ORTools
         case op
         when :<=
           _set_upper_bound(constraint, const)
+        when :>=
+          _set_lower_bound(constraint, const)
+        when :==
+          _set_lower_bound(constraint, const)
+          _set_upper_bound(constraint, const)
         else
           raise "todo: #{op}"
         end
