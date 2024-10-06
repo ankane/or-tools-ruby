@@ -59,7 +59,15 @@ void init_linear(Rice::Module& m) {
     .define_method("set_minimization", &MPObjective::SetMinimization);
 
   Rice::define_class_under<MPSolver>(m, "Solver")
-    .define_constructor(Rice::Constructor<MPSolver, std::string, MPSolver::OptimizationProblemType>())
+    .define_singleton_function(
+      "_new",
+      [](const std::string& name, MPSolver::OptimizationProblemType problem_type) {
+        std::unique_ptr<MPSolver> solver(new MPSolver(name, problem_type));
+        if (!solver) {
+          throw std::runtime_error("Unrecognized solver type");
+        }
+        return solver;
+      })
     .define_singleton_function(
       "_create",
       [](const std::string& solver_id) {

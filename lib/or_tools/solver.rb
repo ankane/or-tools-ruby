@@ -30,16 +30,12 @@ module ORTools
       end
     end
 
-    # hack to work with Rice constructor
-    m = Module.new do
-      def new(solver_id, *args)
-        if args.empty?
-          _create(solver_id)
-        else
-          super
-        end
+    def self.new(solver_id, *args)
+      if args.empty?
+        _create(solver_id)
+      else
+        _new(solver_id, *args)
       end
     end
-    singleton_class.prepend(m)
   end
 end
