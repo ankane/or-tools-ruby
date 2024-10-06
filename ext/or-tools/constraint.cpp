@@ -426,9 +426,12 @@ void init_constraint(Rice::Module& m) {
       [](Object self, CpModelBuilder& model, SatParameters& parameters, Object callback) {
         Model m;
 
+        auto model_proto = model.Build();
+
         std::atomic<bool> stopped(false);
 
-        parameters.set_num_search_workers(1);
+        parameters.set_num_search_workers(0);
+        parameters.set_num_workers(0);
         m.Add(NewSatParameters(parameters));
         m.GetOrCreate<TimeLimit>()->RegisterExternalBooleanAsLimit(&stopped);
 
@@ -446,7 +449,7 @@ void init_constraint(Rice::Module& m) {
           );
         }
 
-        return SolveCpModel(model.Build(), &m);
+        return SolveCpModel(model_proto, &m);
       })
     .define_method(
       "_solution_integer_value",
