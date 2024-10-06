@@ -9,9 +9,13 @@ class Minitest::Test
   def setup
     @output = StringIO.new("")
     @output_checked = false
+
+    GC.stress = true if stress?
   end
 
   def teardown
+    GC.stress = false if stress?
+
     if !@output.string.empty? && !@output_checked
       warn "#{self.class.name}##{name}: Captured output. Use VERBOSE=1 to show."
     end
@@ -26,5 +30,9 @@ class Minitest::Test
   def assert_output(expected)
     assert_equal expected, @output.string
     @output_checked = true
+  end
+
+  def stress?
+    ENV["STRESS"]
   end
 end
