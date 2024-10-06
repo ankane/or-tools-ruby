@@ -2,8 +2,11 @@ require "mkmf-rice"
 
 $CXXFLAGS << " -std=c++17 $(optflags) -DUSE_CBC"
 
-# or-tools warnings
-$CXXFLAGS << " -Wno-sign-compare -Wno-shorten-64-to-32 -Wno-ignored-qualifiers"
+# show warnings
+$CXXFLAGS << " -Wall -Wextra"
+
+# hide or-tools warnings
+$CXXFLAGS << " -Wno-sign-compare -Wno-shorten-64-to-32 -Wno-ignored-qualifiers -Wno-unused-parameter -Wno-missing-field-initializers"
 
 inc, lib = dir_config("or-tools")
 if inc || lib
