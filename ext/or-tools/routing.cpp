@@ -213,7 +213,6 @@ void init_routing(Rice::Module& m) {
 
   Rice::define_class_under<RoutingDimension>(m, "RoutingDimension")
     .define_method("transit_value", &RoutingDimension::GetTransitValue)
-    // TODO GetTransitValueFromClass
     .define_method("cumul_var", &RoutingDimension::CumulVar)
     .define_method("transit_var", &RoutingDimension::TransitVar)
     .define_method("fixed_transit_var", &RoutingDimension::FixedTransitVar)
@@ -338,13 +337,8 @@ void init_routing(Rice::Module& m) {
     .define_method("add_constant_dimension", &RoutingModel::AddConstantDimension)
     .define_method("add_vector_dimension", &RoutingModel::AddVectorDimension)
     .define_method("add_matrix_dimension", &RoutingModel::AddMatrixDimension)
-    // TODO AddDimensionDependentDimensionWithVehicleCapacity
-    // .define_method("make_path_spans_and_total_slacks", &RoutingModel::MakePathSpansAndTotalSlacks)
     .define_method("all_dimension_names", &RoutingModel::GetAllDimensionNames)
-    // .define_method("dimensions", &RoutingModel::GetDimensions)
-    // .define_method("dimensions_with_soft_or_span_costs", &RoutingModel::GetDimensionsWithSoftOrSpanCosts)
     .define_method("dimension?", &RoutingModel::HasDimension)
-    // .define_method("dimension_or_die", &RoutingModel::GetDimensionOrDie)
     .define_method("mutable_dimension", &RoutingModel::GetMutableDimension)
     .define_method("set_primary_constrained_dimension", &RoutingModel::SetPrimaryConstrainedDimension)
     .define_method("primary_constrained_dimension", &RoutingModel::GetPrimaryConstrainedDimension)
@@ -383,9 +377,6 @@ void init_routing(Rice::Module& m) {
         }
         return positions;
       })
-    // TODO SetPickupAndDeliveryPolicyOfAllVehicles
-    // TODO SetPickupAndDeliveryPolicyOfVehicle
-    // TODO GetPickupAndDeliveryPolicyOfVehicle
     .define_method("num_of_singleton_nodes", &RoutingModel::GetNumOfSingletonNodes)
     .define_method("unperformed_penalty", &RoutingModel::UnperformedPenalty)
     .define_method("unperformed_penalty_or_value", &RoutingModel::UnperformedPenaltyOrValue)
@@ -454,8 +445,6 @@ void init_routing(Rice::Module& m) {
     .define_method("compact_and_check_assignment", &RoutingModel::CompactAndCheckAssignment)
     .define_method("add_to_assignment", &RoutingModel::AddToAssignment)
     .define_method("add_interval_to_assignment", &RoutingModel::AddIntervalToAssignment)
-    // TODO PackCumulsOfOptimizerDimensionsFromAssignment
-    // TODO AddLocalSearchFilter
     .define_method("start", &RoutingModel::Start)
     .define_method("end", &RoutingModel::End)
     .define_method("start?", &RoutingModel::IsStart)
