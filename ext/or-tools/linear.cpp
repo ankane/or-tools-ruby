@@ -47,10 +47,7 @@ namespace Rice::detail
 void init_linear(Rice::Module& m) {
   Rice::define_class_under<LinearRange>(m, "LinearRange");
 
-  auto rb_cLinearExpr = Rice::define_class_under<LinearExpr>(m, "LinearExpr");
-  rb_cLinearExpr.define_constructor(Rice::Constructor<LinearExpr>());
-
-  Rice::define_class_under<MPVariable, LinearExpr>(m, "MPVariable")
+  Rice::define_class_under<MPVariable>(m, "MPVariable")
     .define_method("name", &MPVariable::name)
     .define_method("solution_value", &MPVariable::solution_value);
 

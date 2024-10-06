@@ -1,5 +1,5 @@
 module ORTools
-  class LinearExpr
+  module LinearExprMethods
     def solution_value
       coeffs.sum { |var, coeff| var.solution_value * coeff }
     end
@@ -81,5 +81,9 @@ module ORTools
         raise TypeError, "#{self.class} can't be coerced into #{other.class}"
       end
     end
+  end
+
+  class LinearExpr
+    include LinearExprMethods
   end
 end
