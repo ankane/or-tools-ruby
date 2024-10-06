@@ -448,7 +448,13 @@ void init_constraint(Rice::Module& m) {
         }
 
         m.Add(NewSatParameters(parameters));
-        return SolveCpModel(model.Build(), &m);
+        auto response = SolveCpModel(model.Build(), &m);
+
+        if (!callback.is_nil()) {
+          m.GetOrCreate<TimeLimit>()->RegisterExternalBooleanAsLimit(nullptr);
+        }
+
+        return response;
       })
     .define_method(
       "_solution_integer_value",
