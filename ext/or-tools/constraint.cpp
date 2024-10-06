@@ -427,11 +427,12 @@ void init_constraint(Rice::Module& m) {
         Model m;
 
         std::atomic<bool> stopped(false);
-        m.GetOrCreate<TimeLimit>()->RegisterExternalBooleanAsLimit(&stopped);
 
         if (!callback.is_nil()) {
           // TODO figure out how to use callback with multiple cores
           parameters.set_num_search_workers(1);
+
+          m.GetOrCreate<TimeLimit>()->RegisterExternalBooleanAsLimit(&stopped);
 
           m.Add(NewFeasibleSolutionObserver(
             [&](const CpSolverResponse& r) {
