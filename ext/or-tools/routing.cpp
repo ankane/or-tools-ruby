@@ -304,8 +304,13 @@ void init_routing(Rice::Module& m) {
     .define_method(
       "register_unary_transit_callback",
       [](RoutingModel& self, Object callback) {
+        // TODO guard callback?
         return self.RegisterUnaryTransitCallback(
           [callback](int64_t from_index) -> int64_t {
+            if (!ruby_native_thread_p()) {
+              throw std::runtime_error("Non-Ruby thread");
+            }
+
             return Rice::detail::From_Ruby<int64_t>().convert(callback.call("call", from_index));
           }
         );
@@ -314,8 +319,13 @@ void init_routing(Rice::Module& m) {
     .define_method(
       "register_transit_callback",
       [](RoutingModel& self, Object callback) {
+        // TODO guard callback?
         return self.RegisterTransitCallback(
           [callback](int64_t from_index, int64_t to_index) -> int64_t {
+            if (!ruby_native_thread_p()) {
+              throw std::runtime_error("Non-Ruby thread");
+            }
+
             return Rice::detail::From_Ruby<int64_t>().convert(callback.call("call", from_index, to_index));
           }
         );

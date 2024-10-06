@@ -421,12 +421,13 @@ void init_constraint(Rice::Module& m) {
 
           m.Add(NewFeasibleSolutionObserver(
             [&callback](const CpSolverResponse& r) {
-              // ensure Ruby thread
-              if (ruby_native_thread_p()) {
-                // TODO find a better way to do this
-                callback.call("response=", r);
-                callback.call("on_solution_callback");
+              if (!ruby_native_thread_p()) {
+                throw std::runtime_error("Non-Ruby thread");
               }
+
+              // TODO find a better way to do this
+              callback.call("response=", r);
+              callback.call("on_solution_callback");
             })
           );
         }
