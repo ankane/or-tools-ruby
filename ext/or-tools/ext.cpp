@@ -10,6 +10,7 @@ void init_assignment(Rice::Module& m);
 void init_bin_packing(Rice::Module& m);
 void init_constraint(Rice::Module& m);
 void init_linear(Rice::Module& m);
+void init_math_opt(Rice::Module& m);
 void init_network_flows(Rice::Module& m);
 void init_routing(Rice::Module& m);
 
@@ -24,6 +25,7 @@ void Init_ext()
   init_bin_packing(m);
   init_constraint(m);
   init_linear(m);
+  init_math_opt(m);
   init_network_flows(m);
   init_routing(m);
 
