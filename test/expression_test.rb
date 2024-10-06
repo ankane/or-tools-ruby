@@ -30,8 +30,7 @@ class ExpressionTest < Minitest::Test
     x = model.new_int_var(-7, 7, "x")
     y = model.new_int_var(0, 7, "y")
     model.add_max_equality(y, [x, model.new_constant(0)])
-    # TODO support
-    # model.add_max_equality(y, [x, 0])
+    model.add_max_equality(y, [x, 0])
 
     solver = ORTools::CpSolver.new
     assert_equal :optimal, solver.solve(model)
