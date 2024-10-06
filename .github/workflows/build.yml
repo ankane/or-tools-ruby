@@ -9,10 +9,6 @@ jobs:
         include:
           - ruby: 3.3
             os: ubuntu-22.04
-          - ruby: 3.2
-            os: macos-14
-          - ruby: 3.1
-            os: macos-13
     steps:
       - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
@@ -20,4 +16,5 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
       - run: bundle exec rake compile
-      - run: bundle exec rake test
+      - run: sudo apt-get update && sudo apt-get install valgrind
+      - run: bundle exec rake test:valgrind
