@@ -73,6 +73,11 @@ void init_math_opt(Rice::Module& m) {
         self.set_maximize();
       })
     .define_method(
+      "_set_minimize",
+      [](Model& self) {
+        self.set_minimize();
+      })
+    .define_method(
       "_solve",
       [](Model& self) {
         SolveArguments args;

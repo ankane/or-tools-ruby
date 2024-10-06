@@ -22,6 +22,11 @@ module ORTools
         _set_maximize
       end
 
+      def minimize(objective)
+        set_objective(objective)
+        _set_minimize
+      end
+
       def solve
         _solve
       end
