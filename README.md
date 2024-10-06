@@ -23,6 +23,10 @@ Higher Level Interfaces
 - [Traveling Salesperson Problem (TSP)](#traveling-salesperson-problem-tsp)
 - [Sudoku](#sudoku)
 
+MathOpt [unreleased]
+
+- [Basic example](#basic-example)
+
 Linear Optimization
 
 - [Solving an LP Problem](#solving-an-lp-problem)
@@ -309,6 +313,29 @@ grid = [
 ]
 sudoku = ORTools::Sudoku.new(grid, x: true, anti_knight: true, magic_square: true)
 sudoku.solution
+```
+
+## MathOpt
+
+### Basic Example
+
+[Guide](https://developers.google.com/optimization/math_opt/basic_example)
+
+```ruby
+# build the model
+model = ORTools::MathOpt::Model.new("getting_started_lp")
+x = model.add_variable(-1.0, 1.5, "x")
+y = model.add_variable(0.0, 1.0, "y")
+model.add_linear_constraint(x + y <= 1.5)
+model.maximize(x + 2 * y)
+
+# solve
+result = model.solve
+
+# inspect the solution
+puts "Objective value: #{result.objective_value}"
+puts "x: #{result.variable_values[x]}"
+puts "y: #{result.variable_values[y]}"
 ```
 
 ## Linear Optimization
