@@ -1,4 +1,4 @@
-## 0.13.1 (unreleased)
+## 0.13.1 (2024-10-05)
 
 - Added binary installation for Debian 12
 
