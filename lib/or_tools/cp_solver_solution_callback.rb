@@ -16,5 +16,9 @@ module ORTools
     def objective_value
       @response.objective_value
     end
+
+    def stop_search
+      @stopped = true
+    end
   end
 end
