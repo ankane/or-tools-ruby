@@ -242,8 +242,7 @@ class ConstraintTest < Minitest::Test
     x = model.new_int_var(lower_bound, upper_bound, "x")
 
     assert_equal lower_bound, x.domain.min
-    # TODO figure out segfault on Mac ARM
-    # assert_equal upper_bound, x.domain.max
+    assert_equal upper_bound, x.domain.max
   end
 
   def test_sum_empty_true
