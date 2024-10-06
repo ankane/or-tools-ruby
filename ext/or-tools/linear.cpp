@@ -2,8 +2,6 @@
 
 #include "ext.h"
 
-using operations_research::LinearExpr;
-using operations_research::LinearRange;
 using operations_research::MPConstraint;
 using operations_research::MPObjective;
 using operations_research::MPSolver;
@@ -45,8 +43,6 @@ namespace Rice::detail
 }
 
 void init_linear(Rice::Module& m) {
-  Rice::define_class_under<LinearRange>(m, "LinearRange");
-
   Rice::define_class_under<MPVariable>(m, "MPVariable")
     .define_method("name", &MPVariable::name)
     .define_method("solution_value", &MPVariable::solution_value);
