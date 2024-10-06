@@ -64,9 +64,9 @@ class MathOptTest < Minitest::Test
     assert_equal 1, result.variable_values[y]
   end
 
-  def test_basic
+  def test_non_integer_solver
     model = ORTools::MathOpt::Model.new("getting_started_lp")
-    x = model.add_integer_variable(-1.0, 1.5, "x")
+    model.add_integer_variable(-1.0, 1.5, "x")
 
     error = assert_raises do
       model.solve(:glop)
