@@ -116,6 +116,12 @@ void init_math_opt(Rice::Module& m) {
       "_solve",
       [](Model& self, SolverType solver_type) {
         SolveArguments args;
-        return *Solve(self, solver_type, args);
+        auto result = Solve(self, solver_type, args);
+
+        if (!result.ok()) {
+          throw std::runtime_error(std::string{result.status().message()});
+        }
+
+        return *result;
       });
 }
