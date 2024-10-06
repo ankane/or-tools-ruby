@@ -428,12 +428,11 @@ void init_constraint(Rice::Module& m) {
 
         std::atomic<bool> stopped(false);
 
+        parameters.set_num_search_workers(1);
+        m.Add(NewSatParameters(parameters));
+        m.GetOrCreate<TimeLimit>()->RegisterExternalBooleanAsLimit(&stopped);
+
         if (!callback.is_nil()) {
-          // TODO figure out how to use callback with multiple cores
-          parameters.set_num_search_workers(1);
-
-          m.GetOrCreate<TimeLimit>()->RegisterExternalBooleanAsLimit(&stopped);
-
           m.Add(NewFeasibleSolutionObserver(
             [&](const CpSolverResponse& r) {
               // ensure Ruby thread
@@ -447,14 +446,7 @@ void init_constraint(Rice::Module& m) {
           );
         }
 
-        m.Add(NewSatParameters(parameters));
-        auto response = SolveCpModel(model.Build(), &m);
-
-        if (!callback.is_nil()) {
-          m.GetOrCreate<TimeLimit>()->RegisterExternalBooleanAsLimit(nullptr);
-        }
-
-        return response;
+        return SolveCpModel(model.Build(), &m);
       })
     .define_method(
       "_solution_integer_value",
