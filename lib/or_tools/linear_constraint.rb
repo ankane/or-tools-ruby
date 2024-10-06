@@ -28,23 +28,16 @@ module ORTools
       "#<#{self.class.name} #{to_s}>"
     end
 
-    def extract(solver)
+    def extract
       coeffs = @expr.coeffs
       constant = coeffs.delete(OFFSET_KEY) || 0.0
-      lb = -solver.infinity
-      ub = solver.infinity
       if @lb > -Float::INFINITY
         lb = @lb - constant
       end
       if @ub < Float::INFINITY
         ub = @ub - constant
       end
-
-      constraint = solver.constraint(lb, ub)
-      coeffs.each do |v, c|
-        constraint.set_coefficient(v, c.to_f)
-      end
-      constraint
+      [coeffs, lb, ub]
     end
   end
 end

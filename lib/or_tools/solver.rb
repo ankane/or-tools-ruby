@@ -5,7 +5,13 @@ module ORTools
     end
 
     def add(expr)
-      expr.extract(self)
+      coeffs, lb, ub = expr.extract
+
+      constraint = self.constraint(lb || -infinity, ub || infinity)
+      coeffs.each do |v, c|
+        constraint.set_coefficient(v, c.to_f)
+      end
+      constraint
     end
 
     def maximize(expr)
@@ -21,9 +27,10 @@ module ORTools
     private
 
     def set_objective(expr)
-      objective.clear
       coeffs = expr.coeffs
       offset = coeffs.delete(OFFSET_KEY)
+
+      objective.clear
       objective.set_offset(offset) if offset
       coeffs.each do |v, c|
         objective.set_coefficient(v, c)
