@@ -11,6 +11,8 @@ using operations_research::math_opt::Solve;
 using operations_research::math_opt::SolveArguments;
 using operations_research::math_opt::SolveResult;
 using operations_research::math_opt::SolverType;
+using operations_research::math_opt::Termination;
+using operations_research::math_opt::TerminationReason;
 using operations_research::math_opt::Variable;
 
 namespace Rice::detail
@@ -54,7 +56,41 @@ void init_math_opt(Rice::Module& m) {
 
   Rice::define_class_under<LinearConstraint>(mathopt, "LinearConstraint");
 
+  Rice::define_class_under<Termination>(mathopt, "Termination")
+    .define_method(
+      "reason",
+      [](Termination& self) {
+        auto reason = self.reason;
+
+        if (reason == TerminationReason::kOptimal) {
+          return Rice::Symbol("optimal");
+        } else if (reason == TerminationReason::kInfeasible) {
+          return Rice::Symbol("infeasible");
+        } else if (reason == TerminationReason::kUnbounded) {
+          return Rice::Symbol("unbounded");
+        } else if (reason == TerminationReason::kInfeasibleOrUnbounded) {
+          return Rice::Symbol("infeasible_or_unbounded");
+        } else if (reason == TerminationReason::kImprecise) {
+          return Rice::Symbol("imprecise");
+        } else if (reason == TerminationReason::kFeasible) {
+          return Rice::Symbol("feasible");
+        } else if (reason == TerminationReason::kNoSolutionFound) {
+          return Rice::Symbol("no_solution_found");
+        } else if (reason == TerminationReason::kNumericalError) {
+          return Rice::Symbol("numerical_error");
+        } else if (reason == TerminationReason::kOtherError) {
+          return Rice::Symbol("other");
+        } else {
+          throw std::runtime_error("Unknown termination reason");
+        }
+      });
+
   Rice::define_class_under<SolveResult>(mathopt, "SolveResult")
+    .define_method(
+      "termination",
+      [](SolveResult& self) {
+        return self.termination;
+      })
     .define_method(
       "objective_value",
       [](SolveResult& self) {
@@ -119,7 +155,7 @@ void init_math_opt(Rice::Module& m) {
         auto result = Solve(self, solver_type, args);
 
         if (!result.ok()) {
-          throw std::runtime_error(std::string{result.status().message()});
+          throw std::invalid_argument(std::string{result.status().message()});
         }
 
         return *result;

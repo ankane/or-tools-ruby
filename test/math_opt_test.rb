@@ -10,6 +10,7 @@ class MathOptTest < Minitest::Test
     model.maximize(x + 2 * y)
 
     result = model.solve
+    assert_equal :optimal, result.termination.reason
 
     puts "Objective value: #{result.objective_value}"
     puts "x: #{result.variable_values[x]}"
@@ -68,7 +69,7 @@ class MathOptTest < Minitest::Test
     model = ORTools::MathOpt::Model.new("getting_started_lp")
     model.add_integer_variable(-1.0, 1.5, "x")
 
-    error = assert_raises do
+    error = assert_raises(ArgumentError) do
       model.solve(:glop)
     end
     assert_equal "Glop does not support integer variables", error.message
