@@ -104,10 +104,4 @@ class SudokuTest < Minitest::Test
     sudoku = ORTools::Sudoku.new(grid, x: true, anti_knight: true, magic_square: true)
     assert_equal expected, sudoku.solution
   end
-
-  # TODO add method for retrieving all solutions
-  # def test_multiple_solutions
-  #   grid = 9.times.map { 9.times.map { 0 } }
-  #   ORTools::Sudoku.new(grid)
-  # end
 end
