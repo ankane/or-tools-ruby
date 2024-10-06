@@ -35,4 +35,32 @@ class MathOptTest < Minitest::Test
     assert_equal 0.5, result.variable_values[x]
     assert_equal 0, result.variable_values[y]
   end
+
+  def test_integer_variable
+    model = ORTools::MathOpt::Model.new("getting_started_lp")
+    x = model.add_integer_variable(1, 3, "x")
+    y = model.add_integer_variable(0, 5, "y")
+    model.add_linear_constraint(x + y >= 0)
+    model.maximize(x + 2 * y)
+
+    result = model.solve(:cpsat)
+
+    assert_equal 13, result.objective_value
+    assert_equal 3, result.variable_values[x]
+    assert_equal 5, result.variable_values[y]
+  end
+
+  def test_binary_variable
+    model = ORTools::MathOpt::Model.new("getting_started_lp")
+    x = model.add_binary_variable("x")
+    y = model.add_binary_variable("y")
+    model.add_linear_constraint(x + y >= 0)
+    model.maximize(x + 2 * y)
+
+    result = model.solve(:cpsat)
+
+    assert_equal 3, result.objective_value
+    assert_equal 1, result.variable_values[x]
+    assert_equal 1, result.variable_values[y]
+  end
 end

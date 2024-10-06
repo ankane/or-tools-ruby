@@ -13,6 +13,34 @@ using operations_research::math_opt::SolveResult;
 using operations_research::math_opt::SolverType;
 using operations_research::math_opt::Variable;
 
+namespace Rice::detail
+{
+  template<>
+  struct Type<SolverType>
+  {
+    static bool verify()
+    {
+      return true;
+    }
+  };
+
+  template<>
+  struct From_Ruby<SolverType>
+  {
+    static SolverType convert(VALUE x)
+    {
+      auto s = Symbol(x).str();
+      if (s == "glop") {
+        return SolverType::kGlop;
+      } else if (s == "cpsat") {
+        return SolverType::kCpSat;
+      } else {
+        throw std::runtime_error("Unknown solver type: " + s);
+      }
+    }
+  };
+}
+
 void init_math_opt(Rice::Module& m) {
   auto mathopt = Rice::define_module_under(m, "MathOpt");
 
@@ -45,6 +73,8 @@ void init_math_opt(Rice::Module& m) {
   Rice::define_class_under<Model>(mathopt, "Model")
     .define_constructor(Rice::Constructor<Model, std::string>())
     .define_method("add_variable", &Model::AddContinuousVariable)
+    .define_method("add_integer_variable", &Model::AddIntegerVariable)
+    .define_method("add_binary_variable", &Model::AddBinaryVariable)
     .define_method(
       "_add_linear_constraint",
       [](Model& self) {
@@ -84,8 +114,8 @@ void init_math_opt(Rice::Module& m) {
       })
     .define_method(
       "_solve",
-      [](Model& self) {
+      [](Model& self, SolverType solver_type) {
         SolveArguments args;
-        return *Solve(self, SolverType::kGlop, args);
+        return *Solve(self, solver_type, args);
       });
 }

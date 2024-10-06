@@ -32,8 +32,9 @@ module ORTools
         _set_minimize
       end
 
-      def solve
-        _solve
+      # TODO change default for MIP
+      def solve(solver_type = :glop)
+        _solve(solver_type)
       end
 
       private
