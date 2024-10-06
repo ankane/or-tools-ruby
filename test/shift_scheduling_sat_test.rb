@@ -200,7 +200,7 @@ class ShiftSchedulingSatTest < Minitest::Test
 
     # Solve the model.
     solver = ORTools::CpSolver.new
-    solver.parameters.max_time_in_seconds = 1
+    solver.parameters.max_time_in_seconds = 300
     # solution_printer = ORTools::ObjectiveSolutionPrinter.new
     # status = solver.solve_with_solution_callback(model, solution_printer)
     status = solver.solve(model)
