@@ -44,32 +44,23 @@ namespace Rice::detail
   public:
     LinearExpr convert(VALUE v)
     {
-      Object x(v);
       LinearExpr expr;
 
-      if (x.respond_to("to_i")) {
-        expr = From_Ruby<int64_t>().convert(x.call("to_i").value());
-      } else if (x.respond_to("vars")) {
-        Array vars = x.call("vars");
-        for (const auto& v : vars) {
-          // TODO clean up
-          auto cvar = (Array) v;
-          Object var = cvar[0];
-          auto coeff = From_Ruby<int64_t>().convert(cvar[1].value());
+      Rice::Object utils = Rice::define_module("ORTools").const_get("Utils");
 
-          if (var.is_a(rb_cBoolVar)) {
-            expr += From_Ruby<BoolVar>().convert(var.value()) * coeff;
-          } else if (var.is_a(rb_cInteger)) {
-            expr += From_Ruby<int64_t>().convert(var.value()) * coeff;
-          } else {
-            expr += From_Ruby<IntVar>().convert(var.value()) * coeff;
-          }
-        }
-      } else {
-        if (x.is_a(rb_cBoolVar)) {
-          expr = From_Ruby<BoolVar>().convert(x.value());
+      Object x(v);
+      Rice::Hash coeffs = utils.call("index_expression", x);
+
+      for (const auto& entry : coeffs) {
+        Object var = entry.key;
+        auto coeff = From_Ruby<int64_t>().convert(entry.value.value());
+
+        if (var.is_nil()) {
+          expr += coeff;
+        } else if (var.is_a(rb_cBoolVar)) {
+          expr += From_Ruby<BoolVar>().convert(var.value()) * coeff;
         } else {
-          expr = From_Ruby<IntVar>().convert(x.value());
+          expr += From_Ruby<IntVar>().convert(var.value()) * coeff;
         }
       }
 

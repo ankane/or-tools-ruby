@@ -247,7 +247,7 @@ void init_routing(Rice::Module& m) {
         if (o.respond_to("left")) {
           operations_research::IntExpr* left(Rice::detail::From_Ruby<operations_research::IntVar*>().convert(o.call("left")));
           operations_research::IntExpr* right(Rice::detail::From_Ruby<operations_research::IntVar*>().convert(o.call("right")));
-          auto op = o.call("operator").to_s().str();
+          auto op = o.call("op").to_s().str();
           if (op == "==") {
             constraint = self.MakeEquality(left, right);
           } else if (op == "<=") {

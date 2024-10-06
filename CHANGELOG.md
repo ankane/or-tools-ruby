@@ -1,3 +1,7 @@
+## 0.14.0 (unreleased)
+
+- Added experimental support for `MathOpt`
+
 ## 0.13.1 (2024-10-05)
 
 - Added binary installation for Debian 12

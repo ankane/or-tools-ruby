@@ -1,19 +1,16 @@
 module ORTools
   class Comparison
-    attr_reader :operator, :left, :right
+    attr_reader :left, :op, :right
 
-    def initialize(operator, left, right)
-      @operator = operator
-      @left = left
-      @right = right
-    end
-
-    def to_s
-      "#{left} #{operator} #{right}"
+    def initialize(left, op, right)
+      @left = Expression.to_expression(left)
+      @op = op
+      @right = Expression.to_expression(right)
     end
 
     def inspect
-      "#<#{self.class.name} #{to_s}>"
+      "#{@left.inspect} #{@op} #{@right.inspect}"
     end
+    alias_method :to_s, :inspect
   end
 end

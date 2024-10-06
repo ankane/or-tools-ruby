@@ -4,18 +4,18 @@ module ORTools
       case comparison
       when Comparison
         method_name =
-          case comparison.operator
-          when "=="
+          case comparison.op
+          when :==
             :add_equality
-          when "!="
+          when :!=
             :add_not_equal
-          when ">"
+          when :>
             :add_greater_than
-          when ">="
+          when :>=
             :add_greater_or_equal
-          when "<"
+          when :<
             :add_less_than
-          when "<="
+          when :<=
             :add_less_or_equal
           else
             raise ArgumentError, "Unknown operator: #{comparison.operator}"
@@ -32,7 +32,7 @@ module ORTools
     end
 
     def sum(arr)
-      arr.sum(SatLinearExpr.new)
+      Expression.new(arr)
     end
 
     def inspect

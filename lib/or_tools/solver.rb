@@ -1,17 +1,31 @@
 module ORTools
   class Solver
     def sum(arr)
-      LinearExpr.new(arr)
+      Expression.new(arr)
     end
 
     def add(expr)
-      coeffs, lb, ub = expr.extract
+      left, op, const = Utils.index_constraint(expr)
 
-      constraint = self.constraint(lb || -infinity, ub || infinity)
-      coeffs.each do |v, c|
-        constraint.set_coefficient(v, c.to_f)
+      case op
+      when :<=
+        lb = -infinity
+        ub = const
+      when :>=
+        lb = const
+        ub = infinity
+      when :==
+        lb = const
+        ub = const
+      else
+        raise "todo: #{op}"
       end
-      constraint
+
+      constraint = constraint(lb, ub)
+      left.each do |var, c|
+        constraint.set_coefficient(var, c)
+      end
+      nil
     end
 
     def maximize(expr)
@@ -27,13 +41,13 @@ module ORTools
     private
 
     def set_objective(expr)
-      coeffs = expr.coeffs
-      offset = coeffs.delete(OFFSET_KEY)
+      coeffs = Utils.index_expression(expr, check_linear: true)
+      offset = coeffs.delete(nil)
 
       objective.clear
       objective.set_offset(offset) if offset
-      coeffs.each do |v, c|
-        objective.set_coefficient(v, c)
+      coeffs.each do |var, c|
+        objective.set_coefficient(var, c)
       end
     end
 

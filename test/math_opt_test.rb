@@ -6,22 +6,19 @@ class MathOptTest < Minitest::Test
     model = ORTools::MathOpt::Model.new("getting_started_lp")
     x = model.add_variable(-1.0, 1.5, "x")
     y = model.add_variable(0.0, 1.0, "y")
-
-    skip "todo"
-
     model.add_linear_constraint(x + y <= 1.5)
     model.maximize(x + 2 * y)
 
-    params = ORTools::MathOpt::SolveParameters.new(enable_output: true)
+    result = model.solve
 
-    result = mathopt.solve(model, :glop, params)
-    if result.termination.reason != :optimal
-      raise RuntimeError, "model failed to solve: #{result.termination}"
-    end
+    puts "Objective value: #{result.objective_value}"
+    puts "x: #{result.variable_values[x]}"
+    puts "y: #{result.variable_values[y]}"
 
-    puts "MathOpt solve succeeded"
-    puts "Objective value:", result.objective_value
-    puts "x:", result.variable_values[x]
-    puts "y:", result.variable_values[y]
+    assert_output <<~EOS
+      Objective value: 2.5
+      x: 0.5
+      y: 1.0
+    EOS
   end
 end

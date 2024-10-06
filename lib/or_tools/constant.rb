@@ -1,23 +1,26 @@
 module ORTools
-  class Constant < LinearExpr
-    def initialize(val)
-      @val = val
+  class Constant < Expression
+    attr_reader :value
+
+    def initialize(value)
+      @value = value
     end
 
-    def to_s
-      @val.to_s
+    # simplify Ruby sum
+    def +(other)
+      @value == 0 ? other : super
     end
 
-    def add_self_to_coeff_map_or_stack(coeffs, multiplier, stack)
-      coeffs[OFFSET_KEY] += @val * multiplier
+    def inspect
+      @value.to_s
+    end
+
+    def -@
+      Constant.new(-value)
+    end
+
+    def vars
+      @vars ||= []
     end
   end
-
-  class FakeMPVariableRepresentingTheConstantOffset
-    def solution_value
-      1
-    end
-  end
-
-  OFFSET_KEY = FakeMPVariableRepresentingTheConstantOffset.new
 end
