@@ -47,9 +47,7 @@ namespace Rice::detail
       LinearExpr expr;
 
       Rice::Object utils = Rice::define_module("ORTools").const_get("Utils");
-
-      Object x(v);
-      Rice::Hash coeffs = utils.call("index_expression", x);
+      Rice::Hash coeffs = utils.call("index_expression", Object(v));
 
       for (const auto& entry : coeffs) {
         Object var = entry.key;
