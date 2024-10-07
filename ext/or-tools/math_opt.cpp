@@ -32,10 +32,26 @@ namespace Rice::detail
     static SolverType convert(VALUE x)
     {
       auto s = Symbol(x).str();
-      if (s == "glop") {
+      if (s == "gscip") {
+        return SolverType::kGscip;
+      } else if (s == "gurobi") {
+        return SolverType::kGurobi;
+      } else if (s == "glop") {
         return SolverType::kGlop;
       } else if (s == "cpsat") {
         return SolverType::kCpSat;
+      } else if (s == "pdlp") {
+        return SolverType::kPdlp;
+      } else if (s == "glpk") {
+        return SolverType::kGlpk;
+      } else if (s == "ecos") {
+        return SolverType::kEcos;
+      } else if (s == "scs") {
+        return SolverType::kScs;
+      } else if (s == "highs") {
+        return SolverType::kHighs;
+      } else if (s == "santorini") {
+        return SolverType::kSantorini;
       } else {
         throw std::runtime_error("Unknown solver type: " + s);
       }
