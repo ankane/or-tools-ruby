@@ -67,26 +67,6 @@ namespace Rice::detail
       return expr;
     }
   };
-
-  template<>
-  class From_Ruby<std::vector<BoolVar>>
-  {
-  public:
-    std::vector<BoolVar> convert(VALUE v)
-    {
-      auto a = Array(v);
-      std::vector<BoolVar> vec;
-      vec.reserve(a.size());
-      for (const Object v : a) {
-        if (v.is_a(rb_cSatIntVar)) {
-          vec.push_back(From_Ruby<IntVar>().convert(v.value()).ToBoolVar());
-        } else {
-          vec.push_back(From_Ruby<BoolVar>().convert(v.value()));
-        }
-      }
-      return vec;
-    }
-  };
 }
 
 void init_constraint(Rice::Module& m) {
@@ -110,7 +90,17 @@ void init_constraint(Rice::Module& m) {
           return self.OnlyEnforceIf(Rice::detail::From_Ruby<IntVar>().convert(literal).ToBoolVar());
         } else if (literal.is_a(rb_cArray)) {
           // TODO support IntVarSpan
-          return self.OnlyEnforceIf(Rice::detail::From_Ruby<std::vector<BoolVar>>().convert(literal));
+          auto a = Array(literal);
+          std::vector<BoolVar> vec;
+          vec.reserve(a.size());
+          for (const Object v : a) {
+            if (v.is_a(rb_cSatIntVar)) {
+              vec.push_back(Rice::detail::From_Ruby<IntVar>().convert(v.value()).ToBoolVar());
+            } else {
+              vec.push_back(Rice::detail::From_Ruby<BoolVar>().convert(v.value()));
+            }
+          }
+          return self.OnlyEnforceIf(vec);
         } else {
           return self.OnlyEnforceIf(Rice::detail::From_Ruby<BoolVar>().convert(literal));
         }
