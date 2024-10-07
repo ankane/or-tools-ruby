@@ -15,12 +15,6 @@ module ORTools
       end
     end
 
-    def value
-      return nil if left.value.nil? || right.value.nil?
-
-      left.value * right.value
-    end
-
     def vars
       @vars ||= (@left.vars + @right.vars).uniq
     end
