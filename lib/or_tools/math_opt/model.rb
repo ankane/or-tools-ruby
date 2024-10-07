@@ -17,7 +17,7 @@ module ORTools
           _set_lower_bound(constraint, const)
           _set_upper_bound(constraint, const)
         else
-          raise "todo: #{op}"
+          raise ArgumentError, "Supported operations are ==, <=, and >="
         end
         nil
       end
@@ -41,7 +41,7 @@ module ORTools
 
       def set_objective(objective)
         objective = Expression.to_expression(objective)
-        coeffs = Utils.index_expression(objective)
+        coeffs = Utils.index_expression(objective, check_linear: true)
         offset = coeffs.delete(nil)
 
         objective.set_offset(offset) if offset

@@ -14,7 +14,7 @@ module ORTools
       [left, constraint.op, const]
     end
 
-    def self.index_expression(expression, check_linear: false)
+    def self.index_expression(expression, check_linear: true)
       vars = Hash.new(0)
       case expression
       when Numeric
