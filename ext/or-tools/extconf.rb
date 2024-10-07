@@ -6,7 +6,10 @@ $CXXFLAGS << " -std=c++17 $(optflags) -DUSE_CBC"
 $CXXFLAGS << " -Wall -Wextra"
 
 # hide or-tools warnings
-$CXXFLAGS << " -Wno-sign-compare -Wno-shorten-64-to-32 -Wno-ignored-qualifiers -Wno-unused-parameter -Wno-missing-field-initializers"
+$CXXFLAGS << " -Wno-sign-compare -Wno-ignored-qualifiers -Wno-unused-parameter -Wno-missing-field-initializers"
+
+# hide Rice warnings
+$CXXFLAGS << " -Wno-implicit-fallthrough"
 
 inc, lib = dir_config("or-tools")
 if inc || lib
