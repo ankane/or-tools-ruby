@@ -16,7 +16,7 @@ module ORTools
         when :==
           self.constraint(const, const)
         else
-          raise "todo: #{op}"
+          raise ArgumentError, "Supported operations are ==, <=, and >="
         end
       left.each do |var, c|
         constraint.set_coefficient(var, c)
