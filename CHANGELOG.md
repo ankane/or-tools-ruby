@@ -1,6 +1,7 @@
 ## 0.14.0 (unreleased)
 
 - Added experimental support for `MathOpt`
+- Unified model building across solvers
 
 ## 0.13.1 (2024-10-05)
 
