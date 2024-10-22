@@ -23,7 +23,7 @@ Higher Level Interfaces
 - [Traveling Salesperson Problem (TSP)](#traveling-salesperson-problem-tsp)
 - [Sudoku](#sudoku)
 
-MathOpt [unreleased]
+MathOpt
 
 - [Basic example](#basic-example)
 
