@@ -42,4 +42,9 @@ require_relative "or_tools/version"
 
 module ORTools
   class Error < StandardError; end
+
+  # previous names
+  Solver2 = RoutingSolver
+  IntVar = RoutingIntVar
+  BoolVar = SatBoolVar
 end

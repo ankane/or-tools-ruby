@@ -104,7 +104,7 @@ void init_constraint(Rice::Module& m) {
         }
       });
 
-  rb_cBoolVar = Rice::define_class_under<BoolVar>(m, "BoolVar")
+  rb_cBoolVar = Rice::define_class_under<BoolVar>(m, "SatBoolVar")
     .define_method("name", &BoolVar::Name)
     .define_method("index", &BoolVar::index)
     .define_method("not", &BoolVar::Not)

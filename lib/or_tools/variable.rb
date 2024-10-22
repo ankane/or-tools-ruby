@@ -19,11 +19,11 @@ module ORTools
     include Variable
   end
 
-  class BoolVar
+  class SatBoolVar
     include Variable
   end
 
-  class IntVar
+  class RoutingIntVar
     include Variable
   end
 end

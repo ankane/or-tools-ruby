@@ -58,7 +58,7 @@ namespace Rice::detail
 
 void init_routing(Rice::Module& m) {
   auto rb_cRoutingSearchParameters = Rice::define_class_under<RoutingSearchParameters>(m, "RoutingSearchParameters");
-  auto rb_cIntVar = Rice::define_class_under<operations_research::IntVar>(m, "IntVar");
+  auto rb_cIntVar = Rice::define_class_under<operations_research::IntVar>(m, "RoutingIntVar");
 
   m.define_singleton_function("default_routing_search_parameters", &DefaultRoutingSearchParameters);
 
@@ -225,7 +225,7 @@ void init_routing(Rice::Module& m) {
     .define_method("post", &operations_research::Constraint::Post)
     .define_method("debug_string", &operations_research::Constraint::DebugString);
 
-  Rice::define_class_under<operations_research::Solver>(m, "Solver2")
+  Rice::define_class_under<operations_research::Solver>(m, "RoutingSolver")
     .define_method(
       "add",
       [](operations_research::Solver& self, Object o) {
