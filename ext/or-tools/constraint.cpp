@@ -70,6 +70,7 @@ namespace Rice::detail
 void init_constraint(Rice::Module& m) {
   Rice::define_class_under<Domain>(m, "Domain")
     .define_constructor(Rice::Constructor<Domain, int64_t, int64_t>())
+    .define_function("from_values", &Domain::FromValues)
     .define_method("min", &Domain::Min)
     .define_method("max", &Domain::Max);
 
