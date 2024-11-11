@@ -2,6 +2,8 @@ require_relative "test_helper"
 
 class ShiftSchedulingSatTest < Minitest::Test
   def test_shift_scheduling_sat
+    skip if ENV["RUBY_MEMCHECK_RUNNING"]
+
     num_employees = 8
     num_weeks = 3
     shifts = %w[O M A N]
@@ -205,7 +207,7 @@ class ShiftSchedulingSatTest < Minitest::Test
     # status = solver.solve_with_solution_callback(model, solution_printer)
     status = solver.solve(model)
 
-    assert_includes [:feasible, :optimal, :unknown], status
+    assert_includes [:feasible, :optimal], status
     assert_operator solver.objective_value, :<=, 400
 
     _assignments = num_employees.times.map do |e|
