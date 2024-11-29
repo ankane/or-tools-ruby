@@ -4,6 +4,7 @@
 
 using operations_research::MPConstraint;
 using operations_research::MPObjective;
+using operations_research::MPSolverParameters;
 using operations_research::MPSolver;
 using operations_research::MPVariable;
 
@@ -58,6 +59,9 @@ void init_linear(Rice::Module& m) {
     .define_method("set_maximization", &MPObjective::SetMaximization)
     .define_method("set_minimization", &MPObjective::SetMinimization);
 
+  Rice::define_class_under<MPSolverParameters>(m, "MPSolverParameters")
+    .define_constructor(Rice::Constructor<MPSolverParameters>());
+
   Rice::define_class_under<MPSolver>(m, "Solver")
     .define_singleton_function(
       "_new",
@@ -109,9 +113,9 @@ void init_linear(Rice::Module& m) {
         return self.MakeRowConstraint(lb, ub);
       })
     .define_method(
-      "solve",
-      [](MPSolver& self) {
-        auto status = self.Solve();
+      "_solve",
+      [](MPSolver& self, MPSolverParameters& params) {
+        auto status = self.Solve(params);
 
         if (status == MPSolver::ResultStatus::OPTIMAL) {
           return Symbol("optimal");
