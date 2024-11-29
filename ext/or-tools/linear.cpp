@@ -60,7 +60,38 @@ void init_linear(Rice::Module& m) {
     .define_method("set_minimization", &MPObjective::SetMinimization);
 
   Rice::define_class_under<MPSolverParameters>(m, "MPSolverParameters")
-    .define_constructor(Rice::Constructor<MPSolverParameters>());
+    .define_constructor(Rice::Constructor<MPSolverParameters>())
+    .define_method("reset", &MPSolverParameters::Reset)
+    .define_method(
+      "relative_mip_gap=",
+      [](MPSolverParameters& self, double relative_mip_gap) {
+        self.SetDoubleParam(MPSolverParameters::DoubleParam::RELATIVE_MIP_GAP, relative_mip_gap);
+      })
+    .define_method(
+      "relative_mip_gap",
+      [](MPSolverParameters& self) {
+        return self.GetDoubleParam(MPSolverParameters::DoubleParam::RELATIVE_MIP_GAP);
+      })
+    .define_method(
+      "primal_tolerance=",
+      [](MPSolverParameters& self, double primal_tolerance) {
+        self.SetDoubleParam(MPSolverParameters::DoubleParam::PRIMAL_TOLERANCE, primal_tolerance);
+      })
+    .define_method(
+      "primal_tolerance",
+      [](MPSolverParameters& self) {
+        return self.GetDoubleParam(MPSolverParameters::DoubleParam::PRIMAL_TOLERANCE);
+      })
+    .define_method(
+      "dual_tolerance=",
+      [](MPSolverParameters& self, double dual_tolerance) {
+        self.SetDoubleParam(MPSolverParameters::DoubleParam::DUAL_TOLERANCE, dual_tolerance);
+      })
+    .define_method(
+      "dual_tolerance",
+      [](MPSolverParameters& self) {
+        return self.GetDoubleParam(MPSolverParameters::DoubleParam::DUAL_TOLERANCE);
+      });
 
   Rice::define_class_under<MPSolver>(m, "Solver")
     .define_singleton_function(
