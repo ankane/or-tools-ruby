@@ -279,4 +279,10 @@ class ConstraintTest < Minitest::Test
     end
     assert_equal "Not supported: CpModel#add(x)", error.message
   end
+
+  def test_domain_from_values
+    domain = ORTools::Domain.from_values([1, 2, 3])
+    assert_equal 1, domain.min
+    assert_equal 3, domain.max
+  end
 end
