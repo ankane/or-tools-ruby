@@ -57,6 +57,7 @@ void init_linear(Rice::Module& m) {
     .define_method("set_coefficient", &MPObjective::SetCoefficient)
     .define_method("set_offset", &MPObjective::SetOffset)
     .define_method("set_maximization", &MPObjective::SetMaximization)
+    .define_method("best_bound", &MPObjective::BestBound)
     .define_method("set_minimization", &MPObjective::SetMinimization);
 
   Rice::define_class_under<MPSolverParameters>(m, "MPSolverParameters")
