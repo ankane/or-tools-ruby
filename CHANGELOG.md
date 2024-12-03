@@ -1,3 +1,7 @@
+## 0.14.1 (unreleased)
+
+- Fixed error with `inspect` for `MathOpt` variables
+
 ## 0.14.0 (2024-10-22)
 
 - Added experimental support for `MathOpt`
