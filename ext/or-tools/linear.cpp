@@ -4,6 +4,7 @@
 
 using operations_research::MPConstraint;
 using operations_research::MPObjective;
+using operations_research::MPSolverParameters;
 using operations_research::MPSolver;
 using operations_research::MPVariable;
 
@@ -56,7 +57,42 @@ void init_linear(Rice::Module& m) {
     .define_method("set_coefficient", &MPObjective::SetCoefficient)
     .define_method("set_offset", &MPObjective::SetOffset)
     .define_method("set_maximization", &MPObjective::SetMaximization)
+    .define_method("best_bound", &MPObjective::BestBound)
     .define_method("set_minimization", &MPObjective::SetMinimization);
+
+  Rice::define_class_under<MPSolverParameters>(m, "MPSolverParameters")
+    .define_constructor(Rice::Constructor<MPSolverParameters>())
+    .define_method("reset", &MPSolverParameters::Reset)
+    .define_method(
+      "relative_mip_gap=",
+      [](MPSolverParameters& self, double relative_mip_gap) {
+        self.SetDoubleParam(MPSolverParameters::DoubleParam::RELATIVE_MIP_GAP, relative_mip_gap);
+      })
+    .define_method(
+      "relative_mip_gap",
+      [](MPSolverParameters& self) {
+        return self.GetDoubleParam(MPSolverParameters::DoubleParam::RELATIVE_MIP_GAP);
+      })
+    .define_method(
+      "primal_tolerance=",
+      [](MPSolverParameters& self, double primal_tolerance) {
+        self.SetDoubleParam(MPSolverParameters::DoubleParam::PRIMAL_TOLERANCE, primal_tolerance);
+      })
+    .define_method(
+      "primal_tolerance",
+      [](MPSolverParameters& self) {
+        return self.GetDoubleParam(MPSolverParameters::DoubleParam::PRIMAL_TOLERANCE);
+      })
+    .define_method(
+      "dual_tolerance=",
+      [](MPSolverParameters& self, double dual_tolerance) {
+        self.SetDoubleParam(MPSolverParameters::DoubleParam::DUAL_TOLERANCE, dual_tolerance);
+      })
+    .define_method(
+      "dual_tolerance",
+      [](MPSolverParameters& self) {
+        return self.GetDoubleParam(MPSolverParameters::DoubleParam::DUAL_TOLERANCE);
+      });
 
   Rice::define_class_under<MPSolver>(m, "Solver")
     .define_singleton_function(
@@ -109,9 +145,9 @@ void init_linear(Rice::Module& m) {
         return self.MakeRowConstraint(lb, ub);
       })
     .define_method(
-      "solve",
-      [](MPSolver& self) {
-        auto status = self.Solve();
+      "_solve",
+      [](MPSolver& self, MPSolverParameters& params) {
+        auto status = self.Solve(params);
 
         if (status == MPSolver::ResultStatus::OPTIMAL) {
           return Symbol("optimal");
