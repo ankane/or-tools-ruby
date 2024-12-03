@@ -87,6 +87,14 @@ class LinearTest < Minitest::Test
     assert_equal 0, x.solution_value
   end
 
+  def test_unbounded
+    solver = ORTools::Solver.new("GLOP")
+    x = solver.num_var(0, solver.infinity, "x")
+    solver.maximize(x)
+    # https://github.com/google/or-tools/issues/3319
+    assert_equal :infeasible, solver.solve
+  end
+
   # Python returns nil,
   # but since we use new (which should return instance of class),
   # raising an exception seems better
