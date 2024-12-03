@@ -78,7 +78,6 @@ class MathOptTest < Minitest::Test
   def test_variable_inspect
     model = ORTools::MathOpt::Model.new("getting_started_lp")
     var = model.add_integer_variable(-1.0, 1.5, "x")
-
     assert_equal "x", var.inspect
   end
 end
