@@ -92,6 +92,32 @@ void init_linear(Rice::Module& m) {
       "dual_tolerance",
       [](MPSolverParameters& self) {
         return self.GetDoubleParam(MPSolverParameters::DoubleParam::DUAL_TOLERANCE);
+      })
+    .define_method(
+      "presolve=",
+      [](MPSolverParameters& self, Object value) {
+        int presolve;
+        auto s = Symbol(value).str();
+        if (s == "off") {
+          presolve = MPSolverParameters::PresolveValues::PRESOLVE_OFF;
+        } else if (s == "on") {
+          presolve = MPSolverParameters::PresolveValues::PRESOLVE_ON;
+        } else {
+          throw std::invalid_argument("Unknown presolve value: " + s);
+        }
+        self.SetIntegerParam(MPSolverParameters::IntegerParam::PRESOLVE, presolve);
+      })
+    .define_method(
+      "presolve",
+      [](MPSolverParameters& self) {
+        int presolve = self.GetIntegerParam(MPSolverParameters::IntegerParam::PRESOLVE);
+        if (presolve == MPSolverParameters::PresolveValues::PRESOLVE_OFF) {
+          return Symbol("off");
+        } else if (presolve == MPSolverParameters::PresolveValues::PRESOLVE_ON) {
+          return Symbol("on");
+        } else {
+          throw std::runtime_error("Unknown presolve value");
+        }
       });
 
   Rice::define_class_under<MPSolver>(m, "Solver")

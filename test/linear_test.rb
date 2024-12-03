@@ -91,8 +91,10 @@ class LinearTest < Minitest::Test
     solver = ORTools::Solver.new("GLOP")
     x = solver.num_var(0, solver.infinity, "x")
     solver.maximize(x)
+    params = ORTools::MPSolverParameters.new
     # https://github.com/google/or-tools/issues/3319
-    assert_equal :infeasible, solver.solve
+    params.presolve = :off
+    assert_equal :unbounded, solver.solve(params)
   end
 
   # Python returns nil,
@@ -121,5 +123,18 @@ class LinearTest < Minitest::Test
     params = ORTools::MPSolverParameters.new
     params.dual_tolerance = 42
     assert_equal 42, params.dual_tolerance
+  end
+
+  def test_presolve_parameter
+    params = ORTools::MPSolverParameters.new
+    assert_equal :on, params.presolve
+
+    params.presolve = :off
+    assert_equal :off, params.presolve
+
+    error = assert_raises(ArgumentError) do
+      params.presolve = :bad
+    end
+    assert_equal "Unknown presolve value: bad", error.message
   end
 end
