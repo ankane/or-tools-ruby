@@ -75,9 +75,12 @@ class MathOptTest < Minitest::Test
     assert_equal "Glop does not support integer variables", error.message
   end
 
-  def test_variable_inspect
+  def test_inspect
     model = ORTools::MathOpt::Model.new("getting_started_lp")
-    var = model.add_integer_variable(-1.0, 1.5, "x")
-    assert_equal "x", var.inspect
+    x = model.add_integer_variable(-1.0, 1.5, "x")
+
+    assert_equal "x", x.inspect
+    assert_equal "x + 1", (x + 1).inspect
+    assert_equal "x + 1 == 1", (x + 1 == 1).inspect
   end
 end
