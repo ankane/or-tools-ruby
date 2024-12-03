@@ -34,12 +34,9 @@ module ORTools
       objective.set_minimization
     end
 
-    def solve
+    def solve(parameters = nil)
+      parameters ||= MPSolverParameters.new
       _solve(parameters)
-    end
-
-    def parameters
-      @parameters ||= MPSolverParameters.new
     end
 
     private
