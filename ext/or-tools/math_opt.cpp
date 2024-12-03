@@ -64,6 +64,7 @@ void init_math_opt(Rice::Module& m) {
 
   Rice::define_class_under<Variable>(mathopt, "Variable")
     .define_method("id", &Variable::id)
+    .define_method("name", &Variable::name)
     .define_method(
       "_eql?",
       [](Variable& self, Variable &other) {
