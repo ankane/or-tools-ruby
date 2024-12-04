@@ -95,15 +95,12 @@ void init_linear(Rice::Module& m) {
       })
     .define_method(
       "presolve=",
-      [](MPSolverParameters& self, Object value) {
+      [](MPSolverParameters& self, bool value) {
         int presolve;
-        auto s = Symbol(value).str();
-        if (s == "off") {
-          presolve = MPSolverParameters::PresolveValues::PRESOLVE_OFF;
-        } else if (s == "on") {
+        if (value) {
           presolve = MPSolverParameters::PresolveValues::PRESOLVE_ON;
         } else {
-          throw std::invalid_argument("Unknown presolve value: " + s);
+          presolve = MPSolverParameters::PresolveValues::PRESOLVE_OFF;
         }
         self.SetIntegerParam(MPSolverParameters::IntegerParam::PRESOLVE, presolve);
       })
@@ -111,13 +108,7 @@ void init_linear(Rice::Module& m) {
       "presolve",
       [](MPSolverParameters& self) {
         int presolve = self.GetIntegerParam(MPSolverParameters::IntegerParam::PRESOLVE);
-        if (presolve == MPSolverParameters::PresolveValues::PRESOLVE_OFF) {
-          return Symbol("off");
-        } else if (presolve == MPSolverParameters::PresolveValues::PRESOLVE_ON) {
-          return Symbol("on");
-        } else {
-          throw std::runtime_error("Unknown presolve value");
-        }
+        return presolve != MPSolverParameters::PresolveValues::PRESOLVE_OFF;
       });
 
   Rice::define_class_under<MPSolver>(m, "Solver")

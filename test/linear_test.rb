@@ -93,7 +93,7 @@ class LinearTest < Minitest::Test
     solver.maximize(x)
     params = ORTools::MPSolverParameters.new
     # https://github.com/google/or-tools/issues/3319
-    params.presolve = :off
+    params.presolve = false
     assert_equal :unbounded, solver.solve(params)
   end
 
@@ -127,14 +127,9 @@ class LinearTest < Minitest::Test
 
   def test_presolve_parameter
     params = ORTools::MPSolverParameters.new
-    assert_equal :on, params.presolve
+    assert_equal true, params.presolve
 
-    params.presolve = :off
-    assert_equal :off, params.presolve
-
-    error = assert_raises(ArgumentError) do
-      params.presolve = :bad
-    end
-    assert_equal "Unknown presolve value: bad", error.message
+    params.presolve = false
+    assert_equal false, params.presolve
   end
 end
