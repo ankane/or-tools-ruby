@@ -149,9 +149,12 @@ class LinearTest < Minitest::Test
 
   def test_scaling_parameter
     params = ORTools::MPSolverParameters.new
-    assert_equal true, params.scaling
+    assert_nil params.scaling
 
     params.scaling = false
     assert_equal false, params.scaling
+
+    params.scaling = true
+    assert_equal true, params.scaling
   end
 end
