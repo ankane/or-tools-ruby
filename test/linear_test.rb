@@ -109,18 +109,24 @@ class LinearTest < Minitest::Test
 
   def test_relative_mip_gap_parameter
     params = ORTools::MPSolverParameters.new
+    assert_equal 1e-4, params.relative_mip_gap
+
     params.relative_mip_gap = 42
     assert_equal 42, params.relative_mip_gap
   end
 
   def test_primal_tolerance_parameter
     params = ORTools::MPSolverParameters.new
+    assert_equal 1e-7, params.primal_tolerance
+
     params.primal_tolerance = 42
     assert_equal 42, params.primal_tolerance
   end
 
   def test_dual_tolerance_parameter
     params = ORTools::MPSolverParameters.new
+    assert_equal 1e-7, params.dual_tolerance
+
     params.dual_tolerance = 42
     assert_equal 42, params.dual_tolerance
   end
