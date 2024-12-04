@@ -109,6 +109,40 @@ void init_linear(Rice::Module& m) {
       [](MPSolverParameters& self) {
         int presolve = self.GetIntegerParam(MPSolverParameters::IntegerParam::PRESOLVE);
         return presolve != MPSolverParameters::PresolveValues::PRESOLVE_OFF;
+      })
+    .define_method(
+      "incrementality=",
+      [](MPSolverParameters& self, bool value) {
+        int incrementality;
+        if (value) {
+          incrementality = MPSolverParameters::IncrementalityValues::INCREMENTALITY_ON;
+        } else {
+          incrementality = MPSolverParameters::IncrementalityValues::INCREMENTALITY_OFF;
+        }
+        self.SetIntegerParam(MPSolverParameters::IntegerParam::INCREMENTALITY, incrementality);
+      })
+    .define_method(
+      "incrementality",
+      [](MPSolverParameters& self) {
+        int incrementality = self.GetIntegerParam(MPSolverParameters::IntegerParam::INCREMENTALITY);
+        return incrementality != MPSolverParameters::IncrementalityValues::INCREMENTALITY_OFF;
+      })
+    .define_method(
+      "scaling=",
+      [](MPSolverParameters& self, bool value) {
+        int scaling;
+        if (value) {
+          scaling = MPSolverParameters::ScalingValues::SCALING_ON;
+        } else {
+          scaling = MPSolverParameters::ScalingValues::SCALING_OFF;
+        }
+        self.SetIntegerParam(MPSolverParameters::IntegerParam::SCALING, scaling);
+      })
+    .define_method(
+      "scaling",
+      [](MPSolverParameters& self) {
+        int scaling = self.GetIntegerParam(MPSolverParameters::IntegerParam::SCALING);
+        return scaling != MPSolverParameters::ScalingValues::SCALING_OFF;
       });
 
   Rice::define_class_under<MPSolver>(m, "Solver")

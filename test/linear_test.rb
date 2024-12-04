@@ -132,4 +132,20 @@ class LinearTest < Minitest::Test
     params.presolve = false
     assert_equal false, params.presolve
   end
+
+  def test_incrementality_parameter
+    params = ORTools::MPSolverParameters.new
+    assert_equal true, params.incrementality
+
+    params.incrementality = false
+    assert_equal false, params.incrementality
+  end
+
+  def test_scaling_parameter
+    params = ORTools::MPSolverParameters.new
+    assert_equal true, params.scaling
+
+    params.scaling = false
+    assert_equal false, params.scaling
+  end
 end
