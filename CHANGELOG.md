@@ -1,4 +1,4 @@
-## 0.14.1 (unreleased)
+## 0.14.1 (2024-12-04)
 
 - Added support for parameters to `Solver`
 - Fixed error with `inspect` for `MathOpt` variables
