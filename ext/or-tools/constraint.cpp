@@ -42,6 +42,18 @@ namespace Rice::detail
   class From_Ruby<LinearExpr>
   {
   public:
+    Convertible is_convertible(VALUE value)
+    {
+      switch (rb_type(value))
+      {
+        case RUBY_T_DATA:
+          return Data_Type<LinearExpr>::is_descendant(value) ? Convertible::Exact : Convertible::None;
+          break;
+        default:
+          return Convertible::None;
+      }
+    }
+
     LinearExpr convert(VALUE v)
     {
       LinearExpr expr;
