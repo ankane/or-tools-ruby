@@ -23,6 +23,18 @@ namespace Rice::detail
   class From_Ruby<KnapsackSolver::SolverType>
   {
   public:
+    Convertible is_convertible(VALUE value)
+    {
+      switch (rb_type(value))
+      {
+        case RUBY_T_DATA:
+          return Data_Type<KnapsackSolver::SolverType>::is_descendant(value) ? Convertible::Exact : Convertible::None;
+          break;
+        default:
+          return Convertible::None;
+      }
+    }
+
     KnapsackSolver::SolverType convert(VALUE x)
     {
       auto s = Symbol(x).str();

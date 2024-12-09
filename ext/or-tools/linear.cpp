@@ -29,6 +29,18 @@ namespace Rice::detail
   template<>
   struct From_Ruby<MPSolver::OptimizationProblemType>
   {
+    Convertible is_convertible(VALUE value)
+    {
+      switch (rb_type(value))
+      {
+      case RUBY_T_DATA:
+        return Data_Type<MPSolver::OptimizationProblemType>::is_descendant(value) ? Convertible::Exact : Convertible::None;
+        break;
+      default:
+        return Convertible::None;
+      }
+    }
+
     static MPSolver::OptimizationProblemType convert(VALUE x)
     {
       auto s = Symbol(x).str();

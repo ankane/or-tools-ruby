@@ -38,6 +38,18 @@ namespace Rice::detail
   class From_Ruby<RoutingNodeIndex>
   {
   public:
+    Convertible is_convertible(VALUE value)
+    {
+      switch (rb_type(value))
+      {
+      case RUBY_T_DATA:
+        return Data_Type<RoutingNodeIndex>::is_descendant(value) ? Convertible::Exact : Convertible::None;
+        break;
+      default:
+        return Convertible::None;
+      }
+    }
+
     RoutingNodeIndex convert(VALUE x)
     {
       const RoutingNodeIndex index{From_Ruby<int>().convert(x)};
