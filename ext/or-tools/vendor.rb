@@ -42,6 +42,9 @@ else
   elsif os == "debian" && os_version == "12" && !arm
     filename = "or-tools_amd64_debian-12_cpp_v#{version}.tar.gz"
     checksum = "9fda332f2f9d3b5647d85dd65de145ea3e2a1543714bf588f82da8ec57721cbf"
+  elsif os == "fedora" && %w[39 40 41].include?(os_version) && !arm
+    filename = "or-tools_amd64_fedora-39_cpp_v#{version}.tar.gz"
+    checksum = "d7450cbf7c067bab0a543e5ef5642cf3fe60c401489c6b824b853999c714abab"
   elsif os == "arch" && !arm
     filename = "or-tools_amd64_archlinux_cpp_v#{version}.tar.gz"
     checksum = "ac892a949d871294b7e26b0730440ab8629b4021bf3c1641bc7c8fb09b45081f"
@@ -137,6 +140,11 @@ Dir.mktmpdir do |extract_path|
 
   # include
   FileUtils.cp_r(File.join(extract_path, "include"), File.join(path, "include"))
+
+  # in case libraries are build into lib64, copy to lib directory first
+  Dir.glob("*.*", base: File.join(extract_path, "lib64")) do |file|
+    FileUtils.cp(File.join(extract_path, "lib64", file), File.join(extract_path, "lib", file))
+  end
 
   # shared library
   FileUtils.mkdir(File.join(path, "lib"))
