@@ -15,7 +15,20 @@ inc, lib = dir_config("or-tools")
 if inc || lib
   inc ||= "/usr/local/include"
   lib ||= "/usr/local/lib"
-  rpath = lib
+
+  lib_dirs = lib.split(':')
+  rpath = lib_dirs.join(':')
+
+  # Find the first lib directory containing libprotobuf.a
+  libprotobuf_dir = lib_dirs.find { |dir| File.exist?("#{dir}/libprotobuf.a") }
+  raise "libprotobuf.a not found" unless libprotobuf_dir
+
+  # -L flags for each lib directory
+  lib_dirs_flags = lib_dirs.map { |lib_dir| "-L#{lib_dir} " }.join
+
+  $INCFLAGS << " -I#{inc}"
+  ld_flags = "-Wl,-rpath,#{rpath} #{lib_dirs_flags} #{libprotobuf_dir}/libprotobuf.a "
+  $LDFLAGS.prepend(ld_flags)
 else
   # download
   require_relative "vendor"
@@ -27,15 +40,10 @@ else
   # use double dollar sign and single quotes to escape properly
   rpath_prefix = RbConfig::CONFIG["host_os"].match?(/darwin/) ? "@loader_path" : "$$ORIGIN"
   rpath = "'#{rpath_prefix}/../../tmp/or-tools/lib'"
+
+  $INCFLAGS << " -I#{inc}"
+  $LDFLAGS.prepend("-Wl,-rpath,#{rpath} -L#{lib} #{lib}/libprotobuf.a ")
 end
 
-# find_header and find_library first check without adding path
-# which can cause them to find system library
-$INCFLAGS << " -I#{inc}"
-# could support shared libraries for protobuf and abseil
-# but keep simple for now
-raise "libprotobuf.a not found" unless File.exist?("#{lib}/libprotobuf.a")
-$LDFLAGS.prepend("-Wl,-rpath,#{rpath} -L#{lib} #{lib}/libprotobuf.a ")
 raise "OR-Tools not found" unless have_library("ortools")
-
 create_makefile("or_tools/ext")
