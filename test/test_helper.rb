@@ -7,7 +7,7 @@ require "time"
 
 class Minitest::Test
   def setup
-    @output = StringIO.new("")
+    @output = StringIO.new(+"")
     @output_checked = false
 
     GC.stress = true if stress?
