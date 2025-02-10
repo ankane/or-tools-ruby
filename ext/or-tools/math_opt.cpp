@@ -29,6 +29,11 @@ namespace Rice::detail
   template<>
   struct From_Ruby<SolverType>
   {
+    Convertible is_convertible(VALUE value)
+    {
+      return Convertible::Cast;
+    }
+
     static SolverType convert(VALUE x)
     {
       auto s = Symbol(x).str();

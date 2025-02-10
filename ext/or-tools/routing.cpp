@@ -38,6 +38,11 @@ namespace Rice::detail
   class From_Ruby<RoutingNodeIndex>
   {
   public:
+    Convertible is_convertible(VALUE value)
+    {
+      return Convertible::Cast;
+    }
+
     RoutingNodeIndex convert(VALUE x)
     {
       const RoutingNodeIndex index{From_Ruby<int>().convert(x)};
@@ -285,7 +290,7 @@ void init_routing(Rice::Module& m) {
   Rice::define_class_under<RoutingModel::ResourceGroup>(m, "ResourceGroup");
 
   Rice::define_class_under<RoutingModel>(m, "RoutingModel")
-    .define_constructor(Rice::Constructor<RoutingModel, RoutingIndexManager, RoutingModelParameters>(), Rice::Arg("index_manager"), Rice::Arg("parameters") = operations_research::DefaultRoutingModelParameters())
+    .define_constructor(Rice::Constructor<RoutingModel, RoutingIndexManager, RoutingModelParameters>(), Rice::Arg("_index_manager"), Rice::Arg("_parameters") = operations_research::DefaultRoutingModelParameters())
     .define_method("register_unary_transit_vector", &RoutingModel::RegisterUnaryTransitVector)
     .define_method(
       "register_unary_transit_callback",
@@ -300,7 +305,7 @@ void init_routing(Rice::Module& m) {
             return Rice::detail::From_Ruby<int64_t>().convert(callback.call("call", from_index));
           }
         );
-      }, Rice::Arg("callback").keepAlive())
+      }, Rice::Arg("_callback").keepAlive())
     .define_method("register_transit_matrix", &RoutingModel::RegisterTransitMatrix)
     .define_method(
       "register_transit_callback",
@@ -315,7 +320,7 @@ void init_routing(Rice::Module& m) {
             return Rice::detail::From_Ruby<int64_t>().convert(callback.call("call", from_index, to_index));
           }
         );
-      }, Rice::Arg("callback").keepAlive())
+      }, Rice::Arg("_callback").keepAlive())
     .define_method("add_dimension", &RoutingModel::AddDimension)
     .define_method("add_dimension_with_vehicle_transits", &RoutingModel::AddDimensionWithVehicleTransits)
     .define_method("add_dimension_with_vehicle_capacity", &RoutingModel::AddDimensionWithVehicleCapacity)
@@ -332,7 +337,7 @@ void init_routing(Rice::Module& m) {
     .define_method("add_resource_group", &RoutingModel::AddResourceGroup)
     .define_method("dimension_resource_group_indices", &RoutingModel::GetDimensionResourceGroupIndices)
     .define_method("dimension_resource_group_index", &RoutingModel::GetDimensionResourceGroupIndex)
-    .define_method("add_disjunction", &RoutingModel::AddDisjunction, Rice::Arg("indices"), Rice::Arg("penalty"), Rice::Arg("max_cardinality") = (int64_t)1)
+    .define_method("add_disjunction", &RoutingModel::AddDisjunction, Rice::Arg("_indices"), Rice::Arg("_penalty"), Rice::Arg("_max_cardinality") = (int64_t)1)
     .define_method("disjunction_indices", &RoutingModel::GetDisjunctionIndices)
     .define_method("disjunction_penalty", &RoutingModel::GetDisjunctionPenalty)
     .define_method("disjunction_max_cardinality", &RoutingModel::GetDisjunctionMaxCardinality)

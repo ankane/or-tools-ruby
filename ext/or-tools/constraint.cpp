@@ -42,6 +42,11 @@ namespace Rice::detail
   class From_Ruby<LinearExpr>
   {
   public:
+    Convertible is_convertible(VALUE value)
+    {
+      return Convertible::Cast;
+    }
+
     LinearExpr convert(VALUE v)
     {
       LinearExpr expr;
