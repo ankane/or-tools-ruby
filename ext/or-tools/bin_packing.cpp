@@ -13,20 +13,14 @@ namespace Rice::detail
   template<>
   struct Type<KnapsackSolver::SolverType>
   {
-    static bool verify()
-    {
-      return true;
-    }
+    static bool verify() { return true; }
   };
 
   template<>
   class From_Ruby<KnapsackSolver::SolverType>
   {
   public:
-    Convertible is_convertible(VALUE value)
-    {
-      return Convertible::Cast;
-    }
+    Convertible is_convertible(VALUE value) { return Convertible::Cast; }
 
     KnapsackSolver::SolverType convert(VALUE x)
     {

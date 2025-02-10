@@ -32,20 +32,14 @@ namespace Rice::detail
   template<>
   struct Type<LinearExpr>
   {
-    static bool verify()
-    {
-      return true;
-    }
+    static bool verify() { return true; }
   };
 
   template<>
   class From_Ruby<LinearExpr>
   {
   public:
-    Convertible is_convertible(VALUE value)
-    {
-      return Convertible::Cast;
-    }
+    Convertible is_convertible(VALUE value) { return Convertible::Cast; }
 
     LinearExpr convert(VALUE v)
     {

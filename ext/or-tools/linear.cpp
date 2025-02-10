@@ -20,19 +20,13 @@ namespace Rice::detail
   template<>
   struct Type<MPSolver::OptimizationProblemType>
   {
-    static bool verify()
-    {
-      return true;
-    }
+    static bool verify() { return true; }
   };
 
   template<>
   struct From_Ruby<MPSolver::OptimizationProblemType>
   {
-    Convertible is_convertible(VALUE value)
-    {
-      return Convertible::Cast;
-    }
+    Convertible is_convertible(VALUE value) { return Convertible::Cast; }
 
     static MPSolver::OptimizationProblemType convert(VALUE x)
     {

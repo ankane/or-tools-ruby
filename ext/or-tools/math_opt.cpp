@@ -20,19 +20,13 @@ namespace Rice::detail
   template<>
   struct Type<SolverType>
   {
-    static bool verify()
-    {
-      return true;
-    }
+    static bool verify() { return true; }
   };
 
   template<>
   struct From_Ruby<SolverType>
   {
-    Convertible is_convertible(VALUE value)
-    {
-      return Convertible::Cast;
-    }
+    Convertible is_convertible(VALUE value) { return Convertible::Cast; }
 
     static SolverType convert(VALUE x)
     {

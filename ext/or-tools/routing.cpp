@@ -28,20 +28,14 @@ namespace Rice::detail
   template<>
   struct Type<RoutingNodeIndex>
   {
-    static bool verify()
-    {
-      return true;
-    }
+    static bool verify() { return true; }
   };
 
   template<>
   class From_Ruby<RoutingNodeIndex>
   {
   public:
-    Convertible is_convertible(VALUE value)
-    {
-      return Convertible::Cast;
-    }
+    Convertible is_convertible(VALUE value) { return Convertible::Cast; }
 
     RoutingNodeIndex convert(VALUE x)
     {
