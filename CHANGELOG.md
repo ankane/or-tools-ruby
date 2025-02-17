@@ -1,4 +1,4 @@
-## 0.15.0 (unreleased)
+## 0.15.0 (2025-02-17)
 
 - Updated OR-Tools to 9.12
 - Removed `pickup_positions` and `pickup_index_pairs` (use `pickup_position` instead)
