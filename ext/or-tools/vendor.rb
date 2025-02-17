@@ -139,7 +139,10 @@ Dir.mktmpdir do |extract_path|
   FileUtils.mv(File.join(extract_path, "include"), File.join(path, "include"))
 
   # shared library
-  FileUtils.mv(File.join(extract_path, "lib"), File.join(path, "lib"))
+  FileUtils.mkdir(File.join(path, "lib"))
+  Dir.glob("lib/lib*{.dylib,.so,.so.*}", base: extract_path) do |file|
+    FileUtils.mv(File.join(extract_path, file), File.join(path, file))
+  end
 end
 
 # export
