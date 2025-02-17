@@ -25,8 +25,8 @@ task :update do
   require "open-uri"
   require "tmpdir"
 
-  version = "9.11.4210"
-  distributions = ["arm64_macOS-14.6.1", "x86_64_macOS-14.6.1", "amd64_ubuntu-24.04", "amd64_ubuntu-22.04", "amd64_ubuntu-20.04", "amd64_debian-11", "amd64_debian-12", "amd64_archlinux"]
+  version = "9.12.4544"
+  distributions = ["arm64_macOS-15.3.1", "x86_64_macOS-15.3.1", "amd64_ubuntu-24.04", "amd64_ubuntu-22.04", "amd64_ubuntu-20.04", "amd64_debian-11", "amd64_debian-12", "amd64_archlinux"]
 
   short_version = version.split(".").first(2).join(".")
   distributions.each do |dist|
@@ -42,3 +42,5 @@ task :update do
     puts "#{dist}: #{Digest::SHA256.file(dest).hexdigest}"
   end
 end
+
+CLEAN.add("tmp")

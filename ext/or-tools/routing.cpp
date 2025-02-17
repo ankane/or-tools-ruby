@@ -15,6 +15,7 @@ using operations_research::RoutingModel;
 using operations_research::RoutingModelParameters;
 using operations_research::RoutingNodeIndex;
 using operations_research::RoutingSearchParameters;
+using operations_research::RoutingSearchStatus;
 
 using Rice::Array;
 using Rice::Class;
@@ -331,7 +332,7 @@ void init_routing(Rice::Module& m) {
     .define_method("add_resource_group", &RoutingModel::AddResourceGroup)
     .define_method("dimension_resource_group_indices", &RoutingModel::GetDimensionResourceGroupIndices)
     .define_method("dimension_resource_group_index", &RoutingModel::GetDimensionResourceGroupIndex)
-    .define_method("add_disjunction", &RoutingModel::AddDisjunction, Rice::Arg("_indices"), Rice::Arg("_penalty"), Rice::Arg("_max_cardinality") = (int64_t)1)
+    .define_method("add_disjunction", &RoutingModel::AddDisjunction, Rice::Arg("_indices"), Rice::Arg("_penalty"), Rice::Arg("_max_cardinality") = (int64_t)1, Rice::Arg("_penalty_cost_behavior") = RoutingModel::PenaltyCostBehavior::PENALIZE_ONCE)
     .define_method("disjunction_indices", &RoutingModel::GetDisjunctionIndices)
     .define_method("disjunction_penalty", &RoutingModel::GetDisjunctionPenalty)
     .define_method("disjunction_max_cardinality", &RoutingModel::GetDisjunctionMaxCardinality)
@@ -346,22 +347,14 @@ void init_routing(Rice::Module& m) {
     .define_method("add_pickup_and_delivery", &RoutingModel::AddPickupAndDelivery)
     .define_method("add_pickup_and_delivery_sets", &RoutingModel::AddPickupAndDeliverySets)
     .define_method(
-      "pickup_positions",
+      "pickup_position",
       [](RoutingModel& self, int64_t node_index) {
-        std::vector<std::pair<int, int>> positions;
-        for (const auto& v : self.GetPickupPositions(node_index)) {
-          positions.emplace_back(v.pd_pair_index, v.alternative_index);
-        }
-        return positions;
+        return self.GetPickupPosition(node_index);
       })
     .define_method(
-      "delivery_positions",
+      "delivery_position",
       [](RoutingModel& self, int64_t node_index) {
-        std::vector<std::pair<int, int>> positions;
-        for (const auto& v : self.GetDeliveryPositions(node_index)) {
-          positions.emplace_back(v.pd_pair_index, v.alternative_index);
-        }
-        return positions;
+        return self.GetDeliveryPosition(node_index);
       })
     .define_method("num_of_singleton_nodes", &RoutingModel::GetNumOfSingletonNodes)
     .define_method("unperformed_penalty", &RoutingModel::UnperformedPenalty)
@@ -403,15 +396,15 @@ void init_routing(Rice::Module& m) {
       [](RoutingModel& self) {
         auto status = self.status();
 
-        if (status == RoutingModel::ROUTING_NOT_SOLVED) {
+        if (status == RoutingSearchStatus::ROUTING_NOT_SOLVED) {
           return Symbol("not_solved");
-        } else if (status == RoutingModel::ROUTING_SUCCESS) {
+        } else if (status == RoutingSearchStatus::ROUTING_SUCCESS) {
           return Symbol("success");
-        } else if (status == RoutingModel::ROUTING_FAIL) {
+        } else if (status == RoutingSearchStatus::ROUTING_FAIL) {
           return Symbol("fail");
-        } else if (status == RoutingModel::ROUTING_FAIL_TIMEOUT) {
+        } else if (status == RoutingSearchStatus::ROUTING_FAIL_TIMEOUT) {
           return Symbol("fail_timeout");
-        } else if (status == RoutingModel::ROUTING_INVALID) {
+        } else if (status == RoutingSearchStatus::ROUTING_INVALID) {
           return Symbol("invalid");
         } else {
           throw std::runtime_error("Unknown solver status");
