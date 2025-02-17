@@ -1,6 +1,7 @@
 ## 0.15.0 (unreleased)
 
 - Updated OR-Tools to 9.12
+- Added binary installation for Fedora 40 and 41
 - Removed `pickup_positions` and `pickup_index_pairs` (use `pickup_position` instead)
 - Removed `delivery_positions` and `delivery_index_pairs` (use `delivery_position` instead)
 

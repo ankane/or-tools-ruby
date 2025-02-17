@@ -42,6 +42,12 @@ else
   elsif os == "debian" && os_version == "12" && !arm
     filename = "or-tools_amd64_debian-12_cpp_v#{version}.tar.gz"
     checksum = "911143f50fe013fbd50d0dce460512106596adfc0f2ad9a2bc8afd218531bde4"
+  elsif os == "fedora" && os_version == "41" && !arm
+    filename = "or-tools_amd64_fedora-41_cpp_v#{version}.tar.gz"
+    checksum = "44e3ea31924ae1893a669c4ccf46b5efaf2d37157c0417a9b8038568e9e7c1fb"
+  elsif os == "fedora" && os_version == "40" && !arm
+    filename = "or-tools_amd64_fedora-40_cpp_v#{version}.tar.gz"
+    checksum = "ba595e2a9c86e23f559d1be17984ab4cfe56599bb0decd1f5e5b6c4008464023"
   elsif os == "arch" && !arm
     filename = "or-tools_amd64_archlinux_cpp_v#{version}.tar.gz"
     checksum = "18c1d929e2144e9d9602659ea2fa790bd2a150f72c32c38a97f571839816d132"
@@ -140,7 +146,7 @@ Dir.mktmpdir do |extract_path|
 
   # shared library
   FileUtils.mkdir(File.join(path, "lib"))
-  Dir.glob("lib/lib*{.dylib,.so,.so.*}", base: extract_path) do |file|
+  Dir.glob("{lib,lib64}/lib*{.dylib,.so,.so.*}", base: extract_path) do |file|
     next if file.include?("libprotoc.")
     FileUtils.mv(File.join(extract_path, file), File.join(path, file))
   end
