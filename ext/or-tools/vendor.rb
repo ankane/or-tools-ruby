@@ -141,6 +141,7 @@ Dir.mktmpdir do |extract_path|
   # shared library
   FileUtils.mkdir(File.join(path, "lib"))
   Dir.glob("lib/lib*{.dylib,.so,.so.*}", base: extract_path) do |file|
+    next if file.include?("libprotoc.")
     FileUtils.mv(File.join(extract_path, file), File.join(path, file))
   end
 end
