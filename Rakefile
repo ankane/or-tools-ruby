@@ -43,4 +43,4 @@ task :update do
   end
 end
 
-CLEAN.add("tmp")
+CLEAN.add("tmp/or-tools")
