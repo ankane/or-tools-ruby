@@ -132,14 +132,14 @@ Dir.mktmpdir do |extract_path|
   raise "License not found" unless license_files.any?
   license_files.each do |file|
     FileUtils.mkdir_p(File.join(path, File.dirname(file)))
-    FileUtils.cp(File.join(extract_path, file), File.join(path, file))
+    FileUtils.mv(File.join(extract_path, file), File.join(path, file))
   end
 
   # include
-  FileUtils.cp_r(File.join(extract_path, "include"), File.join(path, "include"))
+  FileUtils.mv(File.join(extract_path, "include"), File.join(path, "include"))
 
   # shared library
-  FileUtils.cp_r(File.join(extract_path, "lib"), File.join(path, "lib"))
+  FileUtils.mv(File.join(extract_path, "lib"), File.join(path, "lib"))
 end
 
 # export
