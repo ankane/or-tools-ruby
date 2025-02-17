@@ -148,7 +148,7 @@ Dir.mktmpdir do |extract_path|
   FileUtils.mkdir(File.join(path, "lib"))
   Dir.glob("{lib,lib64}/lib*{.dylib,.so,.so.*}", base: extract_path) do |file|
     next if file.include?("libprotoc.")
-    FileUtils.mv(File.join(extract_path, file), File.join(path, file))
+    FileUtils.mv(File.join(extract_path, file), File.join(path, file.sub(/\Alib64/, "lib")))
   end
 end
 
