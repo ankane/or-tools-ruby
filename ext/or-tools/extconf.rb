@@ -15,6 +15,7 @@ inc, lib = dir_config("or-tools")
 if inc || lib
   inc ||= "/usr/local/include"
   lib ||= "/usr/local/lib"
+  lib64 ||= "/usr/local/lib64"
   rpath = lib
 else
   # download
@@ -22,6 +23,7 @@ else
 
   inc = "#{$vendor_path}/include"
   lib = "#{$vendor_path}/lib"
+  lib64 = "#{$vendor_path}/lib64"
 
   # make rpath relative
   # use double dollar sign and single quotes to escape properly
@@ -32,7 +34,7 @@ end
 # find_header and find_library first check without adding path
 # which can cause them to find system library
 $INCFLAGS << " -I#{inc}"
-$LDFLAGS.prepend("-Wl,-rpath,#{rpath} -L#{lib} ")
+$LDFLAGS.prepend("-Wl,-rpath,#{rpath} -L#{lib} -L#{lib64}")
 raise "OR-Tools not found" unless have_library("ortools")
 
 create_makefile("or_tools/ext")
