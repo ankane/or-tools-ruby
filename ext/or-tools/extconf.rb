@@ -29,12 +29,13 @@ else
   # use double dollar sign and single quotes to escape properly
   rpath_prefix = RbConfig::CONFIG["host_os"].match?(/darwin/) ? "@loader_path" : "$$ORIGIN"
   rpath = "'#{rpath_prefix}/../../tmp/or-tools/lib'"
+  rpath64 = "'#{rpath_prefix}/../../tmp/or-tools/lib64'"
 end
 
 # find_header and find_library first check without adding path
 # which can cause them to find system library
 $INCFLAGS << " -I#{inc}"
-$LDFLAGS.prepend("-Wl,-rpath,#{rpath} -L#{lib} -L#{lib64} ")
+$LDFLAGS.prepend("-Wl,-rpath,#{rpath},#{rpath64} -L#{lib} -L#{lib64} ")
 raise "OR-Tools not found" unless have_library("ortools")
 
 create_makefile("or_tools/ext")
