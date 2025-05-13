@@ -1,9 +1,13 @@
 module ORTools
   class RoutingModel
-    def solve(solution_limit: nil, time_limit: nil, lns_time_limit: nil,
-      first_solution_strategy: nil, local_search_metaheuristic: nil,
-      log_search: nil)
-
+    def solve(
+      solution_limit: nil,
+      time_limit: nil,
+      lns_time_limit: nil,
+      first_solution_strategy: nil,
+      local_search_metaheuristic: nil,
+      log_search: nil
+    )
       search_parameters = ORTools.default_routing_search_parameters
       search_parameters.solution_limit = solution_limit if solution_limit
       search_parameters.time_limit = time_limit if time_limit
