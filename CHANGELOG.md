@@ -1,3 +1,7 @@
+## 0.16.0 (unreleased)
+
+- Updated OR-Tools to 9.13
+
 ## 0.15.0 (2025-02-17)
 
 - Updated OR-Tools to 9.12

@@ -3,18 +3,18 @@ require "fileutils"
 require "net/http"
 require "tmpdir"
 
-version = "9.12.4544"
+version = "9.13.4784"
 
 arch = RbConfig::CONFIG["host_cpu"]
 arm = arch.match?(/arm|aarch64/i)
 
 if RbConfig::CONFIG["host_os"].match?(/darwin/i)
   if arm
-    filename = "or-tools_arm64_macOS-15.3.1_cpp_v#{version}.tar.gz"
-    checksum = "02f89e54bd8d86e6e069f843aeed10a444ff329052e5a7fd732c5e4ec4f845fb"
+    filename = "or-tools_arm64_macOS-15.5_cpp_v#{version}.tar.gz"
+    checksum = "9d1911f038031623e761ffb3cd31f60a533c0910c334bf6543d7b0ae6b75e077"
   else
-    filename = "or-tools_x86_64_macOS-15.3.1_cpp_v#{version}.tar.gz"
-    checksum = "515af60e73e7fa620bab7f4a7d60b9069075d814453d91906aa39993d714f28d"
+    filename = "or-tools_x86_64_macOS-15.5_cpp_v#{version}.tar.gz"
+    checksum = "f6034aa739a03d50dd09f148bc7979f846ab0c753fd1df8d72a639b8037a55dc"
   end
 else
   # try /etc/os-release with fallback to /usr/lib/os-release
@@ -29,22 +29,22 @@ else
 
   if os == "ubuntu" && os_version == "24.04" && !arm
     filename = "or-tools_amd64_ubuntu-24.04_cpp_v#{version}.tar.gz"
-    checksum = "71128e095024707bf9835faf4558cbe34acb79345e899bd532f3008a493a8970"
+    checksum = "9ad206beb4087b188f57af41295e655d33e7fe35f618828d2c64453d157349f8"
   elsif os == "ubuntu" && os_version == "22.04" && !arm
     filename = "or-tools_amd64_ubuntu-22.04_cpp_v#{version}.tar.gz"
-    checksum = "cb42ea7d7799a01fea7cdaafacbdfc67180d85f39532c6d2a8c4cfb419bd07ed"
+    checksum = "873571435955b4102ea86f4851017e96872ed82a85f4260d00bfe58afa2fd245"
   elsif os == "ubuntu" && os_version == "20.04" && !arm
     filename = "or-tools_amd64_ubuntu-20.04_cpp_v#{version}.tar.gz"
-    checksum = "ea51589fe80bd9cd4fb6203bd1e956b311cdb1d21bbd14f7b6dad75c81d3583c"
+    checksum = "8a58434f10c43d772698ecb2dd629e8570e9fda6dcca9d3412bdd9476198cef0"
   elsif os == "debian" && os_version == "11" && !arm
     filename = "or-tools_amd64_debian-11_cpp_v#{version}.tar.gz"
-    checksum = "dcee63b726569bd99c134e0e920173f955feae5856c3370a0bed03fdc995af50"
+    checksum = "28a6e2165949e25087776362205e4cc9c8bf079543349eb90dfdcc355d335470"
   elsif os == "debian" && os_version == "12" && !arm
     filename = "or-tools_amd64_debian-12_cpp_v#{version}.tar.gz"
-    checksum = "911143f50fe013fbd50d0dce460512106596adfc0f2ad9a2bc8afd218531bde4"
+    checksum = "145acb8cb21c9a68174ebd5a3d028ebb5e7266f1f782eca91f15afe53a223305"
   elsif os == "arch" && !arm
     filename = "or-tools_amd64_archlinux_cpp_v#{version}.tar.gz"
-    checksum = "18c1d929e2144e9d9602659ea2fa790bd2a150f72c32c38a97f571839816d132"
+    checksum = "396ab7ea1369914d148f6c2942325bfc5b73b3bc65fd8bba301a21e61d33b770"
   else
     platform =
       if Gem.win_platform?
@@ -127,14 +127,6 @@ Dir.mktmpdir do |extract_path|
   tar_args = Gem.win_platform? ? ["--force-local"] : []
   system "tar", "zxf", download_path, "-C", extract_path, "--strip-components=1", *tar_args
 
-  # licenses
-  license_files = Dir.glob("**/*{LICENSE,LICENCE,NOTICE,COPYING,license,licence,notice,copying}*", base: extract_path)
-  raise "License not found" unless license_files.any?
-  license_files.each do |file|
-    FileUtils.mkdir_p(File.join(path, File.dirname(file)))
-    FileUtils.mv(File.join(extract_path, file), File.join(path, file))
-  end
-
   # include
   FileUtils.mv(File.join(extract_path, "include"), File.join(path, "include"))
 
@@ -142,6 +134,14 @@ Dir.mktmpdir do |extract_path|
   FileUtils.mkdir(File.join(path, "lib"))
   Dir.glob("lib/lib*{.dylib,.so,.so.*}", base: extract_path) do |file|
     next if file.include?("libprotoc.")
+    FileUtils.mv(File.join(extract_path, file), File.join(path, file))
+  end
+
+  # licenses
+  license_files = Dir.glob("**/*{LICENSE,LICENCE,NOTICE,COPYING,license,licence,notice,copying}*", base: extract_path)
+  raise "License not found" unless license_files.any?
+  license_files.each do |file|
+    FileUtils.mkdir_p(File.join(path, File.dirname(file)))
     FileUtils.mv(File.join(extract_path, file), File.join(path, file))
   end
 end
