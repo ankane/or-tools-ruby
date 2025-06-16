@@ -1,9 +1,11 @@
-#include "absl/log/check.h"
-#include "absl/status/statusor.h"
-#include "ortools/base/init_google.h"
-#include "ortools/math_opt/cpp/math_opt.h"
+#include <string>
 
-#include "ext.h"
+#include <absl/log/check.h>
+#include <absl/status/statusor.h>
+#include <ortools/base/init_google.h>
+#include <ortools/math_opt/cpp/math_opt.h>
+#include <rice/rice.hpp>
+#include <rice/stl.hpp>
 
 using operations_research::math_opt::LinearConstraint;
 using operations_research::math_opt::Model;
@@ -15,21 +17,17 @@ using operations_research::math_opt::Termination;
 using operations_research::math_opt::TerminationReason;
 using operations_research::math_opt::Variable;
 
-namespace Rice::detail
-{
+namespace Rice::detail {
   template<>
-  struct Type<SolverType>
-  {
+  struct Type<SolverType> {
     static bool verify() { return true; }
   };
 
   template<>
-  struct From_Ruby<SolverType>
-  {
+  struct From_Ruby<SolverType> {
     Convertible is_convertible(VALUE value) { return Convertible::Cast; }
 
-    static SolverType convert(VALUE x)
-    {
+    static SolverType convert(VALUE x) {
       auto s = Symbol(x).str();
       if (s == "gscip") {
         return SolverType::kGscip;
@@ -56,7 +54,7 @@ namespace Rice::detail
       }
     }
   };
-}
+} // namespace Rice::detail
 
 void init_math_opt(Rice::Module& m) {
   auto mathopt = Rice::define_module_under(m, "MathOpt");
@@ -67,7 +65,7 @@ void init_math_opt(Rice::Module& m) {
     .define_method(
       "_eql?",
       [](Variable& self, Variable &other) {
-        return (bool) (self == other);
+        return static_cast<bool>(self == other);
       });
 
   Rice::define_class_under<LinearConstraint>(mathopt, "LinearConstraint");

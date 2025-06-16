@@ -1,7 +1,7 @@
 #include <ortools/base/version.h>
 #include <ortools/init/init.h>
-
-#include "ext.h"
+#include <rice/rice.hpp>
+#include <rice/stl.hpp>
 
 using operations_research::CppBridge;
 using operations_research::CppFlags;
@@ -15,8 +15,7 @@ void init_network_flows(Rice::Module& m);
 void init_routing(Rice::Module& m);
 
 extern "C"
-void Init_ext()
-{
+void Init_ext() {
   auto m = Rice::define_module("ORTools");
 
   m.define_singleton_function("lib_version", &operations_research::OrToolsVersionString);
