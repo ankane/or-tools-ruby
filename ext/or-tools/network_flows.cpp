@@ -5,7 +5,6 @@
 #include <rice/rice.hpp>
 #include <rice/stl.hpp>
 
-using operations_research::NodeIndex;
 using operations_research::SimpleMaxFlow;
 using operations_research::SimpleMinCostFlow;
 
@@ -25,7 +24,7 @@ void init_network_flows(Rice::Module& m) {
     .define_method("flow", &SimpleMaxFlow::Flow)
     .define_method(
       "solve",
-      [](SimpleMaxFlow& self, NodeIndex source, NodeIndex sink) {
+      [](SimpleMaxFlow& self, SimpleMaxFlow::NodeIndex source, SimpleMaxFlow::NodeIndex sink) {
         auto status = self.Solve(source, sink);
 
         if (status == SimpleMaxFlow::Status::OPTIMAL) {
@@ -43,7 +42,7 @@ void init_network_flows(Rice::Module& m) {
     .define_method(
       "source_side_min_cut",
       [](SimpleMaxFlow& self) {
-        std::vector<NodeIndex> result;
+        std::vector<SimpleMaxFlow::NodeIndex> result;
         self.GetSourceSideMinCut(&result);
 
         Array ret;
@@ -55,7 +54,7 @@ void init_network_flows(Rice::Module& m) {
     .define_method(
       "sink_side_min_cut",
       [](SimpleMaxFlow& self) {
-        std::vector<NodeIndex> result;
+        std::vector<SimpleMaxFlow::NodeIndex> result;
         self.GetSinkSideMinCut(&result);
 
         Array ret;
