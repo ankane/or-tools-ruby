@@ -45,6 +45,12 @@ else
   elsif os == "arch" && !arm
     filename = "or-tools_amd64_archlinux_cpp_v#{version}.tar.gz"
     checksum = "6be039a13c3be7a3dbcdc413d455b43bba4590ce38859062898835effefb5ca4"
+  elsif os == "fedora" && os_version == "42" && !arm
+    filename = "or-tools_amd64_fedora-42_cpp_v#{version}.tar.gz"
+    checksum = "d1c3a890528875dcd3a435077a8f75bf6ae31b769b2d4a0463a6f21d57256aae"
+  elsif os == "fedora" && os_version == "41" && !arm
+    filename = "or-tools_amd64_fedora-41_cpp_v#{version}.tar.gz"
+    checksum = "81f84cf618dc8690a7184e797fa183afb075c7f50e9fa7cb5858f27fafe2db4b"
   else
     platform =
       if Gem.win_platform?
@@ -132,9 +138,9 @@ Dir.mktmpdir do |extract_path|
 
   # shared library
   FileUtils.mkdir(File.join(path, "lib"))
-  Dir.glob("lib/lib*{.dylib,.so,.so.*}", base: extract_path) do |file|
+  Dir.glob("{lib,lib64}/lib*{.dylib,.so,.so.*}", base: extract_path) do |file|
     next if file.include?("libprotoc.")
-    FileUtils.mv(File.join(extract_path, file), File.join(path, file))
+    FileUtils.mv(File.join(extract_path, file), File.join(path, file.sub(/\Alib64/, "lib")))
   end
 
   # licenses

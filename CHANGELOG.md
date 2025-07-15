@@ -1,3 +1,7 @@
+## 0.16.1 (unreleased)
+
+- Added binary installation for Fedora 41 and 42
+
 ## 0.16.0 (2025-06-19)
 
 - Updated OR-Tools to 9.14
