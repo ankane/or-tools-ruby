@@ -1,7 +1,10 @@
+#include <string>
+#include <vector>
+
 #include <google/protobuf/text_format.h>
 #include <ortools/sat/cp_model.h>
-
-#include "ext.h"
+#include <rice/rice.hpp>
+#include <rice/stl.hpp>
 
 using operations_research::Domain;
 using operations_research::sat::BoolVar;
@@ -27,22 +30,18 @@ using Rice::Symbol;
 Class rb_cBoolVar;
 Class rb_cSatIntVar;
 
-namespace Rice::detail
-{
+namespace Rice::detail {
   template<>
-  struct Type<LinearExpr>
-  {
+  struct Type<LinearExpr> {
     static bool verify() { return true; }
   };
 
   template<>
-  class From_Ruby<LinearExpr>
-  {
+  class From_Ruby<LinearExpr> {
   public:
     Convertible is_convertible(VALUE value) { return Convertible::Cast; }
 
-    LinearExpr convert(VALUE v)
-    {
+    LinearExpr convert(VALUE v) {
       LinearExpr expr;
 
       Rice::Object utils = Rice::define_module("ORTools").const_get("Utils");
@@ -64,7 +63,7 @@ namespace Rice::detail
       return expr;
     }
   };
-}
+} // namespace Rice::detail
 
 void init_constraint(Rice::Module& m) {
   Rice::define_class_under<Domain>(m, "Domain")

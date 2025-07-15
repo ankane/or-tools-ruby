@@ -44,7 +44,7 @@ class ShiftSchedulingSatTest < Minitest::Test
     shift_constraints = [
       # One or two consecutive days of rest, this is a hard constraint.
       [0, 1, 1, 0, 2, 2, 0],
-      # betweem 2 and 3 consecutive days of night shifts, 1 and 4 are
+      # between 2 and 3 consecutive days of night shifts, 1 and 4 are
       # possible but penalized.
       [3, 1, 2, 20, 3, 4, 5]
     ]
@@ -68,7 +68,7 @@ class ShiftSchedulingSatTest < Minitest::Test
       [3, 1, 0]
     ]
 
-    # daily demands for work shifts (morning, afternon, night) for each day
+    # daily demands for work shifts (morning, afternoon, night) for each day
     # of the week starting on Monday.
     weekly_cover_demands = [
       [2, 3, 1],  # Monday

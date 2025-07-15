@@ -1,6 +1,9 @@
-#include <ortools/algorithms/knapsack_solver.h>
+#include <string>
+#include <vector>
 
-#include "ext.h"
+#include <ortools/algorithms/knapsack_solver.h>
+#include <rice/rice.hpp>
+#include <rice/stl.hpp>
 
 using operations_research::KnapsackSolver;
 
@@ -8,22 +11,18 @@ using Rice::Array;
 using Rice::Object;
 using Rice::Symbol;
 
-namespace Rice::detail
-{
+namespace Rice::detail {
   template<>
-  struct Type<KnapsackSolver::SolverType>
-  {
+  struct Type<KnapsackSolver::SolverType> {
     static bool verify() { return true; }
   };
 
   template<>
-  class From_Ruby<KnapsackSolver::SolverType>
-  {
+  class From_Ruby<KnapsackSolver::SolverType> {
   public:
     Convertible is_convertible(VALUE value) { return Convertible::Cast; }
 
-    KnapsackSolver::SolverType convert(VALUE x)
-    {
+    KnapsackSolver::SolverType convert(VALUE x) {
       auto s = Symbol(x).str();
       if (s == "branch_and_bound") {
         return KnapsackSolver::KNAPSACK_MULTIDIMENSION_BRANCH_AND_BOUND_SOLVER;
@@ -32,7 +31,7 @@ namespace Rice::detail
       }
     }
   };
-}
+} // namespace Rice::detail
 
 void init_bin_packing(Rice::Module& m) {
   Rice::define_class_under<KnapsackSolver>(m, "KnapsackSolver")

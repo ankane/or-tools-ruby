@@ -1,7 +1,10 @@
+#include <string>
+#include <vector>
+
 #include <ortools/constraint_solver/routing.h>
 #include <ortools/constraint_solver/routing_parameters.h>
-
-#include "ext.h"
+#include <rice/rice.hpp>
+#include <rice/stl.hpp>
 
 using operations_research::Assignment;
 using operations_research::ConstraintSolverParameters;
@@ -24,37 +27,31 @@ using Rice::Object;
 using Rice::String;
 using Rice::Symbol;
 
-namespace Rice::detail
-{
+namespace Rice::detail {
   template<>
-  struct Type<RoutingNodeIndex>
-  {
+  struct Type<RoutingNodeIndex> {
     static bool verify() { return true; }
   };
 
   template<>
-  class From_Ruby<RoutingNodeIndex>
-  {
+  class From_Ruby<RoutingNodeIndex> {
   public:
     Convertible is_convertible(VALUE value) { return Convertible::Cast; }
 
-    RoutingNodeIndex convert(VALUE x)
-    {
+    RoutingNodeIndex convert(VALUE x) {
       const RoutingNodeIndex index{From_Ruby<int>().convert(x)};
       return index;
     }
   };
 
   template<>
-  class To_Ruby<RoutingNodeIndex>
-  {
+  class To_Ruby<RoutingNodeIndex> {
   public:
-    VALUE convert(RoutingNodeIndex const & x)
-    {
+    VALUE convert(RoutingNodeIndex const & x) {
       return To_Ruby<int>().convert(x.value());
     }
   };
-}
+} // namespace Rice::detail
 
 void init_routing(Rice::Module& m) {
   auto rb_cRoutingSearchParameters = Rice::define_class_under<RoutingSearchParameters>(m, "RoutingSearchParameters");
@@ -253,7 +250,11 @@ void init_routing(Rice::Module& m) {
       })
     .define_method(
       "cumulative",
-      [](operations_research::Solver& self, std::vector<operations_research::IntervalVar*> intervals, std::vector<int64_t> demands, int64_t capacity, const std::string& name) {
+      [](operations_research::Solver& self, Array rb_intervals, std::vector<int64_t> demands, int64_t capacity, const std::string& name) {
+        std::vector<operations_research::IntervalVar*> intervals;
+        for (const Object v : rb_intervals) {
+          intervals.push_back(Rice::detail::From_Ruby<operations_research::IntervalVar*>().convert(v.value()));
+        }
         return self.MakeCumulative(intervals, demands, capacity, name);
       });
 
@@ -332,7 +333,7 @@ void init_routing(Rice::Module& m) {
     .define_method("add_resource_group", &RoutingModel::AddResourceGroup)
     .define_method("dimension_resource_group_indices", &RoutingModel::GetDimensionResourceGroupIndices)
     .define_method("dimension_resource_group_index", &RoutingModel::GetDimensionResourceGroupIndex)
-    .define_method("add_disjunction", &RoutingModel::AddDisjunction, Rice::Arg("_indices"), Rice::Arg("_penalty"), Rice::Arg("_max_cardinality") = (int64_t)1, Rice::Arg("_penalty_cost_behavior") = RoutingModel::PenaltyCostBehavior::PENALIZE_ONCE)
+    .define_method("add_disjunction", &RoutingModel::AddDisjunction, Rice::Arg("_indices"), Rice::Arg("_penalty"), Rice::Arg("_max_cardinality") = static_cast<int64_t>(1), Rice::Arg("_penalty_cost_behavior") = RoutingModel::PenaltyCostBehavior::PENALIZE_ONCE)
     .define_method("disjunction_indices", &RoutingModel::GetDisjunctionIndices)
     .define_method("disjunction_penalty", &RoutingModel::GetDisjunctionPenalty)
     .define_method("disjunction_max_cardinality", &RoutingModel::GetDisjunctionMaxCardinality)

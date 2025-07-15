@@ -229,9 +229,10 @@ class ConstraintTest < Minitest::Test
     model.add_hint(x, 1)
     model.add_hint(y, true)
 
-    assert_raises(TypeError) do
+    error = assert_raises(RuntimeError) do
       model.add_hint("z", 1)
     end
+    assert_equal "The provided Ruby object does not wrap a C++ object", error.message
   end
 
   def test_int_var_domain

@@ -1,6 +1,9 @@
-#include <ortools/linear_solver/linear_solver.h>
+#include <memory>
+#include <string>
 
-#include "ext.h"
+#include <ortools/linear_solver/linear_solver.h>
+#include <rice/rice.hpp>
+#include <rice/stl.hpp>
 
 using operations_research::MPConstraint;
 using operations_research::MPObjective;
@@ -15,21 +18,17 @@ using Rice::Object;
 using Rice::String;
 using Rice::Symbol;
 
-namespace Rice::detail
-{
+namespace Rice::detail {
   template<>
-  struct Type<MPSolver::OptimizationProblemType>
-  {
+  struct Type<MPSolver::OptimizationProblemType> {
     static bool verify() { return true; }
   };
 
   template<>
-  struct From_Ruby<MPSolver::OptimizationProblemType>
-  {
+  struct From_Ruby<MPSolver::OptimizationProblemType> {
     Convertible is_convertible(VALUE value) { return Convertible::Cast; }
 
-    static MPSolver::OptimizationProblemType convert(VALUE x)
-    {
+    static MPSolver::OptimizationProblemType convert(VALUE x) {
       auto s = Symbol(x).str();
       if (s == "glop") {
         return MPSolver::OptimizationProblemType::GLOP_LINEAR_PROGRAMMING;
@@ -40,7 +39,7 @@ namespace Rice::detail
       }
     }
   };
-}
+} // namespace Rice::detail
 
 void init_linear(Rice::Module& m) {
   Rice::define_class_under<MPVariable>(m, "MPVariable")
