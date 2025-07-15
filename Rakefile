@@ -32,8 +32,8 @@ task :update do
     "amd64_ubuntu-24.04",
     "amd64_ubuntu-22.04",
     "amd64_ubuntu-20.04",
-    "amd64_debian-11",
     "amd64_debian-12",
+    "amd64_debian-11",
     "amd64_archlinux"
   ]
 
