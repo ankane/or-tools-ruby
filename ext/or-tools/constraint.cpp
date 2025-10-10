@@ -252,6 +252,16 @@ void init_constraint(Rice::Module& m) {
         return self.AddAllDifferent(vars);
       })
     .define_method(
+      "add_allowed_assignments",
+      [](CpModelBuilder& self, std::vector<LinearExpr> expressions) {
+        return self.AddAllowedAssignments(expressions);
+      })
+    .define_method(
+      "add_forbidden_assignments",
+      [](CpModelBuilder& self, std::vector<LinearExpr> expressions) {
+        return self.AddForbiddenAssignments(expressions);
+      })
+    .define_method(
       "add_inverse_constraint",
       [](CpModelBuilder& self, std::vector<IntVar> variables, std::vector<IntVar> inverse_variables) {
         return self.AddInverseConstraint(variables, inverse_variables);
