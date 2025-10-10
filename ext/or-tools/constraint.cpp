@@ -104,7 +104,12 @@ void init_constraint(Rice::Module& m) {
         }
       });
 
-  Rice::define_class_under<TableConstraint, Constraint>(m, "SatTableConstraint");
+  Rice::define_class_under<TableConstraint, Constraint>(m, "SatTableConstraint")
+    .define_method(
+      "add_tuple",
+      [](TableConstraint& self, std::vector<int64_t> tuple) {
+        self.AddTuple(tuple);
+      });
 
   rb_cBoolVar = Rice::define_class_under<BoolVar>(m, "SatBoolVar")
     .define_method("name", &BoolVar::Name)
