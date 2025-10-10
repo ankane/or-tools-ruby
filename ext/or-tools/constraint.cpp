@@ -9,6 +9,7 @@
 using operations_research::Domain;
 using operations_research::sat::BoolVar;
 using operations_research::sat::Constraint;
+using operations_research::sat::TableConstraint;
 using operations_research::sat::CpModelBuilder;
 using operations_research::sat::CpSolverResponse;
 using operations_research::sat::CpSolverStatus;
@@ -102,6 +103,8 @@ void init_constraint(Rice::Module& m) {
           return self.OnlyEnforceIf(Rice::detail::From_Ruby<BoolVar>().convert(literal));
         }
       });
+
+  Rice::define_class_under<TableConstraint, Constraint>(m, "SatTableConstraint");
 
   rb_cBoolVar = Rice::define_class_under<BoolVar>(m, "SatBoolVar")
     .define_method("name", &BoolVar::Name)
