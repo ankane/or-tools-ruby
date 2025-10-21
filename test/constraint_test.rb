@@ -288,4 +288,44 @@ class ConstraintTest < Minitest::Test
     assert_equal 1, domain.min
     assert_equal 3, domain.max
   end
+
+  def test_automaton_consecutive_limit
+    model = ORTools::CpModel.new
+
+    # a small sequence of binary variables
+    n = 8
+    xs = n.times.map { |i| model.new_bool_var("x#{i}") }
+
+    # Build automaton for "at most 2 consecutive 1s"
+    limit = 2
+    transitions = []
+    (0..limit).each { |s| transitions << [s, 0, 0] }       # on 0: reset to 0
+    (0...limit).each { |s| transitions << [s, 1, s + 1] }  # on 1: increment (no 1 from state=limit)
+    finals = (0..limit).to_a
+    start_state = 0
+
+    # Add automaton constraint and push solver to use 1s when possible
+    model.add_automaton(xs, start_state, finals, transitions)
+    model.maximize(model.sum(xs))
+
+    solver = ORTools::CpSolver.new
+    status = solver.solve(model)
+    assert([:optimal, :feasible].include?(status), "Unexpected status: #{status}")
+
+    values = xs.map { |x| solver.value(x) }
+    consec = 0
+    ok = true
+    values.each do |v|
+      if v == 1
+        consec += 1
+        if consec > limit
+          ok = false
+          break
+        end
+      else
+        consec = 0
+      end
+    end
+    assert ok, "Found more than #{limit} consecutive 1s: #{values.inspect}"
+  end
 end

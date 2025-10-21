@@ -16,6 +16,7 @@ using operations_research::Domain;
 using operations_research::sat::BoolVar;
 using operations_research::sat::Constraint;
 using operations_research::sat::TableConstraint;
+using operations_research::sat::AutomatonConstraint;
 using operations_research::sat::CpModelBuilder;
 using operations_research::sat::CpModelProto;
 using operations_research::sat::CpSolverResponse;
@@ -163,6 +164,13 @@ void init_constraint(Rice::Module& m) {
       "add_tuple",
       [](TableConstraint& self, std::vector<int64_t> tuple) {
         self.AddTuple(tuple);
+      });
+
+  Rice::define_class_under<AutomatonConstraint, Constraint>(m, "SatAutomatonConstraint")
+    .define_method(
+      "add_transition",
+      [](AutomatonConstraint& self, int tail, int head, int64_t label) {
+        self.AddTransition(tail, head, label);
       });
 
   rb_cBoolVar = Rice::define_class_under<BoolVar>(m, "SatBoolVar")
@@ -455,6 +463,39 @@ void init_constraint(Rice::Module& m) {
       "add_multiplication_equality",
       [](CpModelBuilder& self, LinearExpr target, std::vector<LinearExpr> vars) {
         return self.AddMultiplicationEquality(target, vars);
+      })
+    .define_method(
+      "add_automaton",
+      [](CpModelBuilder& self,
+         std::vector<LinearExpr> transition_expressions,
+         int64_t starting_state,
+         std::vector<int64_t> final_states,
+         std::vector<std::vector<int64_t>> transition_triples) {
+        for (const auto& t : transition_triples) {
+          if (t.size() != 3) {
+            throw std::runtime_error("Each transition must be an array of 3 integers: [tail, label, head]");
+          }
+        }
+
+        // OR-Tools v9.14 expects ints for starting_state and final_states.
+        std::vector<int> finals;
+        finals.reserve(final_states.size());
+        for (const auto v : final_states) finals.push_back(static_cast<int>(v));
+
+        AutomatonConstraint ct =
+          self.AddAutomaton(transition_expressions,
+                            static_cast<int>(starting_state),
+                            finals);
+
+        // Optionally add provided transitions now; users can also chain later.
+        for (const auto& t : transition_triples) {
+          const int tail = static_cast<int>(t[0]);
+          const int head = static_cast<int>(t[2]);
+          const int64_t label = static_cast<int64_t>(t[1]);
+          ct.AddTransition(tail, head, label);
+        }
+
+        return ct;
       })
     .define_method(
       "add_no_overlap",
