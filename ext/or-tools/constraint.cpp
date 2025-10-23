@@ -1,16 +1,23 @@
+#include <condition_variable>
+#include <deque>
+#include <memory>
+#include <mutex>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include <google/protobuf/text_format.h>
 #include <ortools/sat/cp_model.h>
 #include <rice/rice.hpp>
 #include <rice/stl.hpp>
+#include <ruby/thread.h>
 
 using operations_research::Domain;
 using operations_research::sat::BoolVar;
 using operations_research::sat::Constraint;
 using operations_research::sat::TableConstraint;
 using operations_research::sat::CpModelBuilder;
+using operations_research::sat::CpModelProto;
 using operations_research::sat::CpSolverResponse;
 using operations_research::sat::CpSolverStatus;
 using operations_research::sat::LinearExpr;
@@ -18,6 +25,7 @@ using operations_research::sat::IntVar;
 using operations_research::sat::IntervalVar;
 using operations_research::sat::Model;
 using operations_research::sat::NewFeasibleSolutionObserver;
+using operations_research::sat::SolveCpModel;
 using operations_research::sat::SatParameters;
 using operations_research::sat::SolutionBooleanValue;
 using operations_research::sat::SolutionIntegerValue;
@@ -30,6 +38,45 @@ using Rice::Symbol;
 
 Class rb_cBoolVar;
 Class rb_cSatIntVar;
+
+// Thread-safe queue that lets OR-Tools worker threads enqueue responses while a Ruby-owned
+// thread drains the queue and invokes the Ruby callback after reacquiring the GVL.
+struct CallbackQueue {
+  std::mutex mutex;
+  std::condition_variable cv;
+  std::deque<CpSolverResponse> responses;
+  bool solver_finished = false;
+  bool has_final_response = false;
+  CpSolverResponse final_response;
+};
+
+struct WaitForEventArgs {
+  CallbackQueue* queue;
+  bool has_response = false;
+  CpSolverResponse response;
+};
+
+static void* wait_for_event_without_gvl(void* ptr) {
+  auto* args = static_cast<WaitForEventArgs*>(ptr);
+  std::unique_lock<std::mutex> lock(args->queue->mutex);
+  args->queue->cv.wait(lock, [args]() {
+    return args->queue->solver_finished || !args->queue->responses.empty();
+  });
+
+  if (!args->queue->responses.empty()) {
+    args->response = args->queue->responses.front();
+    args->queue->responses.pop_front();
+    args->has_response = true;
+  } else {
+    args->has_response = false;
+  }
+
+  return nullptr;
+}
+
+static CpSolverResponse solve_cp_model_without_gvl(const CpModelProto* proto, Model* model) {
+  return SolveCpModel(*proto, model);
+}
 
 namespace Rice::detail {
   template<>
@@ -425,26 +472,94 @@ void init_constraint(Rice::Module& m) {
     .define_method(
       "_solve",
       [](Object self, CpModelBuilder& model, SatParameters& parameters, Object callback) {
-        Model m;
+        Model solver_model;
 
-        if (!callback.is_nil()) {
-          // use a single worker since Ruby code cannot be run in a non-Ruby thread
-          parameters.set_num_search_workers(1);
+        bool has_callback = !callback.is_nil();
+        VALUE rb_cb = Qnil;
+        std::shared_ptr<CallbackQueue> callback_queue;
 
-          m.Add(NewFeasibleSolutionObserver(
-            [&callback](const CpSolverResponse& r) {
-              if (!ruby_native_thread_p()) {
-                throw std::runtime_error("Non-Ruby thread");
-              }
+        if (has_callback) {
+          rb_cb = callback.value();
+          rb_gc_register_address(&rb_cb);
 
-              callback.call("response=", r);
-              callback.call("on_solution_callback");
+          callback_queue = std::make_shared<CallbackQueue>();
+
+          solver_model.Add(NewFeasibleSolutionObserver(
+            [callback_queue](const CpSolverResponse& r) {
+              std::lock_guard<std::mutex> lock(callback_queue->mutex);
+              callback_queue->responses.push_back(r);
+              callback_queue->cv.notify_one();
             })
           );
         }
 
-        m.Add(NewSatParameters(parameters));
-        return SolveCpModel(model.Build(), &m);
+        solver_model.Add(NewSatParameters(parameters));
+        const CpModelProto proto = model.Build();
+
+        if (!has_callback) {
+          return Rice::detail::no_gvl(
+            &solve_cp_model_without_gvl,
+            &proto,
+            &solver_model);
+        }
+
+        std::thread solver_thread(
+          [&proto, &solver_model, callback_queue]() {
+            auto response = solve_cp_model_without_gvl(&proto, &solver_model);
+            {
+              std::lock_guard<std::mutex> lock(callback_queue->mutex);
+              callback_queue->final_response = response;
+              callback_queue->has_final_response = true;
+              callback_queue->solver_finished = true;
+            }
+            callback_queue->cv.notify_all();
+          });
+
+        CpSolverResponse final_response;
+
+        try {
+          Rice::Object rb_callback(rb_cb);
+
+          while (true) {
+            WaitForEventArgs wait_args{callback_queue.get()};
+            rb_thread_call_without_gvl(
+              wait_for_event_without_gvl,
+              &wait_args,
+              RUBY_UBF_IO,
+              nullptr);
+
+            if (wait_args.has_response) {
+              rb_callback.call("response=", wait_args.response);
+              rb_callback.call("on_solution_callback");
+            }
+
+            bool done = false;
+            {
+              std::lock_guard<std::mutex> lock(callback_queue->mutex);
+              done = callback_queue->solver_finished && callback_queue->responses.empty();
+            }
+
+            if (done && !wait_args.has_response) {
+              break;
+            }
+          }
+        } catch (...) {
+          solver_thread.join();
+          rb_gc_unregister_address(&rb_cb);
+          throw;
+        }
+
+        solver_thread.join();
+
+        {
+          std::lock_guard<std::mutex> lock(callback_queue->mutex);
+          if (callback_queue->has_final_response) {
+            final_response = callback_queue->final_response;
+          }
+        }
+
+        rb_gc_unregister_address(&rb_cb);
+        return final_response;
       })
     .define_method(
       "_solution_integer_value",
