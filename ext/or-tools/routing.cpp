@@ -36,20 +36,34 @@ namespace Rice::detail {
   template<>
   class From_Ruby<RoutingNodeIndex> {
   public:
+    From_Ruby() = default;
+
+    explicit From_Ruby(Arg* arg) : arg_(arg) { }
+
     Convertible is_convertible(VALUE value) { return Convertible::Cast; }
 
     RoutingNodeIndex convert(VALUE x) {
       const RoutingNodeIndex index{From_Ruby<int>().convert(x)};
       return index;
     }
+
+  private:
+    Arg* arg_ = nullptr;
   };
 
   template<>
   class To_Ruby<RoutingNodeIndex> {
   public:
+    To_Ruby() = default;
+
+    explicit To_Ruby(Arg* arg) : arg_(arg) { }
+
     VALUE convert(RoutingNodeIndex const & x) {
       return To_Ruby<int>().convert(x.value());
     }
+
+  private:
+    Arg* arg_ = nullptr;
   };
 } // namespace Rice::detail
 
@@ -62,7 +76,7 @@ void init_routing(Rice::Module& m) {
   rb_cRoutingSearchParameters
     .define_method(
       "first_solution_strategy=",
-      [](RoutingSearchParameters& self, Symbol value) {
+      [](RoutingSearchParameters& self, Object value) {
         auto s = Symbol(value).str();
 
         FirstSolutionStrategy::Value v;
@@ -102,7 +116,7 @@ void init_routing(Rice::Module& m) {
       })
     .define_method(
       "local_search_metaheuristic=",
-      [](RoutingSearchParameters& self, Symbol value) {
+      [](RoutingSearchParameters& self, Object value) {
         auto s = Symbol(value).str();
 
         LocalSearchMetaheuristic::Value v;

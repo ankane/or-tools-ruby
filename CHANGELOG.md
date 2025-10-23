@@ -1,6 +1,7 @@
 ## 0.16.1 (unreleased)
 
 - Added `add_allowed_assignments` and `add_forbidden_assignments` methods to `CpModel`
+- Fixed error with Rice 4.7
 
 ## 0.16.0 (2025-06-19)
 

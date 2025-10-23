@@ -25,6 +25,10 @@ namespace Rice::detail {
 
   template<>
   struct From_Ruby<SolverType> {
+    From_Ruby() = default;
+
+    explicit From_Ruby(Arg* arg) : arg_(arg) { }
+
     Convertible is_convertible(VALUE value) { return Convertible::Cast; }
 
     static SolverType convert(VALUE x) {
@@ -53,6 +57,9 @@ namespace Rice::detail {
         throw std::runtime_error("Unknown solver type: " + s);
       }
     }
+
+  private:
+    Arg* arg_ = nullptr;
   };
 } // namespace Rice::detail
 
@@ -61,7 +68,11 @@ void init_math_opt(Rice::Module& m) {
 
   Rice::define_class_under<Variable>(mathopt, "Variable")
     .define_method("id", &Variable::id)
-    .define_method("name", &Variable::name)
+    .define_method(
+      "name",
+      [](Variable& self) {
+        return std::string(self.name());
+      })
     .define_method(
       "_eql?",
       [](Variable& self, Variable &other) {

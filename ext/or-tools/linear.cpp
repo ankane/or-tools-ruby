@@ -26,6 +26,10 @@ namespace Rice::detail {
 
   template<>
   struct From_Ruby<MPSolver::OptimizationProblemType> {
+    From_Ruby() = default;
+
+    explicit From_Ruby(Arg* arg) : arg_(arg) { }
+
     Convertible is_convertible(VALUE value) { return Convertible::Cast; }
 
     static MPSolver::OptimizationProblemType convert(VALUE x) {
@@ -38,6 +42,9 @@ namespace Rice::detail {
         throw std::runtime_error("Unknown optimization problem type: " + s);
       }
     }
+
+  private:
+    Arg* arg_ = nullptr;
   };
 } // namespace Rice::detail
 

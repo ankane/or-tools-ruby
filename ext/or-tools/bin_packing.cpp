@@ -20,6 +20,10 @@ namespace Rice::detail {
   template<>
   class From_Ruby<KnapsackSolver::SolverType> {
   public:
+    From_Ruby() = default;
+
+    explicit From_Ruby(Arg* arg) : arg_(arg) { }
+
     Convertible is_convertible(VALUE value) { return Convertible::Cast; }
 
     KnapsackSolver::SolverType convert(VALUE x) {
@@ -30,6 +34,9 @@ namespace Rice::detail {
         throw std::runtime_error("Unknown solver type: " + s);
       }
     }
+
+  private:
+    Arg* arg_ = nullptr;
   };
 } // namespace Rice::detail
 

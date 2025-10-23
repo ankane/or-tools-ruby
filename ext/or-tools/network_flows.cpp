@@ -47,7 +47,7 @@ void init_network_flows(Rice::Module& m) {
 
         Array ret;
         for (const auto& it : result) {
-          ret.push(it);
+          ret.push(it, false);
         }
         return ret;
       })
@@ -59,7 +59,7 @@ void init_network_flows(Rice::Module& m) {
 
         Array ret;
         for (const auto& it : result) {
-          ret.push(it);
+          ret.push(it, false);
         }
         return ret;
       });

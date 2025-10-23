@@ -40,6 +40,10 @@ namespace Rice::detail {
   template<>
   class From_Ruby<LinearExpr> {
   public:
+    From_Ruby() = default;
+
+    explicit From_Ruby(Arg* arg) : arg_(arg) { }
+
     Convertible is_convertible(VALUE value) { return Convertible::Cast; }
 
     LinearExpr convert(VALUE v) {
@@ -63,6 +67,9 @@ namespace Rice::detail {
 
       return expr;
     }
+
+  private:
+    Arg* arg_ = nullptr;
   };
 } // namespace Rice::detail
 
@@ -409,7 +416,7 @@ void init_constraint(Rice::Module& m) {
         auto a = Array();
         auto assumptions = self.sufficient_assumptions_for_infeasibility();
         for (const auto& v : assumptions) {
-          a.push(v);
+          a.push(v, false);
         }
         return a;
       });
