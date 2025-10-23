@@ -6,7 +6,7 @@ $CXXFLAGS << " -std=c++17 $(optflags) -DUSE_CBC -DOR_PROTO_DLL="
 $CXXFLAGS << " -Wall -Wextra"
 
 # hide or-tools warnings
-$CXXFLAGS << " -Wno-sign-compare -Wno-ignored-qualifiers -Wno-unused-parameter -Wno-missing-field-initializers"
+$CXXFLAGS << " -Wno-sign-compare -Wno-ignored-qualifiers -Wno-unused-parameter -Wno-missing-field-initializers -Wno-deprecated-declarations"
 
 # hide Rice warnings
 $CXXFLAGS << " -Wno-unused-private-field -Wno-implicit-fallthrough"
