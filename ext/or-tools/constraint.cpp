@@ -30,6 +30,11 @@ using operations_research::sat::SolveCpModel;
 using operations_research::sat::SatParameters;
 using operations_research::sat::SolutionBooleanValue;
 using operations_research::sat::SolutionIntegerValue;
+using operations_research::sat::CircuitConstraint;
+using operations_research::sat::CumulativeConstraint;
+using operations_research::sat::MultipleCircuitConstraint;
+using operations_research::sat::NoOverlap2DConstraint;
+using operations_research::sat::ReservoirConstraint;
 
 using Rice::Array;
 using Rice::Class;
@@ -39,45 +44,6 @@ using Rice::Symbol;
 
 Class rb_cBoolVar;
 Class rb_cSatIntVar;
-
-// Thread-safe queue that lets OR-Tools worker threads enqueue responses while a Ruby-owned
-// thread drains the queue and invokes the Ruby callback after reacquiring the GVL.
-struct CallbackQueue {
-  std::mutex mutex;
-  std::condition_variable cv;
-  std::deque<CpSolverResponse> responses;
-  bool solver_finished = false;
-  bool has_final_response = false;
-  CpSolverResponse final_response;
-};
-
-struct WaitForEventArgs {
-  CallbackQueue* queue;
-  bool has_response = false;
-  CpSolverResponse response;
-};
-
-static void* wait_for_event_without_gvl(void* ptr) {
-  auto* args = static_cast<WaitForEventArgs*>(ptr);
-  std::unique_lock<std::mutex> lock(args->queue->mutex);
-  args->queue->cv.wait(lock, [args]() {
-    return args->queue->solver_finished || !args->queue->responses.empty();
-  });
-
-  if (!args->queue->responses.empty()) {
-    args->response = args->queue->responses.front();
-    args->queue->responses.pop_front();
-    args->has_response = true;
-  } else {
-    args->has_response = false;
-  }
-
-  return nullptr;
-}
-
-static CpSolverResponse solve_cp_model_without_gvl(const CpModelProto* proto, Model* model) {
-  return SolveCpModel(*proto, model);
-}
 
 namespace Rice::detail {
   template<>
@@ -120,6 +86,79 @@ namespace Rice::detail {
     Arg* arg_ = nullptr;
   };
 } // namespace Rice::detail
+
+// Thread-safe queue that lets OR-Tools worker threads enqueue responses while a Ruby-owned
+// thread drains the queue and invokes the Ruby callback after reacquiring the GVL.
+struct CallbackQueue {
+  std::mutex mutex;
+  std::condition_variable cv;
+  std::deque<CpSolverResponse> responses;
+  bool solver_finished = false;
+  bool has_final_response = false;
+  CpSolverResponse final_response;
+};
+
+struct WaitForEventArgs {
+  CallbackQueue* queue;
+  bool has_response = false;
+  CpSolverResponse response;
+};
+
+static void* wait_for_event_without_gvl(void* ptr) {
+  auto* args = static_cast<WaitForEventArgs*>(ptr);
+  std::unique_lock<std::mutex> lock(args->queue->mutex);
+  args->queue->cv.wait(lock, [args]() {
+    return args->queue->solver_finished || !args->queue->responses.empty();
+  });
+
+  if (!args->queue->responses.empty()) {
+    args->response = args->queue->responses.front();
+    args->queue->responses.pop_front();
+    args->has_response = true;
+  } else {
+    args->has_response = false;
+  }
+
+  return nullptr;
+}
+
+static CpSolverResponse solve_cp_model_without_gvl(const CpModelProto* proto, Model* model) {
+  return SolveCpModel(*proto, model);
+}
+
+static bool object_is_integer(const Object& value) {
+  VALUE val = value.value();
+  return RB_TYPE_P(val, T_FIXNUM) || RB_TYPE_P(val, T_BIGNUM);
+}
+
+static bool array_contains_only_integers(const Array& array) {
+  for (const Object& value : array) {
+    if (!object_is_integer(value)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+static std::vector<int64_t> array_to_int64_vector(const Array& array) {
+  std::vector<int64_t> values;
+  values.reserve(array.size());
+  Rice::detail::From_Ruby<int64_t> converter;
+  for (const Object& value : array) {
+    values.push_back(converter.convert(value.value()));
+  }
+  return values;
+}
+
+static std::vector<LinearExpr> array_to_linear_expr_vector(const Array& array) {
+  std::vector<LinearExpr> values;
+  values.reserve(array.size());
+  Rice::detail::From_Ruby<LinearExpr> converter;
+  for (const Object& value : array) {
+    values.push_back(converter.convert(value.value()));
+  }
+  return values;
+}
 
 void init_constraint(Rice::Module& m) {
   Rice::define_class_under<Domain>(m, "Domain")
@@ -171,6 +210,46 @@ void init_constraint(Rice::Module& m) {
       "add_transition",
       [](AutomatonConstraint& self, int tail, int head, int64_t label) {
         self.AddTransition(tail, head, label);
+      });
+
+  Rice::define_class_under<CircuitConstraint, Constraint>(m, "SatCircuitConstraint")
+    .define_method(
+      "add_arc",
+      [](CircuitConstraint& self, int tail, int head, BoolVar literal) {
+        self.AddArc(tail, head, literal);
+      });
+
+  Rice::define_class_under<MultipleCircuitConstraint, Constraint>(m, "SatMultipleCircuitConstraint")
+    .define_method(
+      "add_arc",
+      [](MultipleCircuitConstraint& self, int tail, int head, BoolVar literal) {
+        self.AddArc(tail, head, literal);
+      });
+
+  Rice::define_class_under<ReservoirConstraint, Constraint>(m, "SatReservoirConstraint")
+    .define_method(
+      "add_event",
+      [](ReservoirConstraint& self, LinearExpr time, int64_t level_change) {
+        self.AddEvent(time, level_change);
+      })
+    .define_method(
+      "add_optional_event",
+      [](ReservoirConstraint& self, LinearExpr time, int64_t level_change, BoolVar is_active) {
+        self.AddOptionalEvent(time, level_change, is_active);
+      });
+
+  Rice::define_class_under<CumulativeConstraint, Constraint>(m, "SatCumulativeConstraint")
+    .define_method(
+      "add_demand",
+      [](CumulativeConstraint& self, IntervalVar interval, LinearExpr demand) {
+        self.AddDemand(interval, demand);
+      });
+
+  Rice::define_class_under<NoOverlap2DConstraint, Constraint>(m, "SatNoOverlap2DConstraint")
+    .define_method(
+      "add_rectangle",
+      [](NoOverlap2DConstraint& self, IntervalVar x_interval, IntervalVar y_interval) {
+        self.AddRectangle(x_interval, y_interval);
       });
 
   rb_cBoolVar = Rice::define_class_under<BoolVar>(m, "SatBoolVar")
@@ -355,6 +434,16 @@ void init_constraint(Rice::Module& m) {
         return self.NewOptionalIntervalVar(start, size, end, presence).WithName(name);
       })
     .define_method(
+      "new_fixed_size_interval_var",
+      [](CpModelBuilder& self, LinearExpr start, int64_t size, const std::string& name) {
+        return self.NewFixedSizeIntervalVar(start, size).WithName(name);
+      })
+    .define_method(
+      "new_optional_fixed_size_interval_var",
+      [](CpModelBuilder& self, LinearExpr start, int64_t size, BoolVar presence, const std::string& name) {
+        return self.NewOptionalFixedSizeIntervalVar(start, size, presence).WithName(name);
+      })
+    .define_method(
       "add_bool_or",
       [](CpModelBuilder& self, std::vector<BoolVar> literals) {
         return self.AddBoolOr(literals);
@@ -368,6 +457,21 @@ void init_constraint(Rice::Module& m) {
       "add_bool_xor",
       [](CpModelBuilder& self, std::vector<BoolVar> literals) {
         return self.AddBoolXor(literals);
+      })
+    .define_method(
+      "add_at_least_one",
+      [](CpModelBuilder& self, std::vector<BoolVar> literals) {
+        return self.AddAtLeastOne(literals);
+      })
+    .define_method(
+      "add_at_most_one",
+      [](CpModelBuilder& self, std::vector<BoolVar> literals) {
+        return self.AddAtMostOne(literals);
+      })
+    .define_method(
+      "add_exactly_one",
+      [](CpModelBuilder& self, std::vector<BoolVar> literals) {
+        return self.AddExactlyOne(literals);
       })
     .define_method(
       "add_implication",
@@ -418,6 +522,30 @@ void init_constraint(Rice::Module& m) {
       "add_all_different",
       [](CpModelBuilder& self, std::vector<IntVar> vars) {
         return self.AddAllDifferent(vars);
+      })
+    .define_method(
+      "add_variable_element",
+      [](CpModelBuilder& self, LinearExpr index, std::vector<IntVar> variables, LinearExpr target) {
+        return self.AddVariableElement(index, variables, target);
+      })
+    .define_method(
+      "add_element",
+      [](CpModelBuilder& self, LinearExpr index, Object values_obj, LinearExpr target) {
+        if (!values_obj.is_a(rb_cArray)) {
+          throw std::runtime_error("values must be an Array");
+        }
+        Array values(values_obj);
+        if (values.size() == 0) {
+          throw std::runtime_error("values array must not be empty");
+        }
+
+        if (array_contains_only_integers(values)) {
+          auto constants = array_to_int64_vector(values);
+          return self.AddElement(index, constants, target);
+        } else {
+          auto expressions = array_to_linear_expr_vector(values);
+          return self.AddElement(index, expressions, target);
+        }
       })
     .define_method(
       "add_allowed_assignments",
@@ -496,6 +624,31 @@ void init_constraint(Rice::Module& m) {
         }
 
         return ct;
+      })
+    .define_method(
+      "add_circuit_constraint",
+      [](CpModelBuilder& self) {
+        return self.AddCircuitConstraint();
+      })
+    .define_method(
+      "add_multiple_circuit_constraint",
+      [](CpModelBuilder& self) {
+        return self.AddMultipleCircuitConstraint();
+      })
+    .define_method(
+      "add_reservoir_constraint",
+      [](CpModelBuilder& self, int64_t min_level, int64_t max_level) {
+        return self.AddReservoirConstraint(min_level, max_level);
+      })
+    .define_method(
+      "add_cumulative",
+      [](CpModelBuilder& self, LinearExpr capacity) {
+        return self.AddCumulative(capacity);
+      })
+    .define_method(
+      "add_no_overlap_2d",
+      [](CpModelBuilder& self) {
+        return self.AddNoOverlap2D();
       })
     .define_method(
       "add_no_overlap",

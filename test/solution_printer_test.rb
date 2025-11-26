@@ -65,7 +65,7 @@ class SolutionPrinterTest < Minitest::Test
     solver.parameters.num_workers = 4
     solution_printer = ORTools::ObjectiveSolutionPrinter.new
 
-    stdout, _ = capture_io do
+    capture_io do
       solver.solve(model, solution_printer)
     end
     assert solution_printer.solution_count >= 1
