@@ -184,6 +184,31 @@ void init_constraint(Rice::Module& m) {
         self.set_max_time_in_seconds(value);
       })
     .define_method(
+      "max_time_in_seconds",
+      [](SatParameters& self) {
+        return self.max_time_in_seconds();
+      })
+    .define_method(
+      "log_search_progress=",
+      [](SatParameters& self, bool value) {
+        self.set_log_search_progress(value);
+      })
+    .define_method(
+      "log_search_progress",
+      [](SatParameters& self) {
+        return self.log_search_progress();
+      })
+    .define_method(
+      "log_to_stdout=",
+      [](SatParameters& self, bool value) {
+        self.set_log_to_stdout(value);
+      })
+    .define_method(
+      "log_to_stdout",
+      [](SatParameters& self) {
+        return self.log_to_stdout();
+      })
+    .define_method(
       "enumerate_all_solutions=",
       [](SatParameters& self, bool value) {
         self.set_enumerate_all_solutions(value);
@@ -193,13 +218,86 @@ void init_constraint(Rice::Module& m) {
       [](SatParameters& self) {
         return self.enumerate_all_solutions();
        })
+    .define_method(
+      "relative_gap_limit=",
+      [](SatParameters& self, double value) {
+        self.set_relative_gap_limit(value);
+      })
+    .define_method(
+      "relative_gap_limit",
+      [](SatParameters& self) {
+        return self.relative_gap_limit();
+      })
+    .define_method(
+      "absolute_gap_limit=",
+      [](SatParameters& self, double value) {
+        self.set_absolute_gap_limit(value);
+      })
+    .define_method(
+      "absolute_gap_limit",
+      [](SatParameters& self) {
+        return self.absolute_gap_limit();
+      })
     .define_method("num_workers=",
       [](SatParameters& self, int32_t value){
         self.set_num_workers(value);
       })
+    .define_method("num_workers",
+      [](SatParameters& self){
+        return self.num_workers();
+      })
     .define_method("cp_model_presolve=",
       [](SatParameters& self, bool value) {
         self.set_cp_model_presolve(value);
+      })
+    .define_method("cp_model_presolve",
+      [](SatParameters& self) {
+        return self.cp_model_presolve();
+      })
+    .define_method(
+      "debug_crash_on_bad_hint=",
+      [](SatParameters& self, bool value) {
+        self.set_debug_crash_on_bad_hint(value);
+      })
+    .define_method(
+      "fix_variables_to_their_hinted_value=",
+      [](SatParameters& self, bool value) {
+        self.set_fix_variables_to_their_hinted_value(value);
+      })
+    .define_method(
+      "keep_all_feasible_solutions_in_presolve=",
+      [](SatParameters& self, bool value) {
+        self.set_keep_all_feasible_solutions_in_presolve(value);
+      })
+    .define_method(
+      "fill_tightened_domains_in_response=",
+      [](SatParameters& self, bool value) {
+        self.set_fill_tightened_domains_in_response(value);
+      })
+    .define_method(
+      "max_presolve_iterations=",
+      [](SatParameters& self, int32_t value) {
+        self.set_max_presolve_iterations(value);
+      })
+    .define_method(
+      "cp_model_probing_level=",
+      [](SatParameters& self, int32_t value) {
+        self.set_cp_model_probing_level(value);
+      })
+    .define_method(
+      "presolve_probing_deterministic_time_limit=",
+      [](SatParameters& self, double value) {
+        self.set_presolve_probing_deterministic_time_limit(value);
+      })
+    .define_method(
+      "use_lns_only=",
+      [](SatParameters& self, bool value) {
+        self.set_use_lns_only(value);
+      })
+    .define_method(
+      "use_lns_only",
+      [](SatParameters& self) {
+        return self.use_lns_only();
       })
     .define_method("random_seed",
       [](SatParameters& self) {
