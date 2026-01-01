@@ -65,6 +65,35 @@ namespace Rice::detail {
   private:
     Arg* arg_ = nullptr;
   };
+
+  template<>
+  struct Type<RoutingModel::PenaltyCostBehavior> {
+    static bool verify() { return true; }
+  };
+
+  template<>
+  class From_Ruby<RoutingModel::PenaltyCostBehavior> {
+  public:
+    From_Ruby() = default;
+
+    explicit From_Ruby(Arg* arg) : arg_(arg) { }
+
+    double is_convertible(VALUE value) { return Convertible::Exact; }
+
+    RoutingModel::PenaltyCostBehavior convert(VALUE x) {
+      auto s = Symbol(x).str();
+      if (s == "penalize_once") {
+        return RoutingModel::PenaltyCostBehavior::PENALIZE_ONCE;
+      } else if (s == "penalize_per_inactive") {
+        return RoutingModel::PenaltyCostBehavior::PENALIZE_PER_INACTIVE;
+      } else {
+        throw std::runtime_error("Unknown penalty cost behavior: " + s);
+      }
+    }
+
+  private:
+    Arg* arg_ = nullptr;
+  };
 } // namespace Rice::detail
 
 void init_routing(Rice::Module& m) {
@@ -297,9 +326,6 @@ void init_routing(Rice::Module& m) {
       return operations_research::DefaultRoutingModelParameters();
     });
 
-  // keep Rice happy
-  Rice::define_enum_under<RoutingModel::PenaltyCostBehavior>("PenaltyCostBehavior", m);
-
   Rice::define_class_under<RoutingModel::ResourceGroup>(m, "ResourceGroup");
 
   Rice::define_class_under<RoutingModel>(m, "RoutingModel")
@@ -350,7 +376,7 @@ void init_routing(Rice::Module& m) {
     .define_method("add_resource_group", &RoutingModel::AddResourceGroup)
     .define_method("dimension_resource_group_indices", &RoutingModel::GetDimensionResourceGroupIndices)
     .define_method("dimension_resource_group_index", &RoutingModel::GetDimensionResourceGroupIndex)
-    .define_method("add_disjunction", &RoutingModel::AddDisjunction, Rice::Arg("_indices"), Rice::Arg("_penalty"), Rice::Arg("_max_cardinality") = static_cast<int64_t>(1), Rice::Arg("_penalty_cost_behavior") = RoutingModel::PenaltyCostBehavior::PENALIZE_ONCE)
+    .define_method("_add_disjunction", &RoutingModel::AddDisjunction)
     .define_method("disjunction_indices", &RoutingModel::GetDisjunctionIndices)
     .define_method("disjunction_penalty", &RoutingModel::GetDisjunctionPenalty)
     .define_method("disjunction_max_cardinality", &RoutingModel::GetDisjunctionMaxCardinality)

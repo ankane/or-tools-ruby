@@ -17,5 +17,9 @@ module ORTools
       search_parameters.log_search = log_search unless log_search.nil?
       solve_with_parameters(search_parameters)
     end
+
+    def add_disjunction(indices, penalty, max_cardinality = 1, penalty_cost_behavior = :penalize_once)
+      _add_disjunction(indices, penalty, max_cardinality, penalty_cost_behavior)
+    end
   end
 end
