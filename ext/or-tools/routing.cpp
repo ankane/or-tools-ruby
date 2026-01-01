@@ -297,7 +297,9 @@ void init_routing(Rice::Module& m) {
       return operations_research::DefaultRoutingModelParameters();
     });
 
+  // keep Rice happy
   Rice::define_enum_under<RoutingModel::PenaltyCostBehavior>("PenaltyCostBehavior", m);
+
   Rice::define_class_under<RoutingModel::ResourceGroup>(m, "ResourceGroup");
 
   Rice::define_class_under<RoutingModel>(m, "RoutingModel")
