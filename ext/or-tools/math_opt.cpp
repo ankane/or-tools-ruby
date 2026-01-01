@@ -29,7 +29,7 @@ namespace Rice::detail {
 
     explicit From_Ruby(Arg* arg) : arg_(arg) { }
 
-    Convertible is_convertible(VALUE value) { return Convertible::Cast; }
+    double is_convertible(VALUE value) { return Convertible::Exact; }
 
     static SolverType convert(VALUE x) {
       auto s = Symbol(x).str();

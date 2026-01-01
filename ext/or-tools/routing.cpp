@@ -40,7 +40,7 @@ namespace Rice::detail {
 
     explicit From_Ruby(Arg* arg) : arg_(arg) { }
 
-    Convertible is_convertible(VALUE value) { return Convertible::Cast; }
+    double is_convertible(VALUE value) { return Convertible::Exact; }
 
     RoutingNodeIndex convert(VALUE x) {
       const RoutingNodeIndex index{From_Ruby<int>().convert(x)};
@@ -297,6 +297,7 @@ void init_routing(Rice::Module& m) {
       return operations_research::DefaultRoutingModelParameters();
     });
 
+  Rice::define_enum_under<RoutingModel::PenaltyCostBehavior>("PenaltyCostBehavior", m);
   Rice::define_class_under<RoutingModel::ResourceGroup>(m, "ResourceGroup");
 
   Rice::define_class_under<RoutingModel>(m, "RoutingModel")

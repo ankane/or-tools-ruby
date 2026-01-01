@@ -232,7 +232,7 @@ class ConstraintTest < Minitest::Test
     error = assert_raises(RuntimeError) do
       model.add_hint("z", 1)
     end
-    assert_equal "The provided Ruby object does not wrap a C++ object", error.message
+    assert_equal "The Ruby object does not wrap a C++ object. It is actually a String.", error.message
   end
 
   def test_int_var_domain
