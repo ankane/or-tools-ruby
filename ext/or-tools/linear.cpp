@@ -172,21 +172,21 @@ void init_linear(Rice::Module& m) {
     .define_singleton_function(
       "_new",
       [](const std::string& name, MPSolver::OptimizationProblemType problem_type) {
-        std::unique_ptr<MPSolver> solver(new MPSolver(name, problem_type));
+        MPSolver* solver = new MPSolver(name, problem_type);
         if (!solver) {
           throw std::runtime_error("Unrecognized solver type");
         }
         return solver;
-      })
+      }, Rice::Return().takeOwnership())
     .define_singleton_function(
       "_create",
       [](const std::string& solver_id) {
-        std::unique_ptr<MPSolver> solver(MPSolver::CreateSolver(solver_id));
+        MPSolver* solver = MPSolver::CreateSolver(solver_id);
         if (!solver) {
           throw std::runtime_error("Unrecognized solver type");
         }
         return solver;
-      })
+      }, Rice::Return().takeOwnership())
     .define_method(
       "time_limit=",
       [](MPSolver& self, double time_limit) {
