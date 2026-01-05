@@ -1,4 +1,4 @@
-## 0.16.3 (unreleased)
+## 0.16.3 (2026-01-05)
 
 - Fixed errors with Rice 4.9
 
