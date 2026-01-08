@@ -12,7 +12,7 @@ jobs:
           - ruby: 3.4
             os: ubuntu-24.04
           - ruby: 3.3
-            os: macos-14
+            os: macos-26
           - ruby: 3.2
             os: ubuntu-22.04
           - ruby: 3.1
