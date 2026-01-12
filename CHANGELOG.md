@@ -1,4 +1,4 @@
-## 0.17.0 (unreleased)
+## 0.17.0 (2026-01-12)
 
 - Updated OR-Tools to 9.15
 
