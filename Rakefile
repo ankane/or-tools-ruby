@@ -26,10 +26,10 @@ task :update do
   require "open-uri"
   require "tmpdir"
 
-  version = "9.14.6206"
+  version = "9.15.6755"
   distributions = [
-    "arm64_macOS-15.5",
-    "x86_64_macOS-15.5",
+    "arm64_macOS-26.2",
+    "x86_64_macOS-26.2",
     "amd64_ubuntu-24.04",
     "amd64_ubuntu-22.04",
     "amd64_ubuntu-20.04",
