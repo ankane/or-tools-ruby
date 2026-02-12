@@ -2,6 +2,8 @@ require_relative "test_helper"
 
 class ShiftSchedulingSatTest < Minitest::Test
   def test_shift_scheduling_sat
+    skip if valgrind?
+
     num_employees = 8
     num_weeks = 3
     shifts = %w[O M A N]
