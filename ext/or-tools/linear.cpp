@@ -1,4 +1,5 @@
 #include <memory>
+#include <optional>
 #include <string>
 
 #include <ortools/linear_solver/linear_solver.h>
@@ -114,11 +115,11 @@ void init_linear(Rice::Module& m) {
       [](MPSolverParameters& self) {
         int presolve = self.GetIntegerParam(MPSolverParameters::IntegerParam::PRESOLVE);
         if (presolve == MPSolverParameters::PresolveValues::PRESOLVE_ON) {
-          return Rice::True;
+          return std::optional<bool>{true};
         } else if (presolve == MPSolverParameters::PresolveValues::PRESOLVE_OFF) {
-          return Rice::False;
+          return std::optional<bool>{false};
         } else {
-          return Rice::Nil;
+          return std::optional<bool>{};
         }
       })
     .define_method(
@@ -137,11 +138,11 @@ void init_linear(Rice::Module& m) {
       [](MPSolverParameters& self) {
         int incrementality = self.GetIntegerParam(MPSolverParameters::IntegerParam::INCREMENTALITY);
         if (incrementality == MPSolverParameters::IncrementalityValues::INCREMENTALITY_ON) {
-          return Rice::True;
+          return std::optional<bool>{true};
         } else if (incrementality == MPSolverParameters::IncrementalityValues::INCREMENTALITY_OFF) {
-          return Rice::False;
+          return std::optional<bool>{false};
         } else {
-          return Rice::Nil;
+          return std::optional<bool>{};
         }
       })
     .define_method(
@@ -160,11 +161,11 @@ void init_linear(Rice::Module& m) {
       [](MPSolverParameters& self) {
         int scaling = self.GetIntegerParam(MPSolverParameters::IntegerParam::SCALING);
         if (scaling == MPSolverParameters::ScalingValues::SCALING_ON) {
-          return Rice::True;
+          return std::optional<bool>{true};
         } else if (scaling == MPSolverParameters::ScalingValues::SCALING_OFF) {
-          return Rice::False;
+          return std::optional<bool>{false};
         } else {
-          return Rice::Nil;
+          return std::optional<bool>{};
         }
       });
 

@@ -98,8 +98,8 @@ void init_constraint(Rice::Module& m) {
           auto a = Array(literal);
           std::vector<BoolVar> vec;
           vec.reserve(a.size());
-          for (const Object v : a) {
-            if (v.is_a(rb_cSatIntVar)) {
+          for (const auto& v : a) {
+            if (Object(v).is_a(rb_cSatIntVar)) {
               vec.push_back(Rice::detail::From_Ruby<IntVar>().convert(v.value()).ToBoolVar());
             } else {
               vec.push_back(Rice::detail::From_Ruby<BoolVar>().convert(v.value()));

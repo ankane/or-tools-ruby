@@ -1,3 +1,7 @@
+## 0.17.1 (unreleased)
+
+- Fixed error with Rice 4.11
+
 ## 0.17.0 (2026-01-12)
 
 - Updated OR-Tools to 9.15
