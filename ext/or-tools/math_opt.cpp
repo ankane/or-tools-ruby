@@ -75,7 +75,7 @@ void init_math_opt(Rice::Module& m) {
       })
     .define_method(
       "_eql?",
-      [](Variable& self, Variable &other) {
+      [](Variable& self, Variable& other) {
         return static_cast<bool>(self == other);
       });
 

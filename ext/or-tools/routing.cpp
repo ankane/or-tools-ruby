@@ -58,7 +58,7 @@ namespace Rice::detail {
 
     explicit To_Ruby(Arg* arg) : arg_(arg) { }
 
-    VALUE convert(RoutingNodeIndex const & x) {
+    VALUE convert(const RoutingNodeIndex& x) {
       return To_Ruby<int>().convert(x.value());
     }
 
