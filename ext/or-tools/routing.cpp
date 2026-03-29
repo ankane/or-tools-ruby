@@ -288,7 +288,7 @@ void init_routing(Rice::Module& m) {
       })
     .define_method(
       "fixed_duration_interval_var",
-      [](operations_research::Solver& self, const operations_research::IntVar& start_variable, int64_t duration, const std::string& name) {
+      [](operations_research::Solver& self, operations_research::IntVar& start_variable, int64_t duration, const std::string& name) {
         return self.MakeFixedDurationIntervalVar(&start_variable, duration, name);
       })
     .define_method(
