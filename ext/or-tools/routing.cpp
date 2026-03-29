@@ -273,7 +273,7 @@ void init_routing(Rice::Module& m) {
         if (o.respond_to("left")) {
           operations_research::IntExpr* left(Rice::detail::From_Ruby<operations_research::IntVar*>().convert(o.call("left")));
           operations_research::IntExpr* right(Rice::detail::From_Ruby<operations_research::IntVar*>().convert(o.call("right")));
-          auto op = o.call("op").to_s().str();
+          std::string op = o.call("op").to_s().str();
           if (op == "==") {
             constraint = self.MakeEquality(left, right);
           } else if (op == "<=") {
@@ -288,8 +288,8 @@ void init_routing(Rice::Module& m) {
       })
     .define_method(
       "fixed_duration_interval_var",
-      [](operations_research::Solver& self, operations_research::IntVar* const start_variable, int64_t duration, const std::string& name) {
-        return self.MakeFixedDurationIntervalVar(start_variable, duration, name);
+      [](operations_research::Solver& self, const operations_research::IntVar& start_variable, int64_t duration, const std::string& name) {
+        return self.MakeFixedDurationIntervalVar(&start_variable, duration, name);
       })
     .define_method(
       "cumulative",
@@ -432,8 +432,8 @@ void init_routing(Rice::Module& m) {
       })
     .define_method(
       "solve_from_assignment_with_parameters",
-      [](RoutingModel& self, const Assignment* assignment, const RoutingSearchParameters& search_parameters) {
-        return self.SolveFromAssignmentWithParameters(assignment, search_parameters);
+      [](RoutingModel& self, const Assignment& assignment, const RoutingSearchParameters& search_parameters) {
+        return self.SolveFromAssignmentWithParameters(&assignment, search_parameters);
       })
     .define_method("compute_lower_bound", &RoutingModel::ComputeLowerBound)
     .define_method("status",
