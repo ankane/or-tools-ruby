@@ -193,32 +193,32 @@ void init_constraint(Rice::Module& m) {
       })
     .define_method(
       "new_interval_var",
-      [](CpModelBuilder& self, IntVar start, IntVar size, IntVar end, const std::string& name) {
+      [](CpModelBuilder& self, const IntVar& start, const IntVar& size, const IntVar& end, const std::string& name) {
         return self.NewIntervalVar(start, size, end).WithName(name);
       })
     .define_method(
       "new_optional_interval_var",
-      [](CpModelBuilder& self, IntVar start, IntVar size, IntVar end, BoolVar presence, const std::string& name) {
+      [](CpModelBuilder& self, const IntVar& start, const IntVar& size, const IntVar& end, const BoolVar& presence, const std::string& name) {
         return self.NewOptionalIntervalVar(start, size, end, presence).WithName(name);
       })
     .define_method(
       "add_bool_or",
-      [](CpModelBuilder& self, std::vector<BoolVar> literals) {
+      [](CpModelBuilder& self, const std::vector<BoolVar>& literals) {
         return self.AddBoolOr(literals);
       })
     .define_method(
       "add_bool_and",
-      [](CpModelBuilder& self, std::vector<BoolVar> literals) {
+      [](CpModelBuilder& self, const std::vector<BoolVar>& literals) {
         return self.AddBoolAnd(literals);
       })
     .define_method(
       "add_bool_xor",
-      [](CpModelBuilder& self, std::vector<BoolVar> literals) {
+      [](CpModelBuilder& self, const std::vector<BoolVar>& literals) {
         return self.AddBoolXor(literals);
       })
     .define_method(
       "add_implication",
-      [](CpModelBuilder& self, BoolVar a, BoolVar b) {
+      [](CpModelBuilder& self, const BoolVar& a, const BoolVar& b) {
         return self.AddImplication(a, b);
       })
     .define_method(
@@ -253,7 +253,7 @@ void init_constraint(Rice::Module& m) {
       })
     .define_method(
       "add_linear_expression_in_domain",
-      [](CpModelBuilder& self, LinearExpr expr, Domain domain) {
+      [](CpModelBuilder& self, LinearExpr expr, const Domain& domain) {
         return self.AddLinearConstraint(expr, domain);
       })
     .define_method(
@@ -263,7 +263,7 @@ void init_constraint(Rice::Module& m) {
       })
     .define_method(
       "add_all_different",
-      [](CpModelBuilder& self, std::vector<IntVar> vars) {
+      [](CpModelBuilder& self, const std::vector<IntVar>& vars) {
         return self.AddAllDifferent(vars);
       })
     .define_method(
@@ -278,7 +278,7 @@ void init_constraint(Rice::Module& m) {
       })
     .define_method(
       "add_inverse_constraint",
-      [](CpModelBuilder& self, std::vector<IntVar> variables, std::vector<IntVar> inverse_variables) {
+      [](CpModelBuilder& self, const std::vector<IntVar>& variables, const std::vector<IntVar>& inverse_variables) {
         return self.AddInverseConstraint(variables, inverse_variables);
       })
     .define_method(
@@ -313,7 +313,7 @@ void init_constraint(Rice::Module& m) {
       })
     .define_method(
       "add_no_overlap",
-      [](CpModelBuilder& self, std::vector<IntervalVar> vars) {
+      [](CpModelBuilder& self, const std::vector<IntervalVar>& vars) {
         return self.AddNoOverlap(vars);
       })
     .define_method(
@@ -348,12 +348,12 @@ void init_constraint(Rice::Module& m) {
       })
     .define_method(
       "add_assumption",
-      [](CpModelBuilder& self, BoolVar lit) {
+      [](CpModelBuilder& self, const BoolVar& lit) {
         self.AddAssumption(lit);
       })
     .define_method(
       "add_assumptions",
-      [](CpModelBuilder& self, std::vector<BoolVar> literals) {
+      [](CpModelBuilder& self, const std::vector<BoolVar>& literals) {
         self.AddAssumptions(literals);
       })
     .define_method(
@@ -448,12 +448,12 @@ void init_constraint(Rice::Module& m) {
       })
     .define_method(
       "_solution_integer_value",
-      [](Object self, const CpSolverResponse& response, IntVar x) {
+      [](Object self, const CpSolverResponse& response, const IntVar& x) {
         return SolutionIntegerValue(response, x);
       })
     .define_method(
       "_solution_boolean_value",
-      [](Object self, const CpSolverResponse& response, BoolVar x) {
+      [](Object self, const CpSolverResponse& response, const BoolVar& x) {
         return SolutionBooleanValue(response, x);
       });
 }
