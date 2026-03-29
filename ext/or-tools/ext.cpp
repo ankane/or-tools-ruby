@@ -16,7 +16,7 @@ void init_routing(Rice::Module& m);
 
 extern "C"
 void Init_ext() {
-  auto m = Rice::define_module("ORTools");
+  Rice::Module m = Rice::define_module("ORTools");
 
   m.define_singleton_function("lib_version", &operations_research::OrToolsVersionString);
 

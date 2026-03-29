@@ -30,7 +30,7 @@ void init_assignment(Rice::Module& m) {
         } else if (status == SimpleLinearSumAssignment::Status::POSSIBLE_OVERFLOW) {
           return Symbol("possible_overflow");
         } else {
-          throw std::runtime_error("Unknown status");
+          throw std::runtime_error{"Unknown status"};
         }
       });
 }

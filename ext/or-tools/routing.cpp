@@ -81,13 +81,13 @@ namespace Rice::detail {
     double is_convertible(VALUE value) { return Convertible::Exact; }
 
     RoutingModel::PenaltyCostBehavior convert(VALUE x) {
-      auto s = Symbol(x).str();
+      std::string s = Symbol(x).str();
       if (s == "penalize_once") {
         return RoutingModel::PenaltyCostBehavior::PENALIZE_ONCE;
       } else if (s == "penalize_per_inactive") {
         return RoutingModel::PenaltyCostBehavior::PENALIZE_PER_INACTIVE;
       } else {
-        throw std::runtime_error("Unknown penalty cost behavior: " + s);
+        throw std::runtime_error{"Unknown penalty cost behavior: " + s};
       }
     }
 
@@ -138,7 +138,7 @@ void init_routing(Rice::Module& m) {
         } else if (s == "first_unbound_min_value") {
           v = FirstSolutionStrategy::FIRST_UNBOUND_MIN_VALUE;
         } else {
-          throw std::runtime_error("Unknown first solution strategy: " + s);
+          throw std::runtime_error{"Unknown first solution strategy: " + s};
         }
 
         return self.set_first_solution_strategy(v);
@@ -158,7 +158,7 @@ void init_routing(Rice::Module& m) {
         } else if (s == "simulated_annealing") {
           v = LocalSearchMetaheuristic::SIMULATED_ANNEALING;
         } else {
-          throw std::runtime_error("Unknown local search metaheuristic: " + s);
+          throw std::runtime_error{"Unknown local search metaheuristic: " + s};
         }
 
         return self.set_local_search_metaheuristic(v);
@@ -192,7 +192,7 @@ void init_routing(Rice::Module& m) {
       })
     .define_singleton_function(
       "_new_starts_ends",
-      [](int num_nodes, int num_vehicles, std::vector<RoutingNodeIndex> starts, std::vector<RoutingNodeIndex> ends) {
+      [](int num_nodes, int num_vehicles, const std::vector<RoutingNodeIndex>& starts, const std::vector<RoutingNodeIndex>& ends) {
         return RoutingIndexManager(num_nodes, num_vehicles, starts, ends);
       })
     .define_method("index_to_node", &RoutingIndexManager::IndexToNode)
@@ -279,7 +279,7 @@ void init_routing(Rice::Module& m) {
           } else if (op == "<=") {
             constraint = self.MakeLessOrEqual(left, right);
           } else {
-            throw std::runtime_error("Unknown operator");
+            throw std::runtime_error{"Unknown operator"};
           }
         } else {
           constraint = Rice::detail::From_Ruby<operations_research::Constraint*>().convert(o);
@@ -293,7 +293,7 @@ void init_routing(Rice::Module& m) {
       })
     .define_method(
       "cumulative",
-      [](operations_research::Solver& self, Array rb_intervals, std::vector<int64_t> demands, int64_t capacity, const std::string& name) {
+      [](operations_research::Solver& self, Array rb_intervals, const std::vector<int64_t>& demands, int64_t capacity, const std::string& name) {
         std::vector<operations_research::IntervalVar*> intervals;
         for (const auto& v : rb_intervals) {
           intervals.push_back(Rice::detail::From_Ruby<operations_research::IntervalVar*>().convert(v.value()));
@@ -338,7 +338,7 @@ void init_routing(Rice::Module& m) {
         return self.RegisterUnaryTransitCallback(
           [callback](int64_t from_index) -> int64_t {
             if (!ruby_native_thread_p()) {
-              throw std::runtime_error("Non-Ruby thread");
+              throw std::runtime_error{"Non-Ruby thread"};
             }
 
             return Rice::detail::From_Ruby<int64_t>().convert(callback.call("call", from_index));
@@ -353,7 +353,7 @@ void init_routing(Rice::Module& m) {
         return self.RegisterTransitCallback(
           [callback](int64_t from_index, int64_t to_index) -> int64_t {
             if (!ruby_native_thread_p()) {
-              throw std::runtime_error("Non-Ruby thread");
+              throw std::runtime_error{"Non-Ruby thread"};
             }
 
             return Rice::detail::From_Ruby<int64_t>().convert(callback.call("call", from_index, to_index));
@@ -451,7 +451,7 @@ void init_routing(Rice::Module& m) {
         } else if (status == RoutingSearchStatus::ROUTING_INVALID) {
           return Symbol("invalid");
         } else {
-          throw std::runtime_error("Unknown solver status");
+          throw std::runtime_error{"Unknown solver status"};
         }
       })
     .define_method("apply_locks", &RoutingModel::ApplyLocks)

@@ -402,7 +402,7 @@ void init_constraint(Rice::Module& m) {
         } else if (status == CpSolverStatus::UNKNOWN) {
           return Symbol("unknown");
         } else {
-          throw std::runtime_error("Unknown solver status");
+          throw std::runtime_error{"Unknown solver status"};
         }
       })
     .define_method(
@@ -434,7 +434,7 @@ void init_constraint(Rice::Module& m) {
           m.Add(NewFeasibleSolutionObserver(
             [&callback](const CpSolverResponse& r) {
               if (!ruby_native_thread_p()) {
-                throw std::runtime_error("Non-Ruby thread");
+                throw std::runtime_error{"Non-Ruby thread"};
               }
 
               callback.call("response=", r);

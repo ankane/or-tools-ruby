@@ -32,7 +32,7 @@ namespace Rice::detail {
     double is_convertible(VALUE value) { return Convertible::Exact; }
 
     static SolverType convert(VALUE x) {
-      auto s = Symbol(x).str();
+      std::string s = Symbol(x).str();
       if (s == "gscip") {
         return SolverType::kGscip;
       } else if (s == "gurobi") {
@@ -54,7 +54,7 @@ namespace Rice::detail {
       } else if (s == "santorini") {
         return SolverType::kSantorini;
       } else {
-        throw std::runtime_error("Unknown solver type: " + s);
+        throw std::runtime_error{"Unknown solver type: " + s};
       }
     }
 
@@ -71,7 +71,7 @@ void init_math_opt(Rice::Module& m) {
     .define_method(
       "name",
       [](Variable& self) {
-        return std::string(self.name());
+        return std::string{self.name()};
       })
     .define_method(
       "_eql?",
@@ -106,7 +106,7 @@ void init_math_opt(Rice::Module& m) {
         } else if (reason == TerminationReason::kOtherError) {
           return Rice::Symbol("other");
         } else {
-          throw std::runtime_error("Unknown termination reason");
+          throw std::runtime_error{"Unknown termination reason"};
         }
       });
 
@@ -143,18 +143,18 @@ void init_math_opt(Rice::Module& m) {
       })
     .define_method(
       "_set_upper_bound",
-      [](Model& self, LinearConstraint constraint, double upper_bound) {
+      [](Model& self, const LinearConstraint& constraint, double upper_bound) {
         self.set_upper_bound(constraint, upper_bound);
       })
     .define_method(
       "_set_lower_bound",
-      [](Model& self, LinearConstraint constraint, double upper_bound) {
+      [](Model& self, const LinearConstraint& constraint, double upper_bound) {
         self.set_lower_bound(constraint, upper_bound);
       })
     .define_method("_set_coefficient", &Model::set_coefficient)
     .define_method(
       "_set_objective_coefficient",
-      [](Model& self, Variable variable, double value) {
+      [](Model& self, const Variable& variable, double value) {
         self.set_objective_coefficient(variable, value);
       })
     .define_method("_clear_objective", &Model::clear_objective)

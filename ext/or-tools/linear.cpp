@@ -34,13 +34,13 @@ namespace Rice::detail {
     double is_convertible(VALUE value) { return Convertible::Exact; }
 
     static MPSolver::OptimizationProblemType convert(VALUE x) {
-      auto s = Symbol(x).str();
+      std::string s = Symbol(x).str();
       if (s == "glop") {
         return MPSolver::OptimizationProblemType::GLOP_LINEAR_PROGRAMMING;
       } else if (s == "cbc") {
         return MPSolver::OptimizationProblemType::CBC_MIXED_INTEGER_PROGRAMMING;
       } else {
-        throw std::runtime_error("Unknown optimization problem type: " + s);
+        throw std::runtime_error{"Unknown optimization problem type: " + s};
       }
     }
 
@@ -175,7 +175,7 @@ void init_linear(Rice::Module& m) {
       [](const std::string& name, MPSolver::OptimizationProblemType problem_type) {
         MPSolver* solver = new MPSolver(name, problem_type);
         if (!solver) {
-          throw std::runtime_error("Unrecognized solver type");
+          throw std::runtime_error{"Unrecognized solver type"};
         }
         return solver;
       }, Rice::Return().takeOwnership())
@@ -184,7 +184,7 @@ void init_linear(Rice::Module& m) {
       [](const std::string& solver_id) {
         MPSolver* solver = MPSolver::CreateSolver(solver_id);
         if (!solver) {
-          throw std::runtime_error("Unrecognized solver type");
+          throw std::runtime_error{"Unrecognized solver type"};
         }
         return solver;
       }, Rice::Return().takeOwnership())
@@ -239,7 +239,7 @@ void init_linear(Rice::Module& m) {
         } else if (status == MPSolver::ResultStatus::NOT_SOLVED) {
           return Symbol("not_solved");
         } else {
-          throw std::runtime_error("Unknown status");
+          throw std::runtime_error{"Unknown status"};
         }
       })
     .define_method(
@@ -247,7 +247,7 @@ void init_linear(Rice::Module& m) {
       [](MPSolver& self, bool obfuscate) {
         std::string model_str;
         if (!self.ExportModelAsLpFormat(obfuscate, &model_str)) {
-          throw std::runtime_error("Export failed");
+          throw std::runtime_error{"Export failed"};
         }
         return model_str;
       })
@@ -256,7 +256,7 @@ void init_linear(Rice::Module& m) {
       [](MPSolver& self, bool fixed_format, bool obfuscate) {
         std::string model_str;
         if (!self.ExportModelAsMpsFormat(fixed_format, obfuscate, &model_str)) {
-          throw std::runtime_error("Export failed");
+          throw std::runtime_error{"Export failed"};
         }
         return model_str;
       });

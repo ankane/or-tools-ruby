@@ -36,7 +36,7 @@ void init_network_flows(Rice::Module& m) {
         } else if (status == SimpleMaxFlow::Status::BAD_RESULT) {
           return Symbol("bad_result");
         } else {
-          throw std::runtime_error("Unknown status");
+          throw std::runtime_error{"Unknown status"};
         }
       })
     .define_method(
@@ -98,7 +98,7 @@ void init_network_flows(Rice::Module& m) {
         } else if (status == SimpleMinCostFlow::Status::BAD_COST_RANGE) {
           return Symbol("bad_cost_range");
         } else {
-          throw std::runtime_error("Unknown status");
+          throw std::runtime_error{"Unknown status"};
         }
       });
 }
