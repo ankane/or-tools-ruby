@@ -1,3 +1,7 @@
+## 0.18.0 (unreleased)
+
+- Dropped support for Ruby < 3.3
+
 ## 0.17.1 (2026-02-19)
 
 - Fixed error with Rice 4.11

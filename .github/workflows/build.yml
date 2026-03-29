@@ -11,15 +11,11 @@ jobs:
             os: ubuntu-24.04
             valgrind: true
           - ruby: 3.4
-            os: ubuntu-24.04
-          - ruby: 3.3
             os: macos-26
-          - ruby: 3.2
-            os: ubuntu-22.04
-          - ruby: 3.1
+          - ruby: 3.3
             os: macos-15-intel
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
