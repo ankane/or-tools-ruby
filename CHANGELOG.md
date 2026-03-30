@@ -1,6 +1,6 @@
 ## 0.18.0 (unreleased)
 
-- Fixed error with `set_allowed_vehicles_for_index` method
+- Fixed error with `apply_locks` and `set_allowed_vehicles_for_index` methods
 - Dropped support for Ruby < 3.3
 
 ## 0.17.1 (2026-02-19)

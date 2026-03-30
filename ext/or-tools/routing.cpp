@@ -458,7 +458,11 @@ void init_routing(Rice::Module& m) {
           throw std::runtime_error{"Unknown solver status"};
         }
       })
-    .define_method("apply_locks", &RoutingModel::ApplyLocks)
+    .define_method(
+      "apply_locks",
+      [](RoutingModel& self, const std::vector<int64_t>& locks) {
+        return self.ApplyLocks(locks);
+      })
     .define_method("apply_locks_to_all_vehicles", &RoutingModel::ApplyLocksToAllVehicles)
     .define_method("pre_assignment", &RoutingModel::PreAssignment)
     .define_method("mutable_pre_assignment", &RoutingModel::MutablePreAssignment)

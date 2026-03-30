@@ -914,4 +914,10 @@ class RoutingTest < Minitest::Test
     routing = ORTools::RoutingModel.new(manager)
     assert_nil routing.set_allowed_vehicles_for_index([0], 0)
   end
+
+  def test_apply_locks
+    manager = ORTools::RoutingIndexManager.new(1, 1, 0)
+    routing = ORTools::RoutingModel.new(manager)
+    assert_nil routing.apply_locks([])
+  end
 end
