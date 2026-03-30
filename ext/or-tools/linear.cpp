@@ -8,8 +8,8 @@
 
 using operations_research::MPConstraint;
 using operations_research::MPObjective;
-using operations_research::MPSolverParameters;
 using operations_research::MPSolver;
+using operations_research::MPSolverParameters;
 using operations_research::MPVariable;
 
 using Rice::Array;

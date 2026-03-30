@@ -9,18 +9,18 @@
 using operations_research::Domain;
 using operations_research::sat::BoolVar;
 using operations_research::sat::Constraint;
-using operations_research::sat::TableConstraint;
 using operations_research::sat::CpModelBuilder;
 using operations_research::sat::CpSolverResponse;
 using operations_research::sat::CpSolverStatus;
-using operations_research::sat::LinearExpr;
-using operations_research::sat::IntVar;
 using operations_research::sat::IntervalVar;
+using operations_research::sat::IntVar;
+using operations_research::sat::LinearExpr;
 using operations_research::sat::Model;
 using operations_research::sat::NewFeasibleSolutionObserver;
 using operations_research::sat::SatParameters;
 using operations_research::sat::SolutionBooleanValue;
 using operations_research::sat::SolutionIntegerValue;
+using operations_research::sat::TableConstraint;
 
 using Rice::Array;
 using Rice::Class;
