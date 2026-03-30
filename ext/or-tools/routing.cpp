@@ -386,7 +386,11 @@ void init_routing(Rice::Module& m) {
     .define_method("perfect_binary_disjunctions", &RoutingModel::GetPerfectBinaryDisjunctions)
     .define_method("ignore_disjunctions_already_forced_to_zero", &RoutingModel::IgnoreDisjunctionsAlreadyForcedToZero)
     .define_method("add_soft_same_vehicle_constraint", &RoutingModel::AddSoftSameVehicleConstraint)
-    .define_method("set_allowed_vehicles_for_index", &RoutingModel::SetAllowedVehiclesForIndex)
+    .define_method(
+      "set_allowed_vehicles_for_index",
+      [](RoutingModel& self, const std::vector<int>& vehicles, int64_t index) {
+        self.SetAllowedVehiclesForIndex(vehicles, index);
+      })
     .define_method("vehicle_allowed_for_index?", &RoutingModel::IsVehicleAllowedForIndex)
     .define_method("add_pickup_and_delivery", &RoutingModel::AddPickupAndDelivery)
     .define_method("add_pickup_and_delivery_sets", &RoutingModel::AddPickupAndDeliverySets)

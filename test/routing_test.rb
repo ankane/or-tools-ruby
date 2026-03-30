@@ -908,4 +908,10 @@ class RoutingTest < Minitest::Test
     search_parameters.local_search_metaheuristic = :guided_local_search
     search_parameters.log_search = true
   end
+
+  def test_set_allowed_vehicles_for_index
+    manager = ORTools::RoutingIndexManager.new(1, 1, 0)
+    routing = ORTools::RoutingModel.new(manager)
+    assert_nil routing.set_allowed_vehicles_for_index([0], 0)
+  end
 end
