@@ -6,6 +6,7 @@ require "tmpdir"
 version = "9.15.6755"
 # Lookup table based on the OS, Version, ARM?
 platforms = {
+  ["alpine", nil,     false] => ["or-tools_amd64_alpine-edge_cpp_v#{version}.tar.gz",  "f7324bb1be49dae7187441834d24e6f73eb7f93c13ea37d8b5fe45e9698ede2f"],
   ["arch",   nil,     false] => ["or-tools_amd64_archlinux_cpp_v#{version}.tar.gz",    "5505079f7b2a6d9379ba6ae446a3a639226d455ef1cfa32d2d23ffc4566e3a4b"],
   ["darwin", nil,     false] => ["or-tools_x86_64_macOS-26.2_cpp_v#{version}.tar.gz",  "d2d36482727520ccaff979eba16f53e6b2cabf40b6fd1126e4d3b34fad2fe851"],
   ["darwin", nil,     true]  => ["or-tools_arm64_macOS-26.2_cpp_v#{version}.tar.gz",   "de0400a45939a66ee13cd8360c230e830fc5e03a6ed5a8a8b60f58a39e4a67bc"],
