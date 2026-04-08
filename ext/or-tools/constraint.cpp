@@ -6,6 +6,8 @@
 #include <rice/rice.hpp>
 #include <rice/stl.hpp>
 
+#include "gvl_callback.hpp"
+
 using operations_research::Domain;
 using operations_research::sat::BoolVar;
 using operations_research::sat::Constraint;
@@ -425,26 +427,16 @@ void init_constraint(Rice::Module& m) {
     .define_method(
       "_solve",
       [](Object self, CpModelBuilder& model, SatParameters& parameters, Object callback) {
-        Model m;
+        Model solver_model;
+        solver_model.Add(NewSatParameters(parameters));
 
-        if (!callback.is_nil()) {
-          // use a single worker since Ruby code cannot be run in a non-Ruby thread
-          parameters.set_num_search_workers(1);
+        const operations_research::sat::CpModelProto proto = model.Build();
 
-          m.Add(NewFeasibleSolutionObserver(
-            [&callback](const CpSolverResponse& r) {
-              if (!ruby_native_thread_p()) {
-                throw std::runtime_error{"Non-Ruby thread"};
-              }
-
-              callback.call("response=", r);
-              callback.call("on_solution_callback");
-            })
-          );
+        if (callback.is_nil()) {
+          return ortools_ruby_solve_cp_model_no_callback(proto, solver_model);
         }
 
-        m.Add(NewSatParameters(parameters));
-        return SolveCpModel(model.Build(), &m);
+        return ortools_ruby_solve_cp_model_with_callback(proto, solver_model, callback);
       })
     .define_method(
       "_solution_integer_value",
