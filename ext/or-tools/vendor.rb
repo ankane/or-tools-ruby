@@ -70,24 +70,22 @@ end
 short_version = version.split(".").first(2).join(".")
 url = "https://github.com/google/or-tools/releases/download/v#{short_version}/#{filename}"
 
-# download
-download_path = "#{Dir.tmpdir}/#{filename}"
-unless File.exist?(download_path)
-  puts "Downloading #{url}..."
-  IO.copy_stream(URI.parse(url).open(max_redirects: 10), download_path)
-end
-
-# check integrity - do this regardless of if just downloaded
-download_checksum = Digest::SHA256.file(download_path).hexdigest
-raise "Bad checksum: #{download_checksum}" if download_checksum != checksum
-
 path = File.expand_path("../../tmp/or-tools", __dir__)
 FileUtils.mkdir_p(path)
 
-# extract - can't use Gem::Package#extract_tar_gz from RubyGems
-# since it limits filenames to 100 characters (doesn't support UStar format)
-# for space, only keep licenses, include, and shared library
 Dir.mktmpdir do |extract_path|
+  # download
+  download_path = "#{extract_path}/#{filename}"
+  puts "Downloading #{url}..."
+  IO.copy_stream(URI.parse(url).open(max_redirects: 10), download_path)
+
+  # check integrity
+  download_checksum = Digest::SHA256.file(download_path).hexdigest
+  raise "Bad checksum: #{download_checksum}" if download_checksum != checksum
+
+  # extract - can't use Gem::Package#extract_tar_gz from RubyGems
+  # since it limits filenames to 100 characters (doesn't support UStar format)
+  # for space, only keep licenses, include, and shared library
   tar_args = Gem.win_platform? ? ["--force-local"] : []
   system "tar", "zxf", download_path, "-C", extract_path, "--strip-components=1", *tar_args
 
