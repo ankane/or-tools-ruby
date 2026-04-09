@@ -432,13 +432,17 @@ void init_constraint(Rice::Module& m) {
           parameters.set_num_search_workers(1);
 
           m.Add(NewFeasibleSolutionObserver(
-            [&callback](const CpSolverResponse& r) {
+            [&](const CpSolverResponse& r) {
               if (!ruby_native_thread_p()) {
                 throw std::runtime_error{"Non-Ruby thread"};
               }
 
               callback.call("response=", r);
               callback.call("on_solution_callback");
+
+              if (callback.attr_get("@stopped")) {
+                StopSearch(&m);
+              }
             })
           );
         }

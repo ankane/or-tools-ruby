@@ -47,6 +47,20 @@ class DiagramPrinter < ORTools::CpSolverSolutionCallback
   end
 end
 
+class StopSearchCallback < ORTools::CpSolverSolutionCallback
+   attr_reader :solution_count
+
+  def initialize
+    super()
+    @solution_count = 0
+  end
+
+  def on_solution_callback
+    @solution_count += 1
+    stop_search if @solution_count >= 3
+  end
+end
+
 class ConstraintTest < Minitest::Test
   # https://developers.google.com/optimization/cp/cp_solver
   def test_cp_sat_solver
@@ -156,6 +170,10 @@ class ConstraintTest < Minitest::Test
     assert_equal 182, solver.num_conflicts
     assert_equal 1777, solver.num_branches
     assert_equal 72, solution_printer.solution_count
+
+    stop_callback = StopSearchCallback.new
+    status = solver.solve(model, stop_callback)
+    assert_equal 3, stop_callback.solution_count
   end
 
   # https://developers.google.com/optimization/cp/queens
