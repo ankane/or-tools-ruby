@@ -75,9 +75,11 @@ FileUtils.mkdir_p(path)
 
 Dir.mktmpdir do |extract_path|
   # download
-  download_path = "#{extract_path}/#{filename}"
   puts "Downloading #{url}..."
-  IO.copy_stream(URI.parse(url).open(max_redirects: 10), download_path)
+  download = URI.parse(url).open(max_redirects: 10)
+  download.flush
+  # should always be tempfile
+  download_path = download.path
 
   # check integrity
   download_checksum = Digest::SHA256.file(download_path).hexdigest
