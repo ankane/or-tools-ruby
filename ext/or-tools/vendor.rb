@@ -77,10 +77,10 @@ Dir.mktmpdir do |extract_path|
   # download
   puts "Downloading #{url}..."
   URI.parse(url).open(max_redirects: 10) do |download|
-    # should always be tempfile
-    download.flush
+    raise "Expected file" unless download.respond_to?(:path)
 
     # check integrity
+    download.flush
     download_checksum = Digest::SHA256.file(download.path).hexdigest
     raise "Bad checksum: #{download_checksum}" if download_checksum != checksum
 
