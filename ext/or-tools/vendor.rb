@@ -70,8 +70,6 @@ end
 short_version = version.split(".").first(2).join(".")
 url = "https://github.com/google/or-tools/releases/download/v#{short_version}/#{filename}"
 
-$stdout.sync = true
-
 # download
 download_path = "#{Dir.tmpdir}/#{filename}"
 unless File.exist?(download_path)
