@@ -1,6 +1,6 @@
 require "digest"
 require "fileutils"
-require "net/http"
+require "open-uri"
 require "tmpdir"
 
 version = "9.15.6755"
@@ -72,45 +72,11 @@ url = "https://github.com/google/or-tools/releases/download/v#{short_version}/#{
 
 $stdout.sync = true
 
-def download_file(url, download_path, redirects = 0)
-  raise "Too many redirects" if redirects > 10
-
-  uri = URI(url)
-  location = nil
-
-  Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
-    request = Net::HTTP::Get.new(uri)
-    http.request(request) do |response|
-      case response
-      when Net::HTTPRedirection
-        location = response["location"]
-      when Net::HTTPSuccess
-        i = 0
-        File.open(download_path, "wb") do |f|
-          response.read_body do |chunk|
-            f.write(chunk)
-
-            # print progress
-            putc "." if i % 50 == 0
-            i += 1
-          end
-        end
-        puts # newline
-      else
-        raise "Bad response"
-      end
-    end
-  end
-
-  # outside of Net::HTTP block to close previous connection
-  download_file(location, download_path, redirects + 1) if location
-end
-
 # download
 download_path = "#{Dir.tmpdir}/#{filename}"
 unless File.exist?(download_path)
   puts "Downloading #{url}..."
-  download_file(url, download_path)
+  IO.copy_stream(URI.parse(url).open(max_redirects: 10), download_path)
 end
 
 # check integrity - do this regardless of if just downloaded
