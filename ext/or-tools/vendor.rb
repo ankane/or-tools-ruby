@@ -76,20 +76,20 @@ FileUtils.mkdir_p(path)
 Dir.mktmpdir do |extract_path|
   # download
   puts "Downloading #{url}..."
-  download = URI.parse(url).open(max_redirects: 10)
-  download.flush
-  # should always be tempfile
-  download_path = download.path
+  URI.parse(url).open(max_redirects: 10) do |download|
+    # should always be tempfile
+    download.flush
 
-  # check integrity
-  download_checksum = Digest::SHA256.file(download_path).hexdigest
-  raise "Bad checksum: #{download_checksum}" if download_checksum != checksum
+    # check integrity
+    download_checksum = Digest::SHA256.file(download.path).hexdigest
+    raise "Bad checksum: #{download_checksum}" if download_checksum != checksum
 
-  # extract - can't use Gem::Package#extract_tar_gz from RubyGems
-  # since it limits filenames to 100 characters (doesn't support UStar format)
-  # for space, only keep licenses, include, and shared library
-  tar_args = Gem.win_platform? ? ["--force-local"] : []
-  system "tar", "zxf", download_path, "-C", extract_path, "--strip-components=1", *tar_args
+    # extract - can't use Gem::Package#extract_tar_gz from RubyGems
+    # since it limits filenames to 100 characters (doesn't support UStar format)
+    # for space, only keep licenses, include, and shared library
+    tar_args = Gem.win_platform? ? ["--force-local"] : []
+    system "tar", "zxf", download.path, "-C", extract_path, "--strip-components=1", *tar_args
+  end
 
   # include
   FileUtils.mv(File.join(extract_path, "include"), File.join(path, "include"))
