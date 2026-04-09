@@ -61,6 +61,12 @@ class StopSearchCallback < ORTools::CpSolverSolutionCallback
   end
 end
 
+class ExceptionCallback < ORTools::CpSolverSolutionCallback
+  def on_solution_callback
+    raise "Error!"
+  end
+end
+
 class ConstraintTest < Minitest::Test
   # https://developers.google.com/optimization/cp/cp_solver
   def test_cp_sat_solver
@@ -174,6 +180,12 @@ class ConstraintTest < Minitest::Test
     stop_callback = StopSearchCallback.new
     status = solver.solve(model, stop_callback)
     assert_equal 3, stop_callback.solution_count
+
+    exception_callback = ExceptionCallback.new
+    error = assert_raises(RuntimeError) do
+      solver.solve(model, exception_callback)
+    end
+    assert_equal "Error!", error.message
   end
 
   # https://developers.google.com/optimization/cp/queens

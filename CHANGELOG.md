@@ -1,5 +1,6 @@
 ## 0.18.0 (unreleased)
 
+- Added support for releasing GVL
 - Added `stop_search` method to `CpSolverSolutionCallback`
 - Fixed error with `apply_locks` and `set_allowed_vehicles_for_index` methods
 - Dropped support for Ruby < 3.3

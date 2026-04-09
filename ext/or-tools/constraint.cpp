@@ -1,3 +1,6 @@
+#include <atomic>
+#include <mutex>
+#include <queue>
 #include <string>
 #include <vector>
 
@@ -426,29 +429,87 @@ void init_constraint(Rice::Module& m) {
       "_solve",
       [](Object self, CpModelBuilder& model, SatParameters& parameters, Object callback) {
         Model m;
+        m.Add(NewSatParameters(parameters));
+
+        std::atomic<bool> done{false};
+        std::queue<CpSolverResponse> queue;
+        std::mutex queue_lock;
+        Rice::Object ruby_thread;
+        std::optional<Rice::Exception> exception;
+
+        // TODO release GVL when not calling Ruby
+        auto ruby_observer = [&]() {
+          try {
+            while (true) {
+              if (done.load()) {
+                std::lock_guard<std::mutex> guard(queue_lock);
+                if (queue.empty()) {
+                  break;
+                }
+              }
+
+              while (true) {
+                CpSolverResponse r;
+                {
+                  std::lock_guard<std::mutex> guard(queue_lock);
+                  if (queue.empty()) {
+                    break;
+                  }
+                  r = queue.front();
+                  queue.pop();
+                }
+
+                callback.call("response=", r);
+                callback.call("on_solution_callback");
+
+                if (callback.attr_get("@stopped")) {
+                  StopSearch(&m);
+                  return Qnil;
+                }
+              }
+
+              rb_thread_schedule();
+            }
+          } catch (const Rice::Exception& e) {
+            exception = e;
+            StopSearch(&m);
+          } catch (const std::exception& e) {
+            exception = Rice::Exception(rb_eRuntimeError, e.what());
+            StopSearch(&m);
+          }
+          return Qnil;
+        };
+
+        auto ruby_wrapper = [](void* arg) {
+          return (*static_cast<decltype(ruby_observer)*>(arg))();
+        };
 
         if (!callback.is_nil()) {
-          // use a single worker since Ruby code cannot be run in a non-Ruby thread
-          parameters.set_num_search_workers(1);
+          ruby_thread = rb_thread_create(ruby_wrapper, &ruby_observer);
 
           m.Add(NewFeasibleSolutionObserver(
             [&](const CpSolverResponse& r) {
-              if (!ruby_native_thread_p()) {
-                throw std::runtime_error{"Non-Ruby thread"};
-              }
-
-              callback.call("response=", r);
-              callback.call("on_solution_callback");
-
-              if (callback.attr_get("@stopped")) {
-                StopSearch(&m);
-              }
+              std::lock_guard<std::mutex> guard(queue_lock);
+              queue.push(r);
             })
           );
         }
 
-        m.Add(NewSatParameters(parameters));
-        return SolveCpModel(model.Build(), &m);
+        CpSolverResponse r;
+        Rice::detail::no_gvl([&]() {
+          r = SolveCpModel(model.Build(), &m);
+          done = true;
+        });
+
+        if (!callback.is_nil()) {
+          ruby_thread.call("value");
+        }
+
+        if (exception.has_value()) {
+          throw exception.value();
+        }
+
+        return r;
       })
     .define_method(
       "_solution_integer_value",
