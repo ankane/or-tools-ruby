@@ -77,12 +77,17 @@ Dir.mktmpdir do |extract_path|
   # download
   puts "Downloading #{url}..."
   URI.parse(url).open(max_redirects: 10) do |download|
-    raise "Expected file" unless download.respond_to?(:path)
-
-    # check integrity
-    download.flush
-    download_checksum = Digest::SHA256.file(download.path).hexdigest
+    download_checksum =
+      if download.respond_to?(:path)
+        download.flush
+        Digest::SHA256.file(download.path).hexdigest
+      else
+        Digest::SHA256.hexdigest(download.string)
+      end
     raise "Bad checksum: #{download_checksum}" if download_checksum != checksum
+
+    # should never happen
+    raise "Expected file" if !download.respond_to?(:path)
 
     # extract - can't use Gem::Package#extract_tar_gz from RubyGems
     # since it limits filenames to 100 characters (doesn't support UStar format)
