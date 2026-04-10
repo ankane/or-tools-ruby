@@ -472,7 +472,7 @@ void init_constraint(Rice::Module& m) {
                 }
               }
 
-              rb_thread_schedule();
+              Rice::detail::protect(rb_thread_schedule);
             }
           } catch (const Rice::Exception& e) {
             exception = e;
@@ -489,7 +489,9 @@ void init_constraint(Rice::Module& m) {
         };
 
         if (!callback.is_nil()) {
-          ruby_thread = rb_thread_create(ruby_wrapper, &ruby_observer);
+          ruby_thread = Rice::detail::protect([&]() {
+            return rb_thread_create(ruby_wrapper, &ruby_observer);
+          });
 
           m.Add(NewFeasibleSolutionObserver(
             [&](const CpSolverResponse& r) {
