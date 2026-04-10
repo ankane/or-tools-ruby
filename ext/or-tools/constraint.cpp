@@ -1,4 +1,5 @@
 #include <atomic>
+#include <condition_variable>
 #include <mutex>
 #include <queue>
 #include <string>
@@ -434,6 +435,7 @@ void init_constraint(Rice::Module& m) {
         std::atomic<bool> done{false};
         std::queue<CpSolverResponse> queue;
         std::mutex queue_lock;
+        std::condition_variable cv;
         Rice::Object ruby_thread;
         std::optional<Rice::Exception> exception;
 
@@ -451,8 +453,10 @@ void init_constraint(Rice::Module& m) {
               while (true) {
                 CpSolverResponse r;
                 {
-                  std::lock_guard<std::mutex> guard(queue_lock);
-                  if (queue.empty()) {
+                  std::unique_lock<std::mutex> lock(queue_lock);
+                  // TODO increase when GVL unlocked
+                  auto time = std::chrono::system_clock::now() + std::chrono::milliseconds(1);
+                  if (!cv.wait_until(lock, time, [&] { return !queue.empty(); })) {
                     break;
                   }
                   r = std::move(queue.front());
@@ -491,6 +495,7 @@ void init_constraint(Rice::Module& m) {
             [&](const CpSolverResponse& r) {
               std::lock_guard<std::mutex> guard(queue_lock);
               queue.push(r);
+              cv.notify_one();
             })
           );
         }
