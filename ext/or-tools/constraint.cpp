@@ -454,8 +454,7 @@ void init_constraint(Rice::Module& m) {
                 CpSolverResponse r;
                 {
                   std::unique_lock<std::mutex> lock(mutex);
-                  // TODO increase when GVL unlocked
-                  auto time = std::chrono::system_clock::now() + std::chrono::milliseconds(1);
+                  auto time = std::chrono::system_clock::now() + std::chrono::milliseconds(10);
                   if (!cv.wait_until(lock, time, [&] { return !queue.empty(); })) {
                     break;
                   }
