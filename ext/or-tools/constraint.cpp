@@ -495,13 +495,12 @@ void init_constraint(Rice::Module& m) {
           );
         }
 
-        CpSolverResponse r;
-        Rice::detail::no_gvl([&]() {
-          r = SolveCpModel(model.Build(), &m);
-          done = true;
+        CpSolverResponse r = Rice::detail::no_gvl([&]() {
+          return SolveCpModel(model.Build(), &m);
         });
 
         if (!callback.is_nil()) {
+          done = true;
           ruby_thread.call("value");
         }
 
