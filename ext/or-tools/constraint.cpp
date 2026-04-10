@@ -462,10 +462,17 @@ void init_constraint(Rice::Module& m) {
                   queue.pop();
                 }
 
-                callback.call("response=", r);
-                callback.call("on_solution_callback");
+                bool stop = false;
+                try {
+                  callback.call("response=", r);
+                  callback.call("on_solution_callback");
+                  stop = static_cast<bool>(callback.attr_get("@stopped"));
+                } catch (const Rice::Exception& e) {
+                  exception = e;
+                  stop = true;
+                }
 
-                if (callback.attr_get("@stopped")) {
+                if (stop) {
                   StopSearch(&m);
                   return Qnil;
                 }
@@ -473,9 +480,6 @@ void init_constraint(Rice::Module& m) {
 
               Rice::detail::protect(rb_thread_schedule);
             }
-          } catch (const Rice::Exception& e) {
-            exception = e;
-            StopSearch(&m);
           } catch (const std::exception& e) {
             exception = Rice::Exception(rb_eRuntimeError, e.what());
             StopSearch(&m);
