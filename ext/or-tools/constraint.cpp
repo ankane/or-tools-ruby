@@ -502,10 +502,10 @@ void init_constraint(Rice::Module& m) {
         if (!callback.is_nil()) {
           done = true;
           ruby_thread.call("value");
-        }
 
-        if (exception.has_value()) {
-          throw exception.value();
+          if (exception.has_value()) {
+            throw exception.value();
+          }
         }
 
         return r;
