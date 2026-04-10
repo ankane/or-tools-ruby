@@ -455,7 +455,7 @@ void init_constraint(Rice::Module& m) {
                   if (queue.empty()) {
                     break;
                   }
-                  r = queue.front();
+                  r = std::move(queue.front());
                   queue.pop();
                 }
 
