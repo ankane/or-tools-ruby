@@ -434,7 +434,7 @@ void init_constraint(Rice::Module& m) {
 
         std::atomic<bool> done{false};
         std::queue<CpSolverResponse> queue;
-        std::mutex queue_lock;
+        std::mutex mutex;
         std::condition_variable cv;
         Rice::Object ruby_thread;
         std::optional<Rice::Exception> exception;
@@ -444,7 +444,7 @@ void init_constraint(Rice::Module& m) {
           try {
             while (true) {
               if (done.load()) {
-                std::lock_guard<std::mutex> guard(queue_lock);
+                std::lock_guard<std::mutex> guard(mutex);
                 if (queue.empty()) {
                   break;
                 }
@@ -453,7 +453,7 @@ void init_constraint(Rice::Module& m) {
               while (true) {
                 CpSolverResponse r;
                 {
-                  std::unique_lock<std::mutex> lock(queue_lock);
+                  std::unique_lock<std::mutex> lock(mutex);
                   // TODO increase when GVL unlocked
                   auto time = std::chrono::system_clock::now() + std::chrono::milliseconds(1);
                   if (!cv.wait_until(lock, time, [&] { return !queue.empty(); })) {
@@ -493,7 +493,7 @@ void init_constraint(Rice::Module& m) {
 
           m.Add(NewFeasibleSolutionObserver(
             [&](const CpSolverResponse& r) {
-              std::lock_guard<std::mutex> guard(queue_lock);
+              std::lock_guard<std::mutex> guard(mutex);
               queue.push(r);
               cv.notify_one();
             })
