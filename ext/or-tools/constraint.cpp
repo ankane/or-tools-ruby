@@ -444,7 +444,7 @@ void init_constraint(Rice::Module& m) {
             (*static_cast<decltype(f)*>(arg))();
             return nullptr;
           };
-          Rice::detail::protect(rb_thread_call_with_gvl, ruby_wrapper, &f);
+          rb_thread_call_with_gvl(ruby_wrapper, &f);
         };
 
         auto ruby_observer = [&]() {
