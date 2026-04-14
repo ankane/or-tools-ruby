@@ -77,6 +77,14 @@ namespace Rice::detail {
   };
 } // namespace Rice::detail
 
+void with_gvl(std::function<void()> f) {
+  auto ruby_wrapper = [](void* arg) -> void* {
+    (*static_cast<decltype(f)*>(arg))();
+    return nullptr;
+  };
+  rb_thread_call_with_gvl(ruby_wrapper, &f);
+}
+
 void init_constraint(Rice::Module& m) {
   Rice::define_class_under<Domain>(m, "Domain")
     .define_constructor(Rice::Constructor<Domain, int64_t, int64_t>())
@@ -439,9 +447,8 @@ void init_constraint(Rice::Module& m) {
         Rice::Object ruby_thread;
         std::optional<Rice::Exception> exception;
 
-        // TODO release GVL when not calling Ruby
         auto ruby_observer = [&]() {
-          try {
+          return Rice::detail::no_gvl([&]() {
             while (true) {
               if (done.load()) {
                 std::lock_guard<std::mutex> guard(mutex);
@@ -463,14 +470,16 @@ void init_constraint(Rice::Module& m) {
                 }
 
                 bool stop = false;
-                try {
-                  callback.call("response=", r);
-                  callback.call("on_solution_callback");
-                  stop = static_cast<bool>(callback.attr_get("@stopped"));
-                } catch (const Rice::Exception& e) {
-                  exception = e;
-                  stop = true;
-                }
+                with_gvl([&]() {
+                  try {
+                    callback.call("response=", r);
+                    callback.call("on_solution_callback");
+                    stop = static_cast<bool>(callback.attr_get("@stopped"));
+                  } catch (const Rice::Exception& e) {
+                    exception = e;
+                    stop = true;
+                  }
+                });
 
                 if (stop) {
                   StopSearch(&m);
@@ -478,13 +487,12 @@ void init_constraint(Rice::Module& m) {
                 }
               }
 
-              Rice::detail::protect(rb_thread_schedule);
+              with_gvl([]() {
+                Rice::detail::protect(rb_thread_schedule);
+              });
             }
-          } catch (const std::exception& e) {
-            exception = Rice::Exception(rb_eRuntimeError, e.what());
-            StopSearch(&m);
-          }
-          return Qnil;
+            return Qnil;
+          });
         };
 
         auto ruby_wrapper = [](void* arg) {
