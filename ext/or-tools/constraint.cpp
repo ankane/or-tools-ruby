@@ -77,14 +77,6 @@ namespace Rice::detail {
   };
 } // namespace Rice::detail
 
-void with_gvl(std::function<void()> f) {
-  auto ruby_wrapper = [](void* arg) -> void* {
-    (*static_cast<decltype(f)*>(arg))();
-    return nullptr;
-  };
-  rb_thread_call_with_gvl(ruby_wrapper, &f);
-}
-
 void init_constraint(Rice::Module& m) {
   Rice::define_class_under<Domain>(m, "Domain")
     .define_constructor(Rice::Constructor<Domain, int64_t, int64_t>())
@@ -446,6 +438,14 @@ void init_constraint(Rice::Module& m) {
         std::condition_variable cv;
         Rice::Object ruby_thread;
         std::optional<Rice::Exception> exception;
+
+        auto with_gvl = [](std::function<void()> f) {
+          auto ruby_wrapper = [](void* arg) -> void* {
+            (*static_cast<decltype(f)*>(arg))();
+            return nullptr;
+          };
+          Rice::detail::protect(rb_thread_call_with_gvl, ruby_wrapper, &f);
+        };
 
         auto ruby_observer = [&]() {
           return Rice::detail::no_gvl([&]() {
