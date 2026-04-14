@@ -375,7 +375,9 @@ void init_constraint(Rice::Module& m) {
       "to_s",
       [](CpModelBuilder& self) {
         std::string proto_string;
-        google::protobuf::TextFormat::PrintToString(self.Proto(), &proto_string);
+        if (!google::protobuf::TextFormat::PrintToString(self.Proto(), &proto_string)) {
+          throw Rice::Exception(rb_eRuntimeError, "PrintToString failed");
+        }
         return proto_string;
       });
 

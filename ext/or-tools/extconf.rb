@@ -9,7 +9,7 @@ $CXXFLAGS << " -Wall -Wextra"
 $CXXFLAGS << " -Wno-sign-compare -Wno-ignored-qualifiers -Wno-unused-parameter -Wno-missing-field-initializers -Wno-deprecated-declarations"
 
 # hide Rice warnings
-$CXXFLAGS << " -Wno-unused-private-field -Wno-implicit-fallthrough"
+$CXXFLAGS << " -Wno-implicit-fallthrough"
 
 inc, lib = dir_config("or-tools")
 if inc || lib
