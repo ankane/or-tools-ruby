@@ -5,6 +5,7 @@
 #include <ortools/constraint_solver/routing_parameters.h>
 #include <rice/rice.hpp>
 #include <rice/stl.hpp>
+#include <ruby/thread.h>
 
 using operations_research::Assignment;
 using operations_research::ConstraintSolverParameters;
@@ -19,6 +20,24 @@ using operations_research::RoutingModelParameters;
 using operations_research::RoutingNodeIndex;
 using operations_research::RoutingSearchParameters;
 using operations_research::RoutingSearchStatus;
+
+
+namespace {
+  struct RoutingSolveArgs {
+    RoutingModel* model;
+    const Assignment* assignment;
+    const RoutingSearchParameters* parameters;
+    const Assignment* result;
+  };
+
+  void* routing_solve_without_gvl(void* data) {
+    auto* args = static_cast<RoutingSolveArgs*>(data);
+    args->result = args->assignment
+      ? args->model->SolveFromAssignmentWithParameters(args->assignment, *args->parameters)
+      : args->model->SolveWithParameters(*args->parameters);
+    return nullptr;
+  }
+}
 
 using Rice::Array;
 using Rice::Class;
@@ -332,7 +351,7 @@ void init_routing(Rice::Module& m) {
     .define_constructor(Rice::Constructor<RoutingModel, RoutingIndexManager, RoutingModelParameters>(), Rice::Arg("_index_manager"), Rice::Arg("_parameters") = operations_research::DefaultRoutingModelParameters())
     .define_method("register_unary_transit_vector", &RoutingModel::RegisterUnaryTransitVector)
     .define_method(
-      "register_unary_transit_callback",
+      "_register_unary_transit_callback",
       [](RoutingModel& self, Object callback) {
         // TODO guard callback?
         return self.RegisterUnaryTransitCallback(
@@ -347,7 +366,7 @@ void init_routing(Rice::Module& m) {
       }, Rice::Arg("_callback").keepAlive())
     .define_method("register_transit_matrix", &RoutingModel::RegisterTransitMatrix)
     .define_method(
-      "register_transit_callback",
+      "_register_transit_callback",
       [](RoutingModel& self, Object callback) {
         // TODO guard callback?
         return self.RegisterTransitCallback(
@@ -430,14 +449,26 @@ void init_routing(Rice::Module& m) {
     .define_method("close_model", &RoutingModel::CloseModel)
     // solve defined in Ruby
     .define_method(
-      "solve_with_parameters",
-      [](RoutingModel& self, const RoutingSearchParameters& search_parameters) {
-        return self.SolveWithParameters(search_parameters);
+      "_solve_with_parameters",
+      [](RoutingModel& self, const RoutingSearchParameters& search_parameters, bool release_gvl) {
+        if (!release_gvl) {
+          return self.SolveWithParameters(search_parameters);
+        }
+
+        RoutingSolveArgs args{&self, nullptr, &search_parameters, nullptr};
+        rb_thread_call_without_gvl(routing_solve_without_gvl, &args, RUBY_UBF_IO, nullptr);
+        return args.result;
       })
     .define_method(
-      "solve_from_assignment_with_parameters",
-      [](RoutingModel& self, const Assignment& assignment, const RoutingSearchParameters& search_parameters) {
-        return self.SolveFromAssignmentWithParameters(&assignment, search_parameters);
+      "_solve_from_assignment_with_parameters",
+      [](RoutingModel& self, const Assignment& assignment, const RoutingSearchParameters& search_parameters, bool release_gvl) {
+        if (!release_gvl) {
+          return self.SolveFromAssignmentWithParameters(&assignment, search_parameters);
+        }
+
+        RoutingSolveArgs args{&self, &assignment, &search_parameters, nullptr};
+        rb_thread_call_without_gvl(routing_solve_without_gvl, &args, RUBY_UBF_IO, nullptr);
+        return args.result;
       })
     .define_method("compute_lower_bound", &RoutingModel::ComputeLowerBound)
     .define_method("status",

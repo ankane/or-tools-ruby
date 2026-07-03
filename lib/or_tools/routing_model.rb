@@ -21,5 +21,31 @@ module ORTools
     def add_disjunction(indices, penalty, max_cardinality = 1, penalty_cost_behavior = :penalize_once)
       _add_disjunction(indices, penalty, max_cardinality, penalty_cost_behavior)
     end
+
+    # Ruby-proc transit callbacks re-enter Ruby during the solve, so the GVL
+    # can only be released when a model registers none of them.
+    def register_transit_callback(callback)
+      @ruby_transit_callbacks = true
+      _register_transit_callback(callback)
+    end
+
+    def register_unary_transit_callback(callback)
+      @ruby_transit_callbacks = true
+      _register_unary_transit_callback(callback)
+    end
+
+    def solve_with_parameters(search_parameters)
+      _solve_with_parameters(search_parameters, !ruby_transit_callbacks?)
+    end
+
+    def solve_from_assignment_with_parameters(assignment, search_parameters)
+      _solve_from_assignment_with_parameters(assignment, search_parameters, !ruby_transit_callbacks?)
+    end
+
+    private
+
+    def ruby_transit_callbacks?
+      defined?(@ruby_transit_callbacks) && @ruby_transit_callbacks
+    end
   end
 end
