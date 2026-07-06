@@ -1889,6 +1889,7 @@ end
 
 # call the solver and display the results
 solver = ORTools::CpSolver.new
+solver.parameters.linearization_level = 0
 solver.parameters.enumerate_all_solutions = true
 a_few_solutions = 5.times.to_a
 solution_printer = NursesPartialSolutionPrinter.new(

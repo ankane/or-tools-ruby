@@ -78,8 +78,8 @@ class SchedulingTest < Minitest::Test
     end
 
     solver = ORTools::CpSolver.new
+    solver.parameters.linearization_level = 0
     solver.parameters.enumerate_all_solutions = true
-    # solver.parameters.linearization_level = 0
     solutions = []
     solution_printer = NursesPartialSolutionPrinter.new(
       shifts, num_nurses, num_days, num_shifts, solutions

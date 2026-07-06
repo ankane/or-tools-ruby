@@ -151,6 +151,11 @@ void init_constraint(Rice::Module& m) {
       [](SatParameters& self) {
         return self.enumerate_all_solutions();
        })
+    .define_method(
+      "linearization_level=",
+      [](SatParameters& self, int32_t value) {
+        self.set_linearization_level(value);
+      })
     .define_method("num_workers=",
       [](SatParameters& self, int32_t value){
         self.set_num_workers(value);
