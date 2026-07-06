@@ -136,42 +136,18 @@ void init_constraint(Rice::Module& m) {
 
   Rice::define_class_under<SatParameters>(m, "SatParameters")
     .define_constructor(Rice::Constructor<SatParameters>())
-    .define_method(
-      "max_time_in_seconds=",
-      [](SatParameters& self, double value) {
-        self.set_max_time_in_seconds(value);
-      })
-    .define_method(
-      "enumerate_all_solutions=",
-      [](SatParameters& self, bool value) {
-        self.set_enumerate_all_solutions(value);
-      })
-    .define_method(
-      "enumerate_all_solutions",
-      [](SatParameters& self) {
-        return self.enumerate_all_solutions();
-       })
-    .define_method(
-      "linearization_level=",
-      [](SatParameters& self, int32_t value) {
-        self.set_linearization_level(value);
-      })
-    .define_method("num_workers=",
-      [](SatParameters& self, int32_t value){
-        self.set_num_workers(value);
-      })
-    .define_method("cp_model_presolve=",
-      [](SatParameters& self, bool value) {
-        self.set_cp_model_presolve(value);
-      })
-    .define_method("random_seed",
-      [](SatParameters& self) {
-        return self.random_seed();
-      })
-    .define_method("random_seed=",
-      [](SatParameters& self, int32_t value) {
-        self.set_random_seed(value);
-      });
+    .define_method("cp_model_presolve", &SatParameters::cp_model_presolve)
+    .define_method("cp_model_presolve=", &SatParameters::set_cp_model_presolve)
+    .define_method("enumerate_all_solutions", &SatParameters::enumerate_all_solutions)
+    .define_method("enumerate_all_solutions=", &SatParameters::set_enumerate_all_solutions)
+    .define_method("linearization_level", &SatParameters::linearization_level)
+    .define_method("linearization_level=", &SatParameters::set_linearization_level)
+    .define_method("max_time_in_seconds", &SatParameters::max_time_in_seconds)
+    .define_method("max_time_in_seconds=", &SatParameters::set_max_time_in_seconds)
+    .define_method("num_workers", &SatParameters::num_workers)
+    .define_method("num_workers=", &SatParameters::set_num_workers)
+    .define_method("random_seed", &SatParameters::random_seed)
+    .define_method("random_seed=", &SatParameters::set_random_seed);
 
   Rice::define_class_under<CpModelBuilder>(m, "CpModel")
     .define_constructor(Rice::Constructor<CpModelBuilder>())
