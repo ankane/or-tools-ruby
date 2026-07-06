@@ -78,6 +78,33 @@ namespace Rice::detail {
   };
 } // namespace Rice::detail
 
+template<typename T>
+class Channel {
+public:
+  std::queue<T> queue;
+  std::mutex mutex;
+  std::condition_variable cv;
+
+  void send(T message) {
+    std::lock_guard<std::mutex> guard(mutex);
+    queue.push(message);
+    cv.notify_one();
+  }
+
+  template<typename U, typename V>
+  std::optional<T> recv_timeout(const std::chrono::duration<U, V>& duration) {
+    T message;
+    std::unique_lock<std::mutex> lock(mutex);
+    auto time = std::chrono::system_clock::now() + duration;
+    if (!cv.wait_until(lock, time, [&] { return !queue.empty(); })) {
+      return std::nullopt;
+    }
+    message = std::move(queue.front());
+    queue.pop();
+    return message;
+  }
+};
+
 void init_constraint(Rice::Module& m) {
   Rice::define_class_under<Domain>(m, "Domain")
     .define_constructor(Rice::Constructor<Domain, int64_t, int64_t>())
@@ -436,9 +463,7 @@ void init_constraint(Rice::Module& m) {
         m.Add(NewSatParameters(parameters));
 
         std::atomic<bool> done{false};
-        std::queue<CpSolverResponse> queue;
-        std::mutex mutex;
-        std::condition_variable cv;
+        Channel<CpSolverResponse> channel;
         Rice::Object ruby_thread;
         std::optional<Rice::Exception> exception;
 
@@ -454,28 +479,22 @@ void init_constraint(Rice::Module& m) {
           return Rice::detail::no_gvl([&]() {
             while (true) {
               if (done.load()) {
-                std::lock_guard<std::mutex> guard(mutex);
-                if (queue.empty()) {
+                std::lock_guard<std::mutex> guard(channel.mutex);
+                if (channel.queue.empty()) {
                   break;
                 }
               }
 
               while (true) {
-                CpSolverResponse r;
-                {
-                  std::unique_lock<std::mutex> lock(mutex);
-                  auto time = std::chrono::system_clock::now() + std::chrono::milliseconds(10);
-                  if (!cv.wait_until(lock, time, [&] { return !queue.empty(); })) {
-                    break;
-                  }
-                  r = std::move(queue.front());
-                  queue.pop();
+                std::optional<CpSolverResponse> r = channel.recv_timeout(std::chrono::milliseconds(10));
+                if (!r) {
+                  break;
                 }
 
                 bool stop = false;
                 with_gvl([&]() {
                   try {
-                    callback.call("response=", r);
+                    callback.call("response=", r.value());
                     callback.call("on_solution_callback");
                     stop = static_cast<bool>(callback.attr_get("@stopped"));
                   } catch (const Rice::Exception& e) {
@@ -510,9 +529,7 @@ void init_constraint(Rice::Module& m) {
 
           m.Add(NewFeasibleSolutionObserver(
             [&](const CpSolverResponse& r) {
-              std::lock_guard<std::mutex> guard(mutex);
-              queue.push(r);
-              cv.notify_one();
+              channel.send(r);
             })
           );
         }
