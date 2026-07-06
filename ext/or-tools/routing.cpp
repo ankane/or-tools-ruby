@@ -332,7 +332,7 @@ void init_routing(Rice::Module& m) {
     .define_constructor(Rice::Constructor<RoutingModel, RoutingIndexManager, RoutingModelParameters>(), Rice::Arg("_index_manager"), Rice::Arg("_parameters") = operations_research::DefaultRoutingModelParameters())
     .define_method("register_unary_transit_vector", &RoutingModel::RegisterUnaryTransitVector)
     .define_method(
-      "register_unary_transit_callback",
+      "_register_unary_transit_callback",
       [](RoutingModel& self, Object callback) {
         // TODO guard callback?
         return self.RegisterUnaryTransitCallback(
@@ -347,7 +347,7 @@ void init_routing(Rice::Module& m) {
       }, Rice::Arg("_callback").keepAlive())
     .define_method("register_transit_matrix", &RoutingModel::RegisterTransitMatrix)
     .define_method(
-      "register_transit_callback",
+      "_register_transit_callback",
       [](RoutingModel& self, Object callback) {
         // TODO guard callback?
         return self.RegisterTransitCallback(
@@ -430,14 +430,26 @@ void init_routing(Rice::Module& m) {
     .define_method("close_model", &RoutingModel::CloseModel)
     // solve defined in Ruby
     .define_method(
-      "solve_with_parameters",
-      [](RoutingModel& self, const RoutingSearchParameters& search_parameters) {
-        return self.SolveWithParameters(search_parameters);
+      "_solve_with_parameters",
+      [](RoutingModel& self, const RoutingSearchParameters& search_parameters, bool release_gvl) {
+        if (release_gvl) {
+          return Rice::detail::no_gvl([&]() {
+            return self.SolveWithParameters(search_parameters);
+          });
+        } else {
+          return self.SolveWithParameters(search_parameters);
+        }
       })
     .define_method(
-      "solve_from_assignment_with_parameters",
-      [](RoutingModel& self, const Assignment& assignment, const RoutingSearchParameters& search_parameters) {
-        return self.SolveFromAssignmentWithParameters(&assignment, search_parameters);
+      "_solve_from_assignment_with_parameters",
+      [](RoutingModel& self, const Assignment& assignment, const RoutingSearchParameters& search_parameters, bool release_gvl) {
+        if (release_gvl) {
+          return Rice::detail::no_gvl([&]() {
+            return self.SolveFromAssignmentWithParameters(&assignment, search_parameters);
+          });
+        } else {
+          return self.SolveFromAssignmentWithParameters(&assignment, search_parameters);
+        }
       })
     .define_method("compute_lower_bound", &RoutingModel::ComputeLowerBound)
     .define_method("status",

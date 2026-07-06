@@ -21,5 +21,23 @@ module ORTools
     def add_disjunction(indices, penalty, max_cardinality = 1, penalty_cost_behavior = :penalize_once)
       _add_disjunction(indices, penalty, max_cardinality, penalty_cost_behavior)
     end
+
+    def solve_with_parameters(search_parameters)
+      _solve_with_parameters(search_parameters, !@ruby_callback)
+    end
+
+    def solve_from_assignment_with_parameters(assignment, search_parameters)
+      _solve_from_assignment_with_parameters(assignment, search_parameters, !@ruby_callback)
+    end
+
+    def register_unary_transit_callback(callback)
+      @ruby_callback = true
+      _register_unary_transit_callback(callback)
+    end
+
+    def register_transit_callback(callback)
+      @ruby_callback = true
+      _register_transit_callback(callback)
+    end
   end
 end
