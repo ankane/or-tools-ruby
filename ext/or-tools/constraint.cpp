@@ -475,6 +475,7 @@ void init_constraint(Rice::Module& m) {
                 bool stop = false;
                 with_gvl([&]() {
                   try {
+                    // TODO keep response alive indefinitely
                     callback.call("response=", r);
                     callback.call("on_solution_callback");
                     stop = static_cast<bool>(callback.attr_get("@stopped"));
@@ -482,6 +483,7 @@ void init_constraint(Rice::Module& m) {
                     exception = e;
                     stop = true;
                   }
+                  callback.call("response=", Qnil);
                 });
 
                 if (stop) {
