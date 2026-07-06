@@ -80,11 +80,11 @@ namespace Rice::detail {
 
 template<typename T>
 class Channel {
-public:
   std::queue<T> queue;
   std::mutex mutex;
   std::condition_variable cv;
 
+public:
   void send(T message) {
     std::lock_guard<std::mutex> guard(mutex);
     queue.push(message);
@@ -102,6 +102,11 @@ public:
     message = std::move(queue.front());
     queue.pop();
     return message;
+  }
+
+  bool empty() {
+    std::lock_guard<std::mutex> guard(mutex);
+    return queue.empty();
   }
 };
 
@@ -478,11 +483,8 @@ void init_constraint(Rice::Module& m) {
         auto ruby_observer = [&]() {
           return Rice::detail::no_gvl([&]() {
             while (true) {
-              if (done.load()) {
-                std::lock_guard<std::mutex> guard(channel.mutex);
-                if (channel.queue.empty()) {
-                  break;
-                }
+              if (done.load() && channel.empty()) {
+                break;
               }
 
               while (true) {
