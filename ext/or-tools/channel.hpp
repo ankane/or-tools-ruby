@@ -23,8 +23,7 @@ public:
   std::optional<T> recv_timeout(const std::chrono::duration<U, V>& duration) {
     T message;
     std::unique_lock<std::mutex> lock(mutex);
-    auto time = std::chrono::system_clock::now() + duration;
-    if (!cv.wait_until(lock, time, [&] { return !queue.empty(); })) {
+    if (!cv.wait_for(lock, duration, [&] { return !queue.empty(); })) {
       return std::nullopt;
     }
     message = std::move(queue.front());
