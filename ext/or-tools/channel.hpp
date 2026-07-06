@@ -15,7 +15,7 @@ class Channel {
 public:
   void send(T message) {
     std::lock_guard<std::mutex> guard(mutex);
-    queue.push(message);
+    queue.push(std::move(message));
     cv.notify_one();
   }
 
