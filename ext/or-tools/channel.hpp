@@ -21,12 +21,11 @@ public:
 
   template<typename U, typename V>
   std::optional<T> recv_timeout(const std::chrono::duration<U, V>& duration) {
-    T message;
     std::unique_lock<std::mutex> lock(mutex);
     if (!cv.wait_for(lock, duration, [&] { return !queue.empty(); })) {
       return std::nullopt;
     }
-    message = std::move(queue.front());
+    T message = std::move(queue.front());
     queue.pop();
     return message;
   }
