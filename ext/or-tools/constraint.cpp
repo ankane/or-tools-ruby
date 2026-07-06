@@ -9,7 +9,7 @@
 #include <rice/rice.hpp>
 #include <rice/stl.hpp>
 
-#include "channel.h"
+#include "channel.hpp"
 
 using operations_research::Domain;
 using operations_research::sat::BoolVar;
