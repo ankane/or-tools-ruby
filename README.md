@@ -537,7 +537,8 @@ end
 # invoke the solver
 solver = ORTools::CpSolver.new
 solution_printer = VarArraySolutionPrinter.new(letters)
-status = solver.search_for_all_solutions(model, solution_printer)
+solver.parameters.enumerate_all_solutions = true
+status = solver.solve(model, solution_printer)
 
 puts
 puts "Statistics"
@@ -598,7 +599,8 @@ end
 # call the solver and display the results
 solver = ORTools::CpSolver.new
 solution_printer = SolutionPrinter.new(queens)
-status = solver.search_for_all_solutions(model, solution_printer)
+solver.parameters.enumerate_all_solutions = true
+status = solver.solve(model, solution_printer)
 puts
 puts "Solutions found : %i" % solution_printer.solution_count
 ```
@@ -1887,11 +1889,12 @@ end
 
 # call the solver and display the results
 solver = ORTools::CpSolver.new
+solver.parameters.enumerate_all_solutions = true
 a_few_solutions = 5.times.to_a
 solution_printer = NursesPartialSolutionPrinter.new(
   shifts, num_nurses, num_days, num_shifts, a_few_solutions
 )
-solver.search_for_all_solutions(model, solution_printer)
+solver.solve(model, solution_printer)
 
 puts
 puts "Statistics"
