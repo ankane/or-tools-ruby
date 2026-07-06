@@ -486,15 +486,15 @@ void init_constraint(Rice::Module& m) {
               }
 
               while (true) {
-                std::optional<CpSolverResponse> r = channel.recv_timeout(std::chrono::milliseconds(10));
-                if (!r) {
+                std::optional<CpSolverResponse> response = channel.recv_timeout(std::chrono::milliseconds(10));
+                if (!response) {
                   break;
                 }
 
                 bool stop = false;
                 with_gvl([&]() {
                   try {
-                    callback.call("response=", r.value());
+                    callback.call("response=", response.value());
                     callback.call("on_solution_callback");
                     stop = static_cast<bool>(callback.attr_get("@stopped"));
                   } catch (const Rice::Exception& e) {
@@ -528,13 +528,13 @@ void init_constraint(Rice::Module& m) {
           });
 
           m.Add(NewFeasibleSolutionObserver(
-            [&](const CpSolverResponse& r) {
-              channel.send(r);
+            [&](const CpSolverResponse& response) {
+              channel.send(response);
             })
           );
         }
 
-        CpSolverResponse r = Rice::detail::no_gvl([&]() {
+        CpSolverResponse response = Rice::detail::no_gvl([&]() {
           return SolveCpModel(model.Build(), &m);
         });
 
@@ -547,7 +547,7 @@ void init_constraint(Rice::Module& m) {
           }
         }
 
-        return r;
+        return response;
       })
     .define_method(
       "_solution_integer_value",
