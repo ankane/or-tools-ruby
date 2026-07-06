@@ -464,14 +464,19 @@ void init_constraint(Rice::Module& m) {
                 bool stop = false;
                 with_gvl([&]() {
                   try {
-                    callback.call("response=", response.value());
-                    callback.call("on_solution_callback");
-                    stop = static_cast<bool>(callback.attr_get("@stopped"));
+                    try {
+                      callback.call("response=", response.value());
+                      callback.call("on_solution_callback");
+                      stop = static_cast<bool>(callback.attr_get("@stopped"));
+                    } catch (const Rice::Exception& e) {
+                      exception = e;
+                      stop = true;
+                    }
+                    callback.call("response=", Object(Qnil));
                   } catch (const Rice::Exception& e) {
                     exception = e;
                     stop = true;
                   }
-                  callback.call("response=", Object(Qnil));
                 });
 
                 if (stop) {
