@@ -471,7 +471,7 @@ void init_constraint(Rice::Module& m) {
                     exception = e;
                     stop = true;
                   }
-                  callback.call("response=", Qnil);
+                  callback.call("response=", Object(Qnil));
                 });
 
                 if (stop) {

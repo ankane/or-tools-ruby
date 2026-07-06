@@ -8,10 +8,8 @@ module ORTools
 
     def solve(model, observer = nil)
       @response = _solve(model, parameters, observer)
-      @response.status
-    ensure
-      # avoid GC issue
       observer.response = @response if observer
+      @response.status
     end
 
     def value(var)
