@@ -1,8 +1,6 @@
 #include <atomic>
-#include <condition_variable>
 #include <chrono>
-#include <mutex>
-#include <queue>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -10,6 +8,8 @@
 #include <ortools/sat/cp_model.h>
 #include <rice/rice.hpp>
 #include <rice/stl.hpp>
+
+#include "channel.h"
 
 using operations_research::Domain;
 using operations_research::sat::BoolVar;
@@ -77,38 +77,6 @@ namespace Rice::detail {
     Arg* arg_ = nullptr;
   };
 } // namespace Rice::detail
-
-template<typename T>
-class Channel {
-  std::queue<T> queue;
-  std::mutex mutex;
-  std::condition_variable cv;
-
-public:
-  void send(T message) {
-    std::lock_guard<std::mutex> guard(mutex);
-    queue.push(message);
-    cv.notify_one();
-  }
-
-  template<typename U, typename V>
-  std::optional<T> recv_timeout(const std::chrono::duration<U, V>& duration) {
-    T message;
-    std::unique_lock<std::mutex> lock(mutex);
-    auto time = std::chrono::system_clock::now() + duration;
-    if (!cv.wait_until(lock, time, [&] { return !queue.empty(); })) {
-      return std::nullopt;
-    }
-    message = std::move(queue.front());
-    queue.pop();
-    return message;
-  }
-
-  bool empty() {
-    std::lock_guard<std::mutex> guard(mutex);
-    return queue.empty();
-  }
-};
 
 void init_constraint(Rice::Module& m) {
   Rice::define_class_under<Domain>(m, "Domain")
