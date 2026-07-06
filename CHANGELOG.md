@@ -1,4 +1,4 @@
-## 0.18.0 (unreleased)
+## 0.18.0 (2026-07-06)
 
 - Added support for releasing GVL
 - Added `stop_search` method to `CpSolverSolutionCallback`
