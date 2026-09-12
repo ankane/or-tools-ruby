@@ -250,6 +250,8 @@ void init_routing(Rice::Module& m) {
     .define_method("set_global_span_cost_coefficient", &RoutingDimension::SetGlobalSpanCostCoefficient)
     // alias
     .define_method("global_span_cost_coefficient=", &RoutingDimension::SetGlobalSpanCostCoefficient)
+    .define_method("set_slack_cost_coefficient_for_vehicle", &RoutingDimension::SetSlackCostCoefficientForVehicle)
+    .define_method("set_slack_cost_coefficient_for_all_vehicles", &RoutingDimension::SetSlackCostCoefficientForAllVehicles)
     .define_method("set_cumul_var_soft_upper_bound", &RoutingDimension::SetCumulVarSoftUpperBound)
     .define_method("cumul_var_soft_upper_bound?", &RoutingDimension::HasCumulVarSoftUpperBound)
     .define_method("cumul_var_soft_upper_bound", &RoutingDimension::GetCumulVarSoftUpperBound)
