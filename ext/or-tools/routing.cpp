@@ -224,6 +224,7 @@ void init_routing(Rice::Module& m) {
 
   // not to be confused with operations_research::sat::IntVar
   rb_cIntVar
+    .define_method("name", &operations_research::IntVar::name)
     .define_method("var?", &operations_research::IntVar::IsVar)
     .define_method("value", &operations_research::IntVar::Value)
     .define_method("remove_value", &operations_research::IntVar::RemoveValue)
