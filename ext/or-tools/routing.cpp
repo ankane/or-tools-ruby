@@ -10,6 +10,7 @@ using operations_research::Assignment;
 using operations_research::ConstraintSolverParameters;
 using operations_research::DefaultRoutingSearchParameters;
 using operations_research::FirstSolutionStrategy;
+using operations_research::IntervalVarElement;
 using operations_research::LocalSearchMetaheuristic;
 using operations_research::RoutingDimension;
 using operations_research::RoutingDisjunctionIndex;
@@ -198,11 +199,28 @@ void init_routing(Rice::Module& m) {
     .define_method("index_to_node", &RoutingIndexManager::IndexToNode)
     .define_method("node_to_index", &RoutingIndexManager::NodeToIndex);
 
+
+  Rice::define_class_under<IntervalVarElement>(m, "IntervalVarElement")
+    .define_method("var", &IntervalVarElement::Var)
+    .define_method("start_value", &IntervalVarElement::StartValue)
+    .define_method("duration_value", &IntervalVarElement::DurationValue)
+    .define_method("end_value", &IntervalVarElement::EndValue)
+    .define_method("performed_value", &IntervalVarElement::PerformedValue);
+
+  Rice::define_class_under<Assignment::IntervalContainer>(m, "IntervalContainer")
+    .define_method("size", &Assignment::IntervalContainer::Size)
+    .define_method(
+      "element",
+      [](Assignment::IntervalContainer& self, int index) {
+        return self.Element(index);
+      });
+
   Rice::define_class_under<Assignment>(m, "Assignment")
     .define_method("objective_value", &Assignment::ObjectiveValue)
     .define_method("value", &Assignment::Value)
     .define_method("min", &Assignment::Min)
-    .define_method("max", &Assignment::Max);
+    .define_method("max", &Assignment::Max)
+    .define_method("interval_var_container", &Assignment::IntervalVarContainer);
 
   // not to be confused with operations_research::sat::IntVar
   rb_cIntVar
@@ -223,6 +241,7 @@ void init_routing(Rice::Module& m) {
       });
 
   Rice::define_class_under<operations_research::IntervalVar>(m, "IntervalVar")
+    .define_method("name", &operations_research::IntervalVar::name)
     .define_method("start_min", &operations_research::IntervalVar::StartMin)
     .define_method("start_max", &operations_research::IntervalVar::StartMax)
     .define_method("set_start_min", &operations_research::IntervalVar::SetStartMin)
@@ -259,7 +278,12 @@ void init_routing(Rice::Module& m) {
     .define_method("set_cumul_var_soft_lower_bound", &RoutingDimension::SetCumulVarSoftLowerBound)
     .define_method("cumul_var_soft_lower_bound?", &RoutingDimension::HasCumulVarSoftLowerBound)
     .define_method("cumul_var_soft_lower_bound", &RoutingDimension::GetCumulVarSoftLowerBound)
-    .define_method("cumul_var_soft_lower_bound_coefficient", &RoutingDimension::GetCumulVarSoftLowerBoundCoefficient);
+    .define_method("cumul_var_soft_lower_bound_coefficient", &RoutingDimension::GetCumulVarSoftLowerBoundCoefficient)
+    .define_method(
+      "set_break_intervals_of_vehicle",
+      [](RoutingDimension& self, std::vector<operations_research::IntervalVar*> breaks, int vehicle, std::vector<int64_t> node_visit_transits) {
+        self.SetBreakIntervalsOfVehicle(breaks, vehicle, node_visit_transits);
+      });
 
   Rice::define_class_under<RoutingDisjunctionIndex>(m, "RoutingDisjunctionIndex");
 
@@ -292,6 +316,11 @@ void init_routing(Rice::Module& m) {
       "fixed_duration_interval_var",
       [](operations_research::Solver& self, operations_research::IntVar& start_variable, int64_t duration, const std::string& name) {
         return self.MakeFixedDurationIntervalVar(&start_variable, duration, name);
+      })
+    .define_method(
+      "fixed_duration_interval_var",
+      [](operations_research::Solver& self, int64_t start_min, int64_t start_max, int64_t duration, bool optional, const std::string& name) {
+        return self.MakeFixedDurationIntervalVar(start_min, start_max, duration, optional, name);
       })
     .define_method(
       "cumulative",

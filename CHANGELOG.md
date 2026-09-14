@@ -1,3 +1,7 @@
+## 0.18.1 (unreleased)
+
+- Added support for breaks for routing
+
 ## 0.18.0 (2026-07-06)
 
 - Added support for releasing GVL
