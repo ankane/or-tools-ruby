@@ -101,8 +101,16 @@ template<typename T>
 operations_research::Constraint *make_constraint(operations_research::Solver &solver, operations_research::IntExpr *left, T right, const std::string &op) {
   if (op == "==") {
     return solver.MakeEquality(left, right);
+  } else if (op == "!=") {
+    return solver.MakeNonEquality(left, right);
+  } else if (op == "<") {
+    return solver.MakeLess(left, right);
   } else if (op == "<=") {
     return solver.MakeLessOrEqual(left, right);
+  } else if (op == ">") {
+    return solver.MakeGreater(left, right);
+  } else if (op == ">=") {
+    return solver.MakeGreaterOrEqual(left, right);
   } else {
     throw std::runtime_error{"Unknown operator"};
   }

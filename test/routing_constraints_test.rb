@@ -44,6 +44,42 @@ class RoutingConstraintsTest < Minitest::Test
     assert_equal :fail, @routing.status
   end
 
+  def test_var_not_equal_const
+    build_routing
+    @routing.solver.add(@distance_dimension.cumul_var(@manager.node_to_index(1)) != 2451)
+    solve
+
+    assert_equal :success, @routing.status
+    assert_equal [0, 2, 1, 0], route
+  end
+
+  def test_var_less_than_const
+    build_routing
+    @routing.solver.add(@distance_dimension.cumul_var(@manager.node_to_index(1)) < 2455)
+    solve
+
+    assert_equal :success, @routing.status
+    assert_equal [0, 1, 2, 0], route
+  end
+
+  def test_var_greater_than_const
+    build_routing
+    @routing.solver.add(@distance_dimension.cumul_var(@manager.node_to_index(1)) > 2455)
+    solve
+
+    assert_equal :success, @routing.status
+    assert_equal [0, 2, 1, 0], route
+  end
+
+  def test_var_greater_than_or_equal_const
+    build_routing
+    @routing.solver.add(@distance_dimension.cumul_var(@manager.node_to_index(1)) >= 2455)
+    solve
+
+    assert_equal :success, @routing.status
+    assert_equal [0, 2, 1, 0], route
+  end
+
   private
 
   def build_routing
