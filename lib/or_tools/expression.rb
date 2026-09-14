@@ -15,7 +15,7 @@ module ORTools
     end
 
     def *(other)
-      Expression.new([Product.new(self, Expression.to_expression(other))])
+      Product.new(self, Expression.to_expression(other))
     end
 
     def >(other)
