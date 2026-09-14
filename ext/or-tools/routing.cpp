@@ -116,6 +116,53 @@ operations_research::Constraint *make_constraint(operations_research::Solver &so
   }
 }
 
+operations_research::IntExpr *make_int_expr(operations_research::Solver &solver, Object expression) {
+  if (expression.class_of().name() == "ORTools::Constant") {
+    return solver.MakeIntConst(Rice::detail::From_Ruby<int64_t>().convert(expression.call("value")));
+  } else if (expression.class_of().name() == "ORTools::Product") {
+    // MakeProd handles the left and right Bound() cases specially itself, so we don't need to optimize
+    // IntVar*Constant or Constant*IntVar ourselves
+    return solver.MakeProd(make_int_expr(solver, expression.call("left")), make_int_expr(solver, expression.call("right")));
+  } else if (expression.class_of().name() == "ORTools::Expression") {
+    const Array parts(expression.call("parts"));
+
+    switch (parts.size()) {
+    case 1:
+      // Unwrap unary Expression
+      return make_int_expr(solver, parts[0]);
+
+    case 2:
+      // ExpressionMethods#-(other) is implemented using + -(other), which we extract here mainly to help the common IntVar-IntVar case
+      if (parts[1].class_of().name() == "ORTools::Product" &&
+          parts[1].call("left").class_of().name() == "ORTools::Constant" &&
+          Rice::detail::From_Ruby<int64_t>().convert(parts[1].call("left").call("value")) == -1) {
+        return solver.MakeDifference(make_int_expr(solver, parts[0]), make_int_expr(solver, parts[1].call("right")));
+      } else {
+        return solver.MakeSum(make_int_expr(solver, parts[0]), make_int_expr(solver, parts[1]));
+      }
+
+    default:
+      // There's a sum(IntVar[]), but not a sum(IntExpr[])
+      if (std::all_of(parts.begin(), parts.end(), [](Object object) {
+        return Rice::detail::From_Ruby<operations_research::IntVar*>().is_convertible(object);
+      })) {
+        std::vector<operations_research::IntVar*> vars;
+        std::transform(parts.begin(), parts.end(), std::back_inserter(vars), [](Object object) {
+          return Rice::detail::From_Ruby<operations_research::IntVar*>().convert(object);
+        });
+        return solver.MakeSum(vars);
+      } else {
+        operations_research::IntExpr *curr = make_int_expr(solver, parts[0]);
+        for (size_t index = 1; index < parts.size(); index++) curr = solver.MakeSum(curr, make_int_expr(solver, parts[index]));
+        return curr;
+      }
+    }
+  } else {
+    // Anything else should be a Variable, ie. a RoutingIntVar
+    return Rice::detail::From_Ruby<operations_research::IntVar*>().convert(expression);
+  }
+}
+
 void init_routing(Rice::Module& m) {
   auto rb_cRoutingSearchParameters = Rice::define_class_under<RoutingSearchParameters>(m, "RoutingSearchParameters");
   auto rb_cIntVar = Rice::define_class_under<operations_research::IntVar>(m, "RoutingIntVar");
@@ -320,9 +367,9 @@ void init_routing(Rice::Module& m) {
       "_make_constraint",
       [](operations_research::Solver& self, Object left, Object right, Symbol op) {
         if (right.class_of().name() == "ORTools::Constant") {
-          return make_constraint(self, Rice::detail::From_Ruby<operations_research::IntVar*>().convert(left), Rice::detail::From_Ruby<int64_t>().convert(right.call("value")), op.str());
+          return make_constraint(self, make_int_expr(self, left), Rice::detail::From_Ruby<int64_t>().convert(right.call("value")), op.str());
         } else {
-          return make_constraint(self, Rice::detail::From_Ruby<operations_research::IntVar*>().convert(left), Rice::detail::From_Ruby<operations_research::IntVar*>().convert(right), op.str());
+          return make_constraint(self, make_int_expr(self, left), make_int_expr(self, right), op.str());
         }
       })
     .define_method(

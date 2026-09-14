@@ -80,6 +80,96 @@ class RoutingConstraintsTest < Minitest::Test
     assert_equal [0, 2, 1, 0], route
   end
 
+  def test_var_plus_var
+    build_routing
+    @routing.solver.add(@distance_dimension.cumul_var(@manager.node_to_index(1)) + @distance_dimension.cumul_var(@manager.node_to_index(2)) == (2451 + (2451 + 1745)))
+    solve
+
+    assert_equal :success, @routing.status
+    assert_equal [0, 1, 2, 0], route
+  end
+
+  def test_sum_vars
+    build_routing
+    @routing.solver.add(@distance_dimension.cumul_var(@manager.node_to_index(0)) + @distance_dimension.cumul_var(@manager.node_to_index(1)) + @distance_dimension.cumul_var(@manager.node_to_index(2)) == (2451 + (2451 + 1745)))
+    solve
+
+    assert_equal :success, @routing.status
+    assert_equal [0, 1, 2, 0], route
+  end
+
+  def test_var_plus_const
+    build_routing
+    @routing.solver.add(@distance_dimension.cumul_var(@manager.node_to_index(1)) + 10000 == (2451 + 10000))
+    solve
+
+    assert_equal :success, @routing.status
+    assert_equal [0, 1, 2, 0], route
+  end
+
+  def test_var_plus_var
+    build_routing
+    @routing.solver.add(@distance_dimension.cumul_var(@manager.node_to_index(1)) + @distance_dimension.cumul_var(@manager.node_to_index(2)) + 10000 == (2451 + (2451 + 1745) + 10000))
+    solve
+
+    assert_equal :success, @routing.status
+    assert_equal [0, 1, 2, 0], route
+  end
+
+  def test_var_minus_var
+    build_routing
+    @routing.solver.add(@distance_dimension.cumul_var(@manager.node_to_index(2)) - @distance_dimension.cumul_var(@manager.node_to_index(1)) == ((2451 + 1745) - 2451))
+    solve
+
+    assert_equal :success, @routing.status
+    assert_equal [0, 1, 2, 0], route
+  end
+
+  def test_var_minus_const
+    build_routing
+    @routing.solver.add(@distance_dimension.cumul_var(@manager.node_to_index(1)) - 1000 == (2451 - 1000))
+    solve
+
+    assert_equal :success, @routing.status
+    assert_equal [0, 1, 2, 0], route
+  end
+
+  def test_var_product_const
+    build_routing
+    @routing.solver.add(@distance_dimension.cumul_var(@manager.node_to_index(1))*2 <= 4910)
+    solve
+
+    assert_equal :success, @routing.status
+    assert_equal [0, 1, 2, 0], route
+  end
+
+  def test_const_product_var
+    build_routing
+    @routing.solver.add(2*@distance_dimension.cumul_var(@manager.node_to_index(1)) <= 4910)
+    solve
+
+    assert_equal :success, @routing.status
+    assert_equal [0, 1, 2, 0], route
+  end
+
+  def test_var_product_var
+    build_routing
+    @routing.solver.add(@distance_dimension.cumul_var(@manager.node_to_index(1))*@distance_dimension.cumul_var(@manager.node_to_index(2)) == (2451*(2451 + 1745)))
+    solve
+
+    assert_equal :success, @routing.status
+    assert_equal [0, 1, 2, 0], route
+  end
+
+  def test_negate_var
+    build_routing
+    @routing.solver.add(-@distance_dimension.cumul_var(@manager.node_to_index(1)) > -2455)
+    solve
+
+    assert_equal :success, @routing.status
+    assert_equal [0, 1, 2, 0], route
+  end
+
   private
 
   def build_routing
