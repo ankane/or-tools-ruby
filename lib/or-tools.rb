@@ -29,6 +29,7 @@ require_relative "or_tools/math_opt/variable"
 # routing
 require_relative "or_tools/routing_index_manager"
 require_relative "or_tools/routing_model"
+require_relative "or_tools/routing_solver"
 
 # higher level interfaces
 require_relative "or_tools/basic_scheduler"

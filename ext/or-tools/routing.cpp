@@ -97,6 +97,17 @@ namespace Rice::detail {
   };
 } // namespace Rice::detail
 
+template<typename T>
+operations_research::Constraint *make_constraint(operations_research::Solver &solver, operations_research::IntExpr *left, T right, const std::string &op) {
+  if (op == "==") {
+    return solver.MakeEquality(left, right);
+  } else if (op == "<=") {
+    return solver.MakeLessOrEqual(left, right);
+  } else {
+    throw std::runtime_error{"Unknown operator"};
+  }
+}
+
 void init_routing(Rice::Module& m) {
   auto rb_cRoutingSearchParameters = Rice::define_class_under<RoutingSearchParameters>(m, "RoutingSearchParameters");
   auto rb_cIntVar = Rice::define_class_under<operations_research::IntVar>(m, "RoutingIntVar");
@@ -293,24 +304,18 @@ void init_routing(Rice::Module& m) {
 
   Rice::define_class_under<operations_research::Solver>(m, "RoutingSolver")
     .define_method(
-      "add",
-      [](operations_research::Solver& self, Object o) {
-        operations_research::Constraint* constraint;
-        if (o.respond_to("left")) {
-          operations_research::IntExpr* left(Rice::detail::From_Ruby<operations_research::IntVar*>().convert(o.call("left")));
-          operations_research::IntExpr* right(Rice::detail::From_Ruby<operations_research::IntVar*>().convert(o.call("right")));
-          std::string op = o.call("op").to_s().str();
-          if (op == "==") {
-            constraint = self.MakeEquality(left, right);
-          } else if (op == "<=") {
-            constraint = self.MakeLessOrEqual(left, right);
-          } else {
-            throw std::runtime_error{"Unknown operator"};
-          }
+      "add_constraint",
+      [](operations_research::Solver& self, operations_research::Constraint& constraint) {
+        self.AddConstraint(&constraint);
+      })
+    .define_method(
+      "_make_constraint",
+      [](operations_research::Solver& self, Object left, Object right, Symbol op) {
+        if (right.class_of().name() == "ORTools::Constant") {
+          return make_constraint(self, Rice::detail::From_Ruby<operations_research::IntVar*>().convert(left), Rice::detail::From_Ruby<int64_t>().convert(right.call("value")), op.str());
         } else {
-          constraint = Rice::detail::From_Ruby<operations_research::Constraint*>().convert(o);
+          return make_constraint(self, Rice::detail::From_Ruby<operations_research::IntVar*>().convert(left), Rice::detail::From_Ruby<operations_research::IntVar*>().convert(right), op.str());
         }
-        self.AddConstraint(constraint);
       })
     .define_method(
       "fixed_duration_interval_var",
