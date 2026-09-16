@@ -97,6 +97,38 @@ namespace Rice::detail {
   };
 } // namespace Rice::detail
 
+int64_t int64_strict(VALUE v) {
+  if (!Object(v).is_a(rb_cInteger)) {
+    throw std::invalid_argument{"Coefficient must be integer"};
+  }
+  return Rice::detail::From_Ruby<int64_t>().convert(v);
+}
+
+operations_research::IntExpr* int_expr(operations_research::Solver& solver, Object o) {
+    Object utils = Rice::define_module("ORTools").const_get("Utils");
+    Rice::Hash rb_coeffs = utils.call("index_expression", o);
+
+    std::vector<operations_research::IntVar*> vars;
+    std::vector<int64_t> coeffs;
+    int64_t constant = 0;
+
+    for (const auto& entry : rb_coeffs) {
+      auto coeff = int64_strict(entry.value.value());
+      if (Object(entry.key).is_nil()) {
+        constant = coeff;
+      } else {
+        vars.push_back(Rice::detail::From_Ruby<operations_research::IntVar*>().convert(entry.key.value()));
+        coeffs.push_back(coeff);
+      }
+    }
+
+    operations_research::IntExpr* expr = solver.MakeScalProd(vars, coeffs);
+    if (constant != 0) {
+      expr = solver.MakeSum(expr, constant);
+    }
+    return expr;
+}
+
 void init_routing(Rice::Module& m) {
   auto rb_cRoutingSearchParameters = Rice::define_class_under<RoutingSearchParameters>(m, "RoutingSearchParameters");
   auto rb_cIntVar = Rice::define_class_under<operations_research::IntVar>(m, "RoutingIntVar");
@@ -298,11 +330,20 @@ void init_routing(Rice::Module& m) {
       [](operations_research::Solver& self, Object o) {
         operations_research::Constraint* constraint;
         if (o.respond_to("left")) {
-          operations_research::IntExpr* left(Rice::detail::From_Ruby<operations_research::IntVar*>().convert(o.call("left")));
-          operations_research::IntExpr* right(Rice::detail::From_Ruby<operations_research::IntVar*>().convert(o.call("right")));
+          auto left = int_expr(self, o.call("left"));
+          auto right = int_expr(self, o.call("right"));
           std::string op = o.call("op").to_s().str();
+
           if (op == "==") {
             constraint = self.MakeEquality(left, right);
+          } else if (op == "!=") {
+            constraint = self.MakeNonEquality(left, right);
+          } else if (op == ">") {
+            constraint = self.MakeGreater(left, right);
+          } else if (op == ">=") {
+            constraint = self.MakeGreaterOrEqual(left, right);
+          } else if (op == "<") {
+            constraint = self.MakeLess(left, right);
           } else if (op == "<=") {
             constraint = self.MakeLessOrEqual(left, right);
           } else {
