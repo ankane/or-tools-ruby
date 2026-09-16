@@ -23,6 +23,7 @@ using operations_research::RoutingSearchStatus;
 
 using Rice::Array;
 using Rice::Class;
+using Rice::Hash;
 using Rice::Module;
 using Rice::Object;
 using Rice::String;
@@ -106,7 +107,7 @@ int64_t int64_strict(VALUE v) {
 
 operations_research::IntExpr* int_expr(operations_research::Solver& solver, Object o) {
     Object utils = Rice::define_module("ORTools").const_get("Utils");
-    Rice::Hash rb_coeffs = utils.call("index_expression", o);
+    Hash rb_coeffs = utils.call("index_expression", o);
 
     std::vector<operations_research::IntVar*> vars;
     std::vector<int64_t> coeffs;

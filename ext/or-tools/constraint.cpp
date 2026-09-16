@@ -29,6 +29,7 @@ using operations_research::sat::TableConstraint;
 
 using Rice::Array;
 using Rice::Class;
+using Rice::Hash;
 using Rice::Object;
 using Rice::String;
 using Rice::Symbol;
@@ -54,8 +55,8 @@ namespace Rice::detail {
     LinearExpr convert(VALUE v) {
       LinearExpr expr;
 
-      Rice::Object utils = Rice::define_module("ORTools").const_get("Utils");
-      Rice::Hash coeffs = utils.call("index_expression", Object(v));
+      Object utils = Rice::define_module("ORTools").const_get("Utils");
+      Hash coeffs = utils.call("index_expression", Object(v));
 
       for (const auto& entry : coeffs) {
         Object var = entry.key;
