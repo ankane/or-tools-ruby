@@ -501,7 +501,17 @@ void init_routing(Rice::Module& m) {
     .define_method("add_weighted_variable_maximized_by_finalizer", &RoutingModel::AddWeightedVariableMaximizedByFinalizer)
     .define_method("add_variable_target_to_finalizer", &RoutingModel::AddVariableTargetToFinalizer)
     .define_method("add_weighted_variable_target_to_finalizer", &RoutingModel::AddWeightedVariableTargetToFinalizer)
-    .define_method("close_model", &RoutingModel::CloseModel)
+    .define_method(
+      "_close_model",
+      [](RoutingModel& self, bool release_gvl) {
+        if (release_gvl) {
+          Rice::detail::no_gvl([&]() {
+            self.CloseModel();
+          });
+        } else {
+          self.CloseModel();
+        }
+      })
     // solve defined in Ruby
     .define_method(
       "_solve_with_parameters",
@@ -555,7 +565,26 @@ void init_routing(Rice::Module& m) {
     .define_method("write_assignment", &RoutingModel::WriteAssignment)
     .define_method("read_assignment", &RoutingModel::ReadAssignment)
     .define_method("restore_assignment", &RoutingModel::RestoreAssignment)
-    .define_method("read_assignment_from_routes", &RoutingModel::ReadAssignmentFromRoutes)
+    .define_method(
+      "_read_assignment_from_routes",
+      [](RoutingModel& self,
+         std::vector<std::vector<int64_t>> routes,
+         bool ignore_inactive_indices,
+         bool release_gvl) -> Object {
+        Assignment* assignment;
+        if (release_gvl) {
+          assignment = Rice::detail::no_gvl([&]() {
+            return self.ReadAssignmentFromRoutes(routes, ignore_inactive_indices);
+          });
+        } else {
+          assignment = self.ReadAssignmentFromRoutes(routes, ignore_inactive_indices);
+        }
+
+        if (assignment == nullptr) {
+          return Object(Qnil);
+        }
+        return Rice::Data_Object<Assignment>(assignment, false);
+      })
     .define_method("routes_to_assignment", &RoutingModel::RoutesToAssignment)
     .define_method("assignment_to_routes", &RoutingModel::AssignmentToRoutes)
     .define_method("compact_assignment", &RoutingModel::CompactAssignment)
