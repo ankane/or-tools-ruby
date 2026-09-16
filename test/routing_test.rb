@@ -907,6 +907,20 @@ class RoutingTest < Minitest::Test
     search_parameters.first_solution_strategy = :path_cheapest_arc
     search_parameters.local_search_metaheuristic = :guided_local_search
     search_parameters.log_search = true
+    assert_nil search_parameters.improvement_limit_parameters
+
+    search_parameters.improvement_limit_parameters = {
+      improvement_rate_coefficient: 0.01,
+      improvement_rate_solutions_distance: 5
+    }
+
+    assert_equal(
+      {
+        improvement_rate_coefficient: 0.01,
+        improvement_rate_solutions_distance: 5
+      },
+      search_parameters.improvement_limit_parameters
+    )
   end
 
   def test_set_allowed_vehicles_for_index
