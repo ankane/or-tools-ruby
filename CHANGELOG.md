@@ -1,6 +1,7 @@
 ## 0.18.1 (unreleased)
 
 - Added support for breaks for routing
+- Added `fix_variables_to_their_hinted_value`, `log_search_progress`, and `max_deterministic_time` to `SatParameters`
 
 ## 0.18.0 (2026-07-06)
 
