@@ -234,6 +234,50 @@ class ConstraintTest < Minitest::Test
     assert_equal :unknown, status
   end
 
+  def test_max_deterministic_time
+    model = ORTools::CpModel.new
+    num_vals = 3
+    x = model.new_int_var(0, num_vals - 1, "x")
+    y = model.new_int_var(0, num_vals - 1, "y")
+    model.add(x != y)
+
+    solver = ORTools::CpSolver.new
+    solver.parameters.max_deterministic_time = 0
+    assert_equal 0, solver.parameters.max_deterministic_time
+
+    status = solver.solve(model)
+    assert_equal :unknown, status
+  end
+
+  def test_fix_variables_to_their_hinted_value
+    model = ORTools::CpModel.new
+    x = model.new_int_var(0, 10, "x")
+    model.add_hint(x, 7)
+    model.minimize(x)
+
+    solver = ORTools::CpSolver.new
+    solver.parameters.fix_variables_to_their_hinted_value = true
+    assert solver.parameters.fix_variables_to_their_hinted_value
+
+    assert_equal :optimal, solver.solve(model)
+    assert_equal 7, solver.value(x)
+  end
+
+  def test_log_search_progress
+    model = ORTools::CpModel.new
+    x = model.new_int_var(0, 10, "x")
+    model.minimize(x)
+
+    solver = ORTools::CpSolver.new
+    solver.parameters.log_search_progress = true
+    assert solver.parameters.log_search_progress
+
+    stdout, _ = capture_subprocess_io do
+      assert_equal :optimal, solver.solve(model)
+    end
+    assert_match "Starting CP-SAT solver", stdout
+  end
+
   def test_infeasible_value
     model = ORTools::CpModel.new
 
