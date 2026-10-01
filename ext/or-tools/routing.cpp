@@ -137,6 +137,66 @@ void init_routing(Rice::Module& m) {
   m.define_singleton_function("default_routing_search_parameters", &DefaultRoutingSearchParameters);
 
   rb_cRoutingSearchParameters
+    .define_method("christofides_use_minimum_matching", &RoutingSearchParameters::christofides_use_minimum_matching)
+    .define_method("christofides_use_minimum_matching=", &RoutingSearchParameters::set_christofides_use_minimum_matching)
+    .define_method("fallback_to_cp_sat_size_threshold", &RoutingSearchParameters::fallback_to_cp_sat_size_threshold)
+    .define_method("fallback_to_cp_sat_size_threshold=", &RoutingSearchParameters::set_fallback_to_cp_sat_size_threshold)
+    .define_method("first_solution_optimization_period", &RoutingSearchParameters::first_solution_optimization_period)
+    .define_method("first_solution_optimization_period=", &RoutingSearchParameters::set_first_solution_optimization_period)
+    .define_method("guided_local_search_lambda_coefficient", &RoutingSearchParameters::guided_local_search_lambda_coefficient)
+    .define_method("guided_local_search_lambda_coefficient=", &RoutingSearchParameters::set_guided_local_search_lambda_coefficient)
+    .define_method("guided_local_search_penalize_with_vehicle_classes", &RoutingSearchParameters::guided_local_search_penalize_with_vehicle_classes)
+    .define_method("guided_local_search_penalize_with_vehicle_classes=", &RoutingSearchParameters::set_guided_local_search_penalize_with_vehicle_classes)
+    .define_method("guided_local_search_reset_penalties_on_new_best_solution", &RoutingSearchParameters::guided_local_search_reset_penalties_on_new_best_solution)
+    .define_method("guided_local_search_reset_penalties_on_new_best_solution=", &RoutingSearchParameters::set_guided_local_search_reset_penalties_on_new_best_solution)
+    .define_method("heuristic_close_nodes_lns_num_nodes", &RoutingSearchParameters::heuristic_close_nodes_lns_num_nodes)
+    .define_method("heuristic_close_nodes_lns_num_nodes=", &RoutingSearchParameters::set_heuristic_close_nodes_lns_num_nodes)
+    .define_method("heuristic_expensive_chain_lns_num_arcs_to_consider", &RoutingSearchParameters::heuristic_expensive_chain_lns_num_arcs_to_consider)
+    .define_method("heuristic_expensive_chain_lns_num_arcs_to_consider=", &RoutingSearchParameters::set_heuristic_expensive_chain_lns_num_arcs_to_consider)
+    .define_method("log_cost_offset", &RoutingSearchParameters::log_cost_offset)
+    .define_method("log_cost_offset=", &RoutingSearchParameters::set_log_cost_offset)
+    .define_method("log_cost_scaling_factor", &RoutingSearchParameters::log_cost_scaling_factor)
+    .define_method("log_cost_scaling_factor=", &RoutingSearchParameters::set_log_cost_scaling_factor)
+    .define_method("log_search", &RoutingSearchParameters::log_search)
+    .define_method("log_search=", &RoutingSearchParameters::set_log_search)
+    .define_method("log_tag", &RoutingSearchParameters::log_tag)
+    // .define_method("log_tag=", &RoutingSearchParameters::set_log_tag)
+    .define_method("ls_operator_min_neighbors", &RoutingSearchParameters::ls_operator_min_neighbors)
+    .define_method("ls_operator_min_neighbors=", &RoutingSearchParameters::set_ls_operator_min_neighbors)
+    .define_method("ls_operator_neighbors_ratio", &RoutingSearchParameters::ls_operator_neighbors_ratio)
+    .define_method("ls_operator_neighbors_ratio=", &RoutingSearchParameters::set_ls_operator_neighbors_ratio)
+    .define_method("max_swap_active_chain_size", &RoutingSearchParameters::max_swap_active_chain_size)
+    .define_method("max_swap_active_chain_size=", &RoutingSearchParameters::set_max_swap_active_chain_size)
+    .define_method("multi_armed_bandit_compound_operator_exploration_coefficient", &RoutingSearchParameters::multi_armed_bandit_compound_operator_exploration_coefficient)
+    .define_method("multi_armed_bandit_compound_operator_exploration_coefficient=", &RoutingSearchParameters::set_multi_armed_bandit_compound_operator_exploration_coefficient)
+    .define_method("multi_armed_bandit_compound_operator_memory_coefficient", &RoutingSearchParameters::multi_armed_bandit_compound_operator_memory_coefficient)
+    .define_method("multi_armed_bandit_compound_operator_memory_coefficient=", &RoutingSearchParameters::set_multi_armed_bandit_compound_operator_memory_coefficient)
+    .define_method("num_max_local_optima_before_metaheuristic_switch", &RoutingSearchParameters::num_max_local_optima_before_metaheuristic_switch)
+    .define_method("num_max_local_optima_before_metaheuristic_switch=", &RoutingSearchParameters::set_num_max_local_optima_before_metaheuristic_switch)
+    .define_method("number_of_solutions_to_collect", &RoutingSearchParameters::number_of_solutions_to_collect)
+    .define_method("number_of_solutions_to_collect=", &RoutingSearchParameters::set_number_of_solutions_to_collect)
+    .define_method("optimization_step", &RoutingSearchParameters::optimization_step)
+    .define_method("optimization_step=", &RoutingSearchParameters::set_optimization_step)
+    .define_method("relocate_expensive_chain_num_arcs_to_consider", &RoutingSearchParameters::relocate_expensive_chain_num_arcs_to_consider)
+    .define_method("relocate_expensive_chain_num_arcs_to_consider=", &RoutingSearchParameters::set_relocate_expensive_chain_num_arcs_to_consider)
+    .define_method("report_intermediate_cp_sat_solutions", &RoutingSearchParameters::report_intermediate_cp_sat_solutions)
+    .define_method("report_intermediate_cp_sat_solutions=", &RoutingSearchParameters::set_report_intermediate_cp_sat_solutions)
+    .define_method("secondary_ls_time_limit_ratio", &RoutingSearchParameters::secondary_ls_time_limit_ratio)
+    .define_method("secondary_ls_time_limit_ratio=", &RoutingSearchParameters::set_secondary_ls_time_limit_ratio)
+    .define_method("solution_limit", &RoutingSearchParameters::solution_limit)
+    .define_method("solution_limit=", &RoutingSearchParameters::set_solution_limit)
+    .define_method("use_depth_first_search", &RoutingSearchParameters::use_depth_first_search)
+    .define_method("use_depth_first_search=", &RoutingSearchParameters::set_use_depth_first_search)
+    .define_method("use_full_propagation", &RoutingSearchParameters::use_full_propagation)
+    .define_method("use_full_propagation=", &RoutingSearchParameters::set_use_full_propagation)
+    .define_method("use_guided_local_search_penalties_in_local_search_operators", &RoutingSearchParameters::use_guided_local_search_penalties_in_local_search_operators)
+    .define_method("use_guided_local_search_penalties_in_local_search_operators=", &RoutingSearchParameters::set_use_guided_local_search_penalties_in_local_search_operators)
+    .define_method("use_iterated_local_search", &RoutingSearchParameters::use_iterated_local_search)
+    .define_method("use_iterated_local_search=", &RoutingSearchParameters::set_use_iterated_local_search)
+    .define_method("use_multi_armed_bandit_concatenate_operators", &RoutingSearchParameters::use_multi_armed_bandit_concatenate_operators)
+    .define_method("use_multi_armed_bandit_concatenate_operators=", &RoutingSearchParameters::set_use_multi_armed_bandit_concatenate_operators)
+    .define_method("use_unfiltered_first_solution_strategy", &RoutingSearchParameters::use_unfiltered_first_solution_strategy)
+    .define_method("use_unfiltered_first_solution_strategy=", &RoutingSearchParameters::set_use_unfiltered_first_solution_strategy)
     .define_method(
       "first_solution_strategy=",
       [](RoutingSearchParameters& self, Object value) {
@@ -197,8 +257,6 @@ void init_routing(Rice::Module& m) {
 
         return self.set_local_search_metaheuristic(v);
       })
-    .define_method("log_search=", &RoutingSearchParameters::set_log_search)
-    .define_method("solution_limit=", &RoutingSearchParameters::set_solution_limit)
     .define_method(
       "time_limit=",
       [](RoutingSearchParameters& self, int64_t value) {
@@ -368,18 +426,64 @@ void init_routing(Rice::Module& m) {
       });
 
   Rice::define_class_under<ConstraintSolverParameters>(m, "ConstraintSolverParameters")
-    .define_method(
-      "trace_propagation=",
-      [](ConstraintSolverParameters& self, bool value) {
-        self.set_trace_propagation(value);
-      })
-    .define_method(
-      "trace_search=",
-      [](ConstraintSolverParameters& self, bool value) {
-        self.set_trace_search(value);
-      });
+    .define_method("array_split_size", &ConstraintSolverParameters::array_split_size)
+    .define_method("array_split_size=", &ConstraintSolverParameters::set_array_split_size)
+    .define_method("check_solution_period", &ConstraintSolverParameters::check_solution_period)
+    .define_method("check_solution_period=", &ConstraintSolverParameters::set_check_solution_period)
+    .define_method("diffn_use_cumulative", &ConstraintSolverParameters::diffn_use_cumulative)
+    .define_method("diffn_use_cumulative=", &ConstraintSolverParameters::set_diffn_use_cumulative)
+    .define_method("disable_solve", &ConstraintSolverParameters::disable_solve)
+    .define_method("disable_solve=", &ConstraintSolverParameters::set_disable_solve)
+    .define_method("max_edge_finder_size", &ConstraintSolverParameters::max_edge_finder_size)
+    .define_method("max_edge_finder_size=", &ConstraintSolverParameters::set_max_edge_finder_size)
+    .define_method("name_all_variables", &ConstraintSolverParameters::name_all_variables)
+    .define_method("name_all_variables=", &ConstraintSolverParameters::set_name_all_variables)
+    .define_method("name_cast_variables", &ConstraintSolverParameters::name_cast_variables)
+    .define_method("name_cast_variables=", &ConstraintSolverParameters::set_name_cast_variables)
+    .define_method("print_added_constraints", &ConstraintSolverParameters::print_added_constraints)
+    .define_method("print_added_constraints=", &ConstraintSolverParameters::set_print_added_constraints)
+    .define_method("print_local_search_profile", &ConstraintSolverParameters::print_local_search_profile)
+    .define_method("print_local_search_profile=", &ConstraintSolverParameters::set_print_local_search_profile)
+    .define_method("print_model", &ConstraintSolverParameters::print_model)
+    .define_method("print_model=", &ConstraintSolverParameters::set_print_model)
+    .define_method("print_model_stats", &ConstraintSolverParameters::print_model_stats)
+    .define_method("print_model_stats=", &ConstraintSolverParameters::set_print_model_stats)
+    .define_method("profile_file", &ConstraintSolverParameters::profile_file)
+    // .define_method("profile_file=", &ConstraintSolverParameters::set_profile_file)
+    .define_method("profile_local_search", &ConstraintSolverParameters::profile_local_search)
+    .define_method("profile_local_search=", &ConstraintSolverParameters::set_profile_local_search)
+    .define_method("profile_propagation", &ConstraintSolverParameters::profile_propagation)
+    .define_method("profile_propagation=", &ConstraintSolverParameters::set_profile_propagation)
+    .define_method("skip_locally_optimal_paths", &ConstraintSolverParameters::skip_locally_optimal_paths)
+    .define_method("skip_locally_optimal_paths=", &ConstraintSolverParameters::set_skip_locally_optimal_paths)
+    .define_method("store_names", &ConstraintSolverParameters::store_names)
+    .define_method("store_names=", &ConstraintSolverParameters::set_store_names)
+    .define_method("trace_propagation", &ConstraintSolverParameters::trace_propagation)
+    .define_method("trace_propagation=", &ConstraintSolverParameters::set_trace_propagation)
+    .define_method("trace_search", &ConstraintSolverParameters::trace_search)
+    .define_method("trace_search=", &ConstraintSolverParameters::set_trace_search)
+    .define_method("trail_block_size", &ConstraintSolverParameters::trail_block_size)
+    .define_method("trail_block_size=", &ConstraintSolverParameters::set_trail_block_size)
+    .define_method("use_all_possible_disjunctions", &ConstraintSolverParameters::use_all_possible_disjunctions)
+    .define_method("use_all_possible_disjunctions=", &ConstraintSolverParameters::set_use_all_possible_disjunctions)
+    .define_method("use_cumulative_edge_finder", &ConstraintSolverParameters::use_cumulative_edge_finder)
+    .define_method("use_cumulative_edge_finder=", &ConstraintSolverParameters::set_use_cumulative_edge_finder)
+    .define_method("use_cumulative_time_table", &ConstraintSolverParameters::use_cumulative_time_table)
+    .define_method("use_cumulative_time_table=", &ConstraintSolverParameters::set_use_cumulative_time_table)
+    .define_method("use_cumulative_time_table_sync", &ConstraintSolverParameters::use_cumulative_time_table_sync)
+    .define_method("use_cumulative_time_table_sync=", &ConstraintSolverParameters::set_use_cumulative_time_table_sync)
+    .define_method("use_element_rmq", &ConstraintSolverParameters::use_element_rmq)
+    .define_method("use_element_rmq=", &ConstraintSolverParameters::set_use_element_rmq)
+    .define_method("use_sequence_high_demand_tasks", &ConstraintSolverParameters::use_sequence_high_demand_tasks)
+    .define_method("use_sequence_high_demand_tasks=", &ConstraintSolverParameters::set_use_sequence_high_demand_tasks)
+    .define_method("use_small_table", &ConstraintSolverParameters::use_small_table)
+    .define_method("use_small_table=", &ConstraintSolverParameters::set_use_small_table);
 
   Rice::define_class_under<RoutingModelParameters>(m, "RoutingModelParameters")
+    .define_method("reduce_vehicle_cost_model", &RoutingModelParameters::reduce_vehicle_cost_model)
+    .define_method("reduce_vehicle_cost_model=", &RoutingModelParameters::set_reduce_vehicle_cost_model)
+    .define_method("max_callback_cache_size", &RoutingModelParameters::max_callback_cache_size)
+    .define_method("max_callback_cache_size=", &RoutingModelParameters::set_max_callback_cache_size)
     .define_method(
       "solver_parameters",
       [](RoutingModelParameters& self) {
