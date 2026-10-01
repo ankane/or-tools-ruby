@@ -318,4 +318,45 @@ class ConstraintTest < Minitest::Test
     assert_equal 1, domain.min
     assert_equal 3, domain.max
   end
+
+  def test_parameters
+    solver = ORTools::CpSolver.new
+    parameters = solver.parameters
+
+    assert_equal true, parameters.cp_model_presolve
+    parameters.cp_model_presolve = false
+    assert_equal false, parameters.cp_model_presolve
+
+    assert_equal false, parameters.enumerate_all_solutions
+    parameters.enumerate_all_solutions = true
+    assert_equal true, parameters.enumerate_all_solutions
+
+    assert_equal false, parameters.fix_variables_to_their_hinted_value
+    parameters.fix_variables_to_their_hinted_value = true
+    assert_equal true, parameters.fix_variables_to_their_hinted_value
+
+    assert_equal 1, parameters.linearization_level
+    parameters.linearization_level = 0
+    assert_equal 0, parameters.linearization_level
+
+    assert_equal false, parameters.log_search_progress
+    parameters.log_search_progress = true
+    assert_equal true, parameters.log_search_progress
+
+    assert_equal Float::INFINITY, parameters.max_deterministic_time
+    parameters.max_deterministic_time = 1
+    assert_equal 1, parameters.max_deterministic_time
+
+    assert_equal Float::INFINITY, parameters.max_time_in_seconds
+    parameters.max_time_in_seconds = 1
+    assert_equal 1, parameters.max_time_in_seconds
+
+    assert_equal 0, parameters.num_workers
+    parameters.num_workers = 1
+    assert_equal 1, parameters.num_workers
+
+    assert_equal 1, parameters.random_seed
+    parameters.random_seed = 2
+    assert_equal 2, parameters.random_seed
+  end
 end
