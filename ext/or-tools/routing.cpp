@@ -197,16 +197,8 @@ void init_routing(Rice::Module& m) {
 
         return self.set_local_search_metaheuristic(v);
       })
-    .define_method(
-      "log_search=",
-      [](RoutingSearchParameters& self, bool value) {
-        self.set_log_search(value);
-      })
-    .define_method(
-      "solution_limit=",
-      [](RoutingSearchParameters& self, int64_t value) {
-        self.set_solution_limit(value);
-      })
+    .define_method("log_search=", &RoutingSearchParameters::set_log_search)
+    .define_method("solution_limit=", &RoutingSearchParameters::set_solution_limit)
     .define_method(
       "time_limit=",
       [](RoutingSearchParameters& self, int64_t value) {
