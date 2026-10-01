@@ -355,8 +355,20 @@ class ConstraintTest < Minitest::Test
     parameters.num_workers = 1
     assert_equal 1, parameters.num_workers
 
+    assert_equal false, parameters.polarity_exploit_ls_hints
+    parameters.polarity_exploit_ls_hints = true
+    assert_equal true, parameters.polarity_exploit_ls_hints
+
+    assert_equal 1000, parameters.polarity_rephase_increment
+    parameters.polarity_rephase_increment = 1001
+    assert_equal 1001, parameters.polarity_rephase_increment
+
     assert_equal 1, parameters.random_seed
     parameters.random_seed = 2
     assert_equal 2, parameters.random_seed
+
+    assert_equal true, parameters.use_phase_saving
+    parameters.use_phase_saving = false
+    assert_equal false, parameters.use_phase_saving
   end
 end
