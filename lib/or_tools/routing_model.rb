@@ -30,6 +30,10 @@ module ORTools
       _solve_from_assignment_with_parameters(assignment, search_parameters, !@ruby_callback)
     end
 
+    def read_assignment_from_routes(routes, ignore_inactive_indices)
+      _read_assignment_from_routes(routes, ignore_inactive_indices, !@ruby_callback)
+    end
+
     def register_unary_transit_callback(callback)
       @ruby_callback = true
       _register_unary_transit_callback(callback)

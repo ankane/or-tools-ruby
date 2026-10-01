@@ -555,7 +555,17 @@ void init_routing(Rice::Module& m) {
     .define_method("write_assignment", &RoutingModel::WriteAssignment)
     .define_method("read_assignment", &RoutingModel::ReadAssignment)
     .define_method("restore_assignment", &RoutingModel::RestoreAssignment)
-    .define_method("read_assignment_from_routes", &RoutingModel::ReadAssignmentFromRoutes)
+    .define_method(
+      "_read_assignment_from_routes",
+      [](RoutingModel& self, const std::vector<std::vector<int64_t>>& routes, bool ignore_inactive_indices, bool release_gvl) {
+        if (release_gvl) {
+          return Rice::detail::no_gvl([&]() {
+            return self.ReadAssignmentFromRoutes(routes, ignore_inactive_indices);
+          });
+        } else {
+          return self.ReadAssignmentFromRoutes(routes, ignore_inactive_indices);
+        }
+      })
     .define_method("routes_to_assignment", &RoutingModel::RoutesToAssignment)
     .define_method("assignment_to_routes", &RoutingModel::AssignmentToRoutes)
     .define_method("compact_assignment", &RoutingModel::CompactAssignment)
