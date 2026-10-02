@@ -907,6 +907,14 @@ class RoutingTest < Minitest::Test
     search_parameters.first_solution_strategy = :path_cheapest_arc
     search_parameters.local_search_metaheuristic = :guided_local_search
     search_parameters.log_search = true
+
+    assert_equal 0, search_parameters.improvement_limit_parameters.improvement_rate_coefficient
+    search_parameters.improvement_limit_parameters.improvement_rate_coefficient = 0.5
+    assert_equal 0.5, search_parameters.improvement_limit_parameters.improvement_rate_coefficient
+
+    assert_equal 0, search_parameters.improvement_limit_parameters.improvement_rate_solutions_distance
+    search_parameters.improvement_limit_parameters.improvement_rate_solutions_distance = 1
+    assert_equal 1, search_parameters.improvement_limit_parameters.improvement_rate_solutions_distance
   end
 
   def test_set_allowed_vehicles_for_index
