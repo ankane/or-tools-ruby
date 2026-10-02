@@ -1,4 +1,4 @@
-## 0.18.1 (unreleased)
+## 0.18.1 (2026-10-02)
 
 - Added support for breaks for routing
 - Added support for more constraints for routing
