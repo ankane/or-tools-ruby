@@ -17,6 +17,11 @@ module ORTools
       !@response.nil?
     end
 
+    def stop_search
+      # TODO check response? in 0.19.0
+      @stopped = true
+    end
+
     def objective_value
       # TODO check response? in 0.19.0
       @response&.objective_value
@@ -27,11 +32,6 @@ module ORTools
         raise "solve() has not been called."
       end
       @response.best_objective_bound
-    end
-
-    def stop_search
-      # TODO check response? in 0.19.0
-      @stopped = true
     end
   end
 end
