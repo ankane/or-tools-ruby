@@ -11,10 +11,6 @@ class SolutionPrinterTest < Minitest::Test
     solver.parameters.enumerate_all_solutions = true
     solution_printer = ORTools::ObjectiveSolutionPrinter.new
     assert_nil solution_printer.objective_value
-    error = assert_raises do
-      solution_printer.best_objective_bound
-    end
-    assert_equal "solve() has not been called.", error.message
 
     stdout, _ = capture_io do
       solver.solve(model, solution_printer)
@@ -66,5 +62,13 @@ class SolutionPrinterTest < Minitest::Test
     end
     assert_equal 15, solution_printer.solution_count
     assert_match "Solution 14", stdout
+  end
+
+  def test_not_solved
+    solution_printer = ORTools::ObjectiveSolutionPrinter.new
+    error = assert_raises do
+      solution_printer.best_objective_bound
+    end
+    assert_equal "solve() has not been called.", error.message
   end
 end
