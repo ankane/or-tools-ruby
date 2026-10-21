@@ -973,9 +973,8 @@ void init_constraint(Rice::Module& m) {
     .define_method(
       "sufficient_assumptions_for_infeasibility",
       [](CpSolverResponse& self) {
-        auto a = Array();
-        auto assumptions = self.sufficient_assumptions_for_infeasibility();
-        for (const auto& v : assumptions) {
+        Array a;
+        for (const auto& v : self.sufficient_assumptions_for_infeasibility()) {
           a.push(v, false);
         }
         return a;
