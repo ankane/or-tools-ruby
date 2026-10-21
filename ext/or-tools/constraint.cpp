@@ -927,6 +927,7 @@ void init_constraint(Rice::Module& m) {
 
   Rice::define_class_under<CpSolverResponse>(m, "CpSolverResponse")
     .define_method("objective_value", &CpSolverResponse::objective_value)
+    .define_method("best_objective_bound", &CpSolverResponse::best_objective_bound)
     .define_method("num_conflicts", &CpSolverResponse::num_conflicts)
     .define_method("num_branches", &CpSolverResponse::num_branches)
     .define_method("wall_time", &CpSolverResponse::wall_time)
