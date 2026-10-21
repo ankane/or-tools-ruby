@@ -18,12 +18,14 @@ module ORTools
     end
 
     def stop_search
-      # TODO check response? in 0.19.0
+      # TODO uncomment in 0.19.0
+      # raise "solve() has not been called." unless response?
       @stopped = true
     end
 
     def objective_value
-      # TODO check response? in 0.19.0
+      # TODO uncomment in 0.19.0
+      # raise "solve() has not been called." unless response?
       @response&.objective_value
     end
 
