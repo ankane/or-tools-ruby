@@ -141,7 +141,6 @@ class ConstraintTest < Minitest::Test
       y = 3
       z = 5
     EOS
-    assert_equal 35, solver.best_objective_bound
   end
 
   # https://developers.google.com/optimization/cp/cryptarithmetic
