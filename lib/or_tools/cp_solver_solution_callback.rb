@@ -17,6 +17,10 @@ module ORTools
       @response&.objective_value
     end
 
+    def best_objective_bound
+      @response&.best_objective_bound
+    end
+
     def stop_search
       @stopped = true
     end

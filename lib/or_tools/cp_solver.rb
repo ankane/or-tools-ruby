@@ -4,7 +4,7 @@ module ORTools
   class CpSolver
     extend Forwardable
 
-    def_delegators :@response, :objective_value, :num_conflicts, :num_branches, :wall_time
+    def_delegators :@response, :objective_value, :best_objective_bound, :num_conflicts, :num_branches, :wall_time
 
     def solve(model, observer = nil)
       @response = _solve(model, parameters, observer)
