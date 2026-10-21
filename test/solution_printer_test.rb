@@ -9,6 +9,7 @@ class SolutionPrinterTest < Minitest::Test
 
     solver = ORTools::CpSolver.new
     solver.parameters.enumerate_all_solutions = true
+
     solution_printer = ORTools::ObjectiveSolutionPrinter.new
     assert_nil solution_printer.objective_value
 
@@ -20,6 +21,7 @@ class SolutionPrinterTest < Minitest::Test
 
     # ensure @response is still valid after solve
     GC.start
+
     assert_equal 0, solution_printer.objective_value
     assert_equal 0, solution_printer.best_objective_bound
     assert_equal 14, solution_printer.num_booleans
