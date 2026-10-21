@@ -399,5 +399,7 @@ class ConstraintTest < Minitest::Test
     assert_kind_of Float, solver.wall_time
     assert_kind_of Float, solver.user_time
     assert_equal "", solver.solve_log
+    assert_empty solver.sufficient_assumptions_for_infeasibility
+    assert_equal "main", solver.solution_info
   end
 end
