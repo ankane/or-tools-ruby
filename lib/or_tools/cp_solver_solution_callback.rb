@@ -3,6 +3,8 @@ module ORTools
     attr_writer :response
 
     def value(expr)
+      # TODO uncomment in 0.19.0
+      # raise "solve() has not been called." unless response?
       case expr
       when SatIntVar
         @response&.solution_integer_value(expr)
