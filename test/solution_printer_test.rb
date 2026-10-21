@@ -11,6 +11,7 @@ class SolutionPrinterTest < Minitest::Test
     solver.parameters.enumerate_all_solutions = true
     solution_printer = ORTools::ObjectiveSolutionPrinter.new
     assert_nil solution_printer.objective_value
+    assert_nil solution_printer.best_objective_bound
 
     stdout, _ = capture_io do
       solver.solve(model, solution_printer)
