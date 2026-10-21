@@ -28,10 +28,48 @@ module ORTools
     end
 
     def best_objective_bound
-      unless response?
-        raise "solve() has not been called."
-      end
+      raise "solve() has not been called." unless response?
       @response.best_objective_bound
+    end
+
+    def num_booleans
+      raise "solve() has not been called." unless response?
+      @response.num_booleans
+    end
+
+    def num_conflicts
+      raise "solve() has not been called." unless response?
+      @response.num_conflicts
+    end
+
+    def num_branches
+      raise "solve() has not been called." unless response?
+      @response.num_branches
+    end
+
+    def num_integer_propagations
+      raise "solve() has not been called." unless response?
+      @response.num_integer_propagations
+    end
+
+    def num_binary_propagations
+      raise "solve() has not been called." unless response?
+      @response.num_binary_propagations
+    end
+
+    def deterministic_time
+      raise "solve() has not been called." unless response?
+      @response.deterministic_time
+    end
+
+    def wall_time
+      raise "solve() has not been called." unless response?
+      @response.wall_time
+    end
+
+    def user_time
+      raise "solve() has not been called." unless response?
+      @response.user_time
     end
   end
 end

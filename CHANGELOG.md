@@ -1,6 +1,7 @@
 ## 0.18.2 (unreleased)
 
-- Added `best_objective_bound` method to `CpSolver` and `CpSolverSolutionCallback`
+- Added `best_objective_bound` method to `CpSolver`
+- Added more methods to `CpSolverSolutionCallback`
 
 ## 0.18.1 (2026-10-02)
 

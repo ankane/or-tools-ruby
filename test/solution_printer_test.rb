@@ -25,6 +25,15 @@ class SolutionPrinterTest < Minitest::Test
     # ensure @response is still valid after solve
     GC.start
     assert_equal 0, solution_printer.objective_value
+    assert_equal 0, solution_printer.best_objective_bound
+    assert_equal 14, solution_printer.num_booleans
+    assert_equal 0, solution_printer.num_conflicts
+    assert_equal 14, solution_printer.num_branches
+    assert_equal 49, solution_printer.num_integer_propagations
+    assert_equal 14, solution_printer.num_binary_propagations
+    assert_kind_of Float, solution_printer.deterministic_time
+    assert_kind_of Float, solution_printer.wall_time
+    assert_kind_of Float, solution_printer.user_time
   end
 
   def test_var_array_solution_printer
