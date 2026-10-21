@@ -371,4 +371,33 @@ class ConstraintTest < Minitest::Test
     parameters.use_phase_saving = false
     assert_equal false, parameters.use_phase_saving
   end
+
+  def test_response
+    model = ORTools::CpModel.new
+    x = model.new_int_var(-7, 7, "x")
+    y = model.new_int_var(0, 7, "y")
+    model.add_max_equality(y, [x, model.new_constant(0)])
+
+    solver = ORTools::CpSolver.new
+    solver.parameters.enumerate_all_solutions = true
+
+    error = assert_raises do
+      solver.best_objective_bound
+    end
+    assert_equal "solve() has not been called.", error.message
+
+    solver.solve(model)
+
+    assert_equal 0, solver.objective_value
+    assert_equal 0, solver.best_objective_bound
+    assert_equal 14, solver.num_booleans
+    assert_equal 0, solver.num_conflicts
+    assert_equal 14, solver.num_branches
+    assert_equal 49, solver.num_integer_propagations
+    assert_equal 14, solver.num_binary_propagations
+    assert_kind_of Float, solver.deterministic_time
+    assert_kind_of Float, solver.wall_time
+    assert_kind_of Float, solver.user_time
+    assert_equal "", solver.solve_log
+  end
 end

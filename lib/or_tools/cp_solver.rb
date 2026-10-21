@@ -1,10 +1,8 @@
-require "forwardable"
-
 module ORTools
   class CpSolver
-    extend Forwardable
-
-    def_delegators :@response, :objective_value, :best_objective_bound, :num_conflicts, :num_branches, :wall_time
+    def parameters
+      @parameters ||= SatParameters.new
+    end
 
     def solve(model, observer = nil)
       @response = _solve(model, parameters, observer)
@@ -26,16 +24,63 @@ module ORTools
       end
     end
 
-    def solution_info
-      @response.solution_info
+    def objective_value
+      checked_response.objective_value
+    end
+
+    def best_objective_bound
+      checked_response.best_objective_bound
+    end
+
+    def num_booleans
+      checked_response.num_booleans
+    end
+
+    def num_conflicts
+      checked_response.num_conflicts
+    end
+
+    def num_branches
+      checked_response.num_branches
+    end
+
+    def num_binary_propagations
+      checked_response.num_binary_propagations
+    end
+
+    def num_integer_propagations
+      checked_response.num_integer_propagations
+    end
+
+    def deterministic_time
+      checked_response.deterministic_time
+    end
+
+    def wall_time
+      checked_response.wall_time
+    end
+
+    def user_time
+      checked_response.user_time
+    end
+
+    def solve_log
+      checked_response.solve_log
     end
 
     def sufficient_assumptions_for_infeasibility
-      @response.sufficient_assumptions_for_infeasibility
+      checked_response.sufficient_assumptions_for_infeasibility
     end
 
-    def parameters
-      @parameters ||= SatParameters.new
+    def solution_info
+      checked_response.solution_info
+    end
+
+    private
+
+    def checked_response
+      raise "solve() has not been called." if @response.nil?
+      @response
     end
   end
 end
