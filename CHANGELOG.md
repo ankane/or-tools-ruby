@@ -1,4 +1,4 @@
-## 0.18.2 (unreleased)
+## 0.18.2 (2026-10-27)
 
 - Added `add_at_most_one` and `add_exactly_one` methods to `CpModel`
 - Added `objective?` and `clear_objective` methods to `CpModel`
