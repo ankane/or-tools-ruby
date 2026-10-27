@@ -305,6 +305,48 @@ class ConstraintTest < Minitest::Test
     assert_equal expected, model.inspect
   end
 
+  def test_add_at_most_one
+    model = ORTools::CpModel.new
+    x = model.new_bool_var("x")
+    y = model.new_bool_var("y")
+    z = model.new_bool_var("z")
+    model.add_at_most_one([x, y, z])
+    model.maximize(model.sum([x, y, z]))
+
+    solver = ORTools::CpSolver.new
+    assert_equal :optimal, solver.solve(model)
+    assert_equal 1, solver.objective_value
+    assert_equal 1, [x, y, z].count { |v| solver.value(v) }
+  end
+
+  def test_add_exactly_one
+    model = ORTools::CpModel.new
+    x = model.new_bool_var("x")
+    y = model.new_bool_var("y")
+    z = model.new_bool_var("z")
+    model.add_exactly_one([x, y, z])
+    model.minimize(model.sum([x, y, z]))
+
+    solver = ORTools::CpSolver.new
+    assert_equal :optimal, solver.solve(model)
+    assert_equal 1, solver.objective_value
+    assert_equal 1, [x, y, z].count { |v| solver.value(v) }
+  end
+
+  def test_add_at_most_one_enforced
+    model = ORTools::CpModel.new
+    x = model.new_bool_var("x")
+    y = model.new_bool_var("y")
+    guard = model.new_bool_var("guard")
+    model.add_at_most_one([x, y]).only_enforce_if(guard)
+    model.add(guard == 1)
+    model.maximize(model.sum([x, y]))
+
+    solver = ORTools::CpSolver.new
+    assert_equal :optimal, solver.solve(model)
+    assert_equal 1, solver.objective_value
+  end
+
   def test_add_not_supported
     model = ORTools::CpModel.new
     error = assert_raises(TypeError) do

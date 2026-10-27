@@ -766,6 +766,16 @@ void init_constraint(Rice::Module& m) {
         return self.AddBoolXor(literals);
       })
     .define_method(
+      "add_at_most_one",
+      [](CpModelBuilder& self, const std::vector<BoolVar>& literals) {
+        return self.AddAtMostOne(literals);
+      })
+    .define_method(
+      "add_exactly_one",
+      [](CpModelBuilder& self, const std::vector<BoolVar>& literals) {
+        return self.AddExactlyOne(literals);
+      })
+    .define_method(
       "add_implication",
       [](CpModelBuilder& self, const BoolVar& a, const BoolVar& b) {
         return self.AddImplication(a, b);
