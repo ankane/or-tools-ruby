@@ -1,5 +1,6 @@
 ## 0.18.2 (unreleased)
 
+- Added `add_at_most_one` and `add_exactly_one` methods to `CpModel`
 - Added more methods to `CpSolver`
 - Added more methods to `CpSolverSolutionCallback`
 
