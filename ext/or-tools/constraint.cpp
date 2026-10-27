@@ -886,6 +886,16 @@ void init_constraint(Rice::Module& m) {
         self.Minimize(expr);
       })
     .define_method(
+      "clear_objective",
+      [](CpModelBuilder& self) {
+        self.ClearObjective();
+      })
+    .define_method(
+      "objective?",
+      [](CpModelBuilder& self) {
+        return self.HasObjective();
+      })
+    .define_method(
       "add_hint",
       [](CpModelBuilder& self, Object var, Object value) {
         if (var.is_a(rb_cBoolVar)) {
