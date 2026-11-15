@@ -93,7 +93,7 @@ Dir.mktmpdir do |extract_path|
     # since it limits filenames to 100 characters (doesn't support UStar format)
     # for space, only keep licenses, include, and shared library
     tar_args = Gem.win_platform? ? ["--force-local"] : []
-    system "tar", "zxf", download.path, "-C", extract_path, "--strip-components=1", *tar_args
+    system "tar", "zxf", download.path, "-C", extract_path, "--strip-components=1", *tar_args, exception: true
   end
 
   # include
