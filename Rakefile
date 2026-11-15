@@ -51,8 +51,7 @@ task :update do
     dest = "#{Dir.tmpdir}/#{filename}"
     unless File.exist?(dest)
       temp_dest = "#{dest}.tmp"
-      success = system("wget", "-O", temp_dest, url)
-      raise "Download failed" unless success
+      system "wget", "-O", temp_dest, url, exception: true
       File.rename(temp_dest, dest)
     end
     puts "#{dist}: #{Digest::SHA256.file(dest).hexdigest}"
