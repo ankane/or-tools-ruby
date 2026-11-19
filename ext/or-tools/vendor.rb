@@ -27,7 +27,12 @@ else
   os = os_info["ID"]
   os_version = os_info["VERSION_ID"]
 
-  if os == "ubuntu" && os_version == "24.04" && !arm
+  # A single aarch64 build is available and is compatible with these distributions
+  valid_aarch64_distribution = os == "arch" || (os == "ubuntu" && ["24.04", "22.04", "20.04"].include?(os_version)) || (os == "debian" && ["12", "11"].include?(os_version))
+  if arm && valid_aarch64_distribution
+    filename = "or-tools_aarch64_AlmaLinux-8.10_cpp_v#{version}.tar.gz"
+    checksum = "422320008143611479b05216f3fa4dce65ca9d1a4751a070ecbe3a2ef1ebea4b"
+  elsif os == "ubuntu" && os_version == "24.04" && !arm
     filename = "or-tools_amd64_ubuntu-24.04_cpp_v#{version}.tar.gz"
     checksum = "6f389320672cee00b78aacefb2bde33fef0bb988c3b2735573b9fffd1047fbda"
   elsif os == "ubuntu" && os_version == "22.04" && !arm
@@ -100,10 +105,11 @@ Dir.mktmpdir do |extract_path|
   FileUtils.mv(File.join(extract_path, "include"), File.join(path, "include"))
 
   # shared library
+  lib_dir = Dir.exist?(File.join(extract_path, "lib64")) ? "lib64" : "lib"
   FileUtils.mkdir(File.join(path, "lib"))
-  Dir.glob("lib/lib*{.dylib,.so,.so.*}", base: extract_path) do |file|
+  Dir.glob("#{lib_dir}/lib*{.dylib,.so,.so.*}", base: extract_path) do |file|
     next if file.include?("libprotoc.")
-    FileUtils.mv(File.join(extract_path, file), File.join(path, file))
+    FileUtils.mv(File.join(extract_path, file), File.join(path, "lib", File.basename(file)))
   end
 
   # licenses
