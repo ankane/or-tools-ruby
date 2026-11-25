@@ -3,72 +3,40 @@ require "fileutils"
 require "open-uri"
 require "tmpdir"
 
-version = "9.15.6755"
+version = "10.0-rc.1"
 
 arch = RbConfig::CONFIG["host_cpu"]
 arm = arch.match?(/arm|aarch64/i)
 
 if RbConfig::CONFIG["host_os"].match?(/darwin/i)
   if arm
-    filename = "or-tools_arm64_macOS-26.2_cpp_v#{version}.tar.gz"
-    checksum = "de0400a45939a66ee13cd8360c230e830fc5e03a6ed5a8a8b60f58a39e4a67bc"
+    filename = "ortools-arm64-macos-cpp.zip"
+    checksum = "50cedc302339e5d07847fa1fbdef869356eb38484fbc0d7aded4f66c051175c7"
   else
-    filename = "or-tools_x86_64_macOS-26.2_cpp_v#{version}.tar.gz"
-    checksum = "d2d36482727520ccaff979eba16f53e6b2cabf40b6fd1126e4d3b34fad2fe851"
+    filename = "ortools-amd64-macos-cpp.zip"
+    checksum = "cb97c75aad502f2f0ac62be628449a2edebaf1fe55cb8b06bb6662c9e8ebb0a9"
+  end
+elsif !Gem.win_platform?
+  if arm
+    filename = "ortools-arm64-linux-cpp.zip"
+    checksum = "34ce9eb8dc31d3c209da672d3c22da21c1435dc2f3eb79bed550e395536ddb61"
+  else
+    filename = "ortools-amd64-linux-cpp.zip"
+    checksum = "42e17d61cbe7a4cba03d8b826a32c0c17343652640f664f3f891f031c8622300"
   end
 else
-  # try /etc/os-release with fallback to /usr/lib/os-release
-  # https://www.freedesktop.org/software/systemd/man/os-release.html
-  os_filename = File.exist?("/etc/os-release") ? "/etc/os-release" : "/usr/lib/os-release"
+  # there is a binary download for Windows
+  # however, it's compiled with Visual Studio rather than MinGW (which RubyInstaller uses)
+  raise <<~MSG
+    Binary installation not available for this platform: Windows
 
-  # for safety, parse rather than source
-  os_info = File.readlines(os_filename, chomp: true).to_h { |v| v.split("=", 2) }.transform_values { |v| v.delete_prefix('"').delete_suffix('"') } rescue {}
+    Build the OR-Tools C++ library from source, then run:
+    bundle config build.or-tools --with-or-tools-dir=/path/to/or-tools
 
-  os = os_info["ID"]
-  os_version = os_info["VERSION_ID"]
-
-  if os == "ubuntu" && os_version == "24.04" && !arm
-    filename = "or-tools_amd64_ubuntu-24.04_cpp_v#{version}.tar.gz"
-    checksum = "6f389320672cee00b78aacefb2bde33fef0bb988c3b2735573b9fffd1047fbda"
-  elsif os == "ubuntu" && os_version == "22.04" && !arm
-    filename = "or-tools_amd64_ubuntu-22.04_cpp_v#{version}.tar.gz"
-    checksum = "0b30114d7c05f0596286bf3ef8d02adcf5f45be3b39273490e6bb74a2a9bd1ea"
-  elsif os == "ubuntu" && os_version == "20.04" && !arm
-    filename = "or-tools_amd64_ubuntu-20.04_cpp_v#{version}.tar.gz"
-    checksum = "cfe5068b0fe4bafff916ab1b75670b341e80571c8cfd8b647dfe3e97a233e836"
-  elsif os == "debian" && os_version == "12" && !arm
-    filename = "or-tools_amd64_debian-12_cpp_v#{version}.tar.gz"
-    checksum = "b2c9870c8778eeb26c98742402da17da039c058fca7eca87be5c90832b04153c"
-  elsif os == "debian" && os_version == "11" && !arm
-    filename = "or-tools_amd64_debian-11_cpp_v#{version}.tar.gz"
-    checksum = "c6c4341ff8f9aae3e77f161ca8ea3bb0d22f35ff696596fd11ec51c5da6bd4f7"
-  elsif os == "arch" && !arm
-    filename = "or-tools_amd64_archlinux_cpp_v#{version}.tar.gz"
-    checksum = "5505079f7b2a6d9379ba6ae446a3a639226d455ef1cfa32d2d23ffc4566e3a4b"
-  else
-    platform =
-      if Gem.win_platform?
-        "Windows"
-      elsif os || os_version
-        "#{os} #{os_version} #{arch}"
-      else
-        "Unknown"
-      end
-
-    # there is a binary download for Windows
-    # however, it's compiled with Visual Studio rather than MinGW (which RubyInstaller uses)
-    raise <<~MSG
-      Binary installation not available for this platform: #{platform}
-
-      Build the OR-Tools C++ library from source, then run:
-      bundle config build.or-tools --with-or-tools-dir=/path/to/or-tools
-
-    MSG
-  end
+  MSG
 end
 
-short_version = version.split(".").first(2).join(".")
-url = "https://github.com/google/or-tools/releases/download/v#{short_version}/#{filename}"
+url = "https://github.com/google/or-tools/releases/download/v#{version}/#{filename}"
 
 path = File.expand_path("../../tmp/or-tools", __dir__)
 FileUtils.mkdir_p(path)
@@ -89,11 +57,17 @@ Dir.mktmpdir do |extract_path|
     # should never happen
     raise "Expected file" if !download.respond_to?(:path)
 
-    # extract - can't use Gem::Package#extract_tar_gz from RubyGems
-    # since it limits filenames to 100 characters (doesn't support UStar format)
-    # for space, only keep licenses, include, and shared library
-    tar_args = Gem.win_platform? ? ["--force-local"] : []
-    system "tar", "zxf", download.path, "-C", extract_path, "--strip-components=1", *tar_args, exception: true
+    Dir.mktmpdir do |unzip_path|
+      system "unzip", "-q", download.path, "-d", unzip_path, exception: true
+
+      # extract - can't use Gem::Package#extract_tar_gz from RubyGems
+      # since it limits filenames to 100 characters (doesn't support UStar format)
+      # for space, only keep licenses, include, and shared library
+      tar_args = Gem.win_platform? ? ["--force-local"] : []
+      # TODO fix version and name
+      export_name = filename.include?("macos") ? "Darwin" : "Linux"
+      system "tar", "zxf", "#{unzip_path}/export/OR-Tools-10.0.0-rc.1-#{export_name}.tar.gz", "-C", extract_path, "--strip-components=1", *tar_args, exception: true
+    end
   end
 
   # include

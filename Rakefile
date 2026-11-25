@@ -32,22 +32,17 @@ task :update do
   require "open-uri"
   require "tmpdir"
 
-  version = "9.15.6755"
+  version = "10.0-rc.1"
   distributions = [
-    "arm64_macOS-26.2",
-    "x86_64_macOS-26.2",
-    "amd64_ubuntu-24.04",
-    "amd64_ubuntu-22.04",
-    "amd64_ubuntu-20.04",
-    "amd64_debian-12",
-    "amd64_debian-11",
-    "amd64_archlinux"
+    "arm64-macos",
+    "amd64-macos",
+    "arm64-linux",
+    "amd64-linux"
   ]
 
-  short_version = version.split(".").first(2).join(".")
   distributions.each do |dist|
-    filename = "or-tools_#{dist}_cpp_v#{version}.tar.gz"
-    url = "https://github.com/google/or-tools/releases/download/v#{short_version}/#{filename}"
+    filename = "ortools-#{dist}-cpp.zip"
+    url = "https://github.com/google/or-tools/releases/download/v#{version}/#{filename}"
     dest = "#{Dir.tmpdir}/#{filename}"
     unless File.exist?(dest)
       temp_dest = "#{dest}.tmp"

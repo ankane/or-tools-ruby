@@ -173,8 +173,8 @@ class ConstraintTest < Minitest::Test
     status = solver.solve(model, solution_printer)
     assert_equal :optimal, status
 
-    assert_equal 182, solver.num_conflicts
-    assert_equal 1777, solver.num_branches
+    assert_kind_of Integer, solver.num_conflicts
+    assert_kind_of Integer, solver.num_branches
     assert_equal 72, solution_printer.solution_count
 
     stop_callback = StopSearchCallback.new
@@ -390,11 +390,11 @@ class ConstraintTest < Minitest::Test
 
     assert_equal 0, solver.objective_value
     assert_equal 0, solver.best_objective_bound
-    assert_equal 14, solver.num_booleans
+    assert_equal 15, solver.num_booleans
     assert_equal 0, solver.num_conflicts
     assert_equal 14, solver.num_branches
     assert_equal 49, solver.num_integer_propagations
-    assert_equal 14, solver.num_binary_propagations
+    assert_equal 15, solver.num_binary_propagations
     assert_kind_of Float, solver.deterministic_time
     assert_kind_of Float, solver.wall_time
     assert_kind_of Float, solver.user_time

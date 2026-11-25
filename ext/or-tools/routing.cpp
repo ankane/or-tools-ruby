@@ -1,25 +1,26 @@
 #include <string>
 #include <vector>
 
-#include <ortools/constraint_solver/routing.h>
-#include <ortools/constraint_solver/routing_parameters.h>
+#include <ortools/constraint_solver/interval.h>
+#include <ortools/routing/parameters.h>
+#include <ortools/routing/routing.h>
 #include <rice/rice.hpp>
 #include <rice/stl.hpp>
 
 using operations_research::Assignment;
 using operations_research::ConstraintSolverParameters;
-using operations_research::DefaultRoutingSearchParameters;
-using operations_research::FirstSolutionStrategy;
+using operations_research::routing::DefaultRoutingSearchParameters;
+using operations_research::routing::FirstSolutionStrategy;
 using operations_research::IntervalVarElement;
-using operations_research::LocalSearchMetaheuristic;
-using operations_research::RoutingDimension;
-using operations_research::RoutingDisjunctionIndex;
-using operations_research::RoutingIndexManager;
-using operations_research::RoutingModel;
-using operations_research::RoutingModelParameters;
-using operations_research::RoutingNodeIndex;
-using operations_research::RoutingSearchParameters;
-using operations_research::RoutingSearchStatus;
+using operations_research::routing::LocalSearchMetaheuristic;
+using operations_research::routing::RoutingDimension;
+using operations_research::routing::RoutingDisjunctionIndex;
+using operations_research::routing::RoutingIndexManager;
+using operations_research::routing::RoutingModel;
+using operations_research::routing::RoutingModelParameters;
+using operations_research::routing::RoutingNodeIndex;
+using operations_research::routing::RoutingSearchParameters;
+using operations_research::routing::RoutingSearchStatus;
 
 using Rice::Array;
 using Rice::Class;
@@ -197,8 +198,6 @@ void init_routing(Rice::Module& m) {
     .define_method("use_full_propagation=", &RoutingSearchParameters::set_use_full_propagation)
     .define_method("use_guided_local_search_penalties_in_local_search_operators", &RoutingSearchParameters::use_guided_local_search_penalties_in_local_search_operators)
     .define_method("use_guided_local_search_penalties_in_local_search_operators=", &RoutingSearchParameters::set_use_guided_local_search_penalties_in_local_search_operators)
-    .define_method("use_iterated_local_search", &RoutingSearchParameters::use_iterated_local_search)
-    .define_method("use_iterated_local_search=", &RoutingSearchParameters::set_use_iterated_local_search)
     .define_method("use_multi_armed_bandit_concatenate_operators", &RoutingSearchParameters::use_multi_armed_bandit_concatenate_operators)
     .define_method("use_multi_armed_bandit_concatenate_operators=", &RoutingSearchParameters::set_use_multi_armed_bandit_concatenate_operators)
     .define_method("use_unfiltered_first_solution_strategy", &RoutingSearchParameters::use_unfiltered_first_solution_strategy)
@@ -455,12 +454,8 @@ void init_routing(Rice::Module& m) {
     .define_method("print_model=", &ConstraintSolverParameters::set_print_model)
     .define_method("print_model_stats", &ConstraintSolverParameters::print_model_stats)
     .define_method("print_model_stats=", &ConstraintSolverParameters::set_print_model_stats)
-    .define_method("profile_file", &ConstraintSolverParameters::profile_file)
-    // .define_method("profile_file=", &ConstraintSolverParameters::set_profile_file)
     .define_method("profile_local_search", &ConstraintSolverParameters::profile_local_search)
     .define_method("profile_local_search=", &ConstraintSolverParameters::set_profile_local_search)
-    .define_method("profile_propagation", &ConstraintSolverParameters::profile_propagation)
-    .define_method("profile_propagation=", &ConstraintSolverParameters::set_profile_propagation)
     .define_method("skip_locally_optimal_paths", &ConstraintSolverParameters::skip_locally_optimal_paths)
     .define_method("skip_locally_optimal_paths=", &ConstraintSolverParameters::set_skip_locally_optimal_paths)
     .define_method("store_names", &ConstraintSolverParameters::store_names)
@@ -500,13 +495,13 @@ void init_routing(Rice::Module& m) {
   m.define_singleton_function(
     "default_routing_model_parameters",
     []() {
-      return operations_research::DefaultRoutingModelParameters();
+      return operations_research::routing::DefaultRoutingModelParameters();
     });
 
   Rice::define_class_under<RoutingModel::ResourceGroup>(m, "ResourceGroup");
 
   Rice::define_class_under<RoutingModel>(m, "RoutingModel")
-    .define_constructor(Rice::Constructor<RoutingModel, RoutingIndexManager, RoutingModelParameters>(), Rice::Arg("_index_manager"), Rice::Arg("_parameters") = operations_research::DefaultRoutingModelParameters())
+    .define_constructor(Rice::Constructor<RoutingModel, RoutingIndexManager, RoutingModelParameters>(), Rice::Arg("_index_manager"), Rice::Arg("_parameters") = operations_research::routing::DefaultRoutingModelParameters())
     .define_method("register_unary_transit_vector", &RoutingModel::RegisterUnaryTransitVector)
     .define_method(
       "_register_unary_transit_callback",
@@ -537,10 +532,10 @@ void init_routing(Rice::Module& m) {
           }
         );
       }, Rice::Arg("_callback").keepAlive())
-    .define_method("add_dimension", &RoutingModel::AddDimension)
-    .define_method("add_dimension_with_vehicle_transits", &RoutingModel::AddDimensionWithVehicleTransits)
-    .define_method("add_dimension_with_vehicle_capacity", &RoutingModel::AddDimensionWithVehicleCapacity)
-    .define_method("add_dimension_with_vehicle_transit_and_capacity", &RoutingModel::AddDimensionWithVehicleTransitAndCapacity)
+    .define_method("add_dimension", &RoutingModel::AddDimension, Rice::Arg("evaluator_index"), Rice::Arg("slack_max"), Rice::Arg("capacity"), Rice::Arg("fix_start_cumul_to_zero"), Rice::Arg("name"), Rice::Arg("has_variable_transits")=false)
+    .define_method("add_dimension_with_vehicle_transits", &RoutingModel::AddDimensionWithVehicleTransits, Rice::Arg("evaluator_indices"), Rice::Arg("slack_max"), Rice::Arg("capacity"), Rice::Arg("fix_start_cumul_to_zero"), Rice::Arg("name"), Rice::Arg("has_variable_transits")=false)
+    .define_method("add_dimension_with_vehicle_capacity", &RoutingModel::AddDimensionWithVehicleCapacity, Rice::Arg("evaluator_index"), Rice::Arg("slack_max"), Rice::Arg("vehicle_capacities"), Rice::Arg("fix_start_cumul_to_zero"), Rice::Arg("name"), Rice::Arg("has_variable_transits")=false)
+    .define_method("add_dimension_with_vehicle_transit_and_capacity", &RoutingModel::AddDimensionWithVehicleTransitAndCapacity, Rice::Arg("evaluator_indices"), Rice::Arg("slack_max"), Rice::Arg("vehicle_capacities"), Rice::Arg("fix_start_cumul_to_zero"), Rice::Arg("name"), Rice::Arg("has_variable_transits")=false)
     .define_method("add_constant_dimension_with_slack", &RoutingModel::AddConstantDimensionWithSlack)
     .define_method("add_constant_dimension", &RoutingModel::AddConstantDimension)
     .define_method("add_vector_dimension", &RoutingModel::AddVectorDimension)
@@ -553,13 +548,15 @@ void init_routing(Rice::Module& m) {
     .define_method("add_resource_group", &RoutingModel::AddResourceGroup)
     .define_method("dimension_resource_group_indices", &RoutingModel::GetDimensionResourceGroupIndices)
     .define_method("dimension_resource_group_index", &RoutingModel::GetDimensionResourceGroupIndex)
-    .define_method("_add_disjunction", &RoutingModel::AddDisjunction)
+    .define_method(
+      "_add_disjunction",
+      [](RoutingModel& self, const std::vector<int64_t>& indices, int64_t penalty, int64_t max_cardinality, RoutingModel::PenaltyCostBehavior penalty_cost_behavior) {
+        self.AddDisjunction(indices, penalty, max_cardinality, penalty_cost_behavior);
+      })
     .define_method("disjunction_indices", &RoutingModel::GetDisjunctionIndices)
     .define_method("disjunction_penalty", &RoutingModel::GetDisjunctionPenalty)
     .define_method("disjunction_max_cardinality", &RoutingModel::GetDisjunctionMaxCardinality)
     .define_method("number_of_disjunctions", &RoutingModel::GetNumberOfDisjunctions)
-    .define_method("mandatory_disjunctions?", &RoutingModel::HasMandatoryDisjunctions)
-    .define_method("max_cardinality_constrained_disjunctions?", &RoutingModel::HasMaxCardinalityConstrainedDisjunctions)
     .define_method("perfect_binary_disjunctions", &RoutingModel::GetPerfectBinaryDisjunctions)
     .define_method("ignore_disjunctions_already_forced_to_zero", &RoutingModel::IgnoreDisjunctionsAlreadyForcedToZero)
     .define_method("add_soft_same_vehicle_constraint", &RoutingModel::AddSoftSameVehicleConstraint)

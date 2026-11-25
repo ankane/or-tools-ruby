@@ -1,6 +1,6 @@
 require "mkmf-rice"
 
-$CXXFLAGS << " -std=c++17 $(optflags) -DUSE_CBC -DOR_PROTO_DLL="
+$CXXFLAGS << " -std=c++20 $(optflags) -DUSE_CBC -DOR_ORTOOLS_PROTO_DLL= -DOR_MATH_OPT_PROTO_DLL= -DOR_ROUTING_PROTO_DLL="
 
 # show warnings
 $CXXFLAGS << " -Wall -Wextra"
@@ -33,6 +33,6 @@ end
 # which can cause them to find system library
 $INCFLAGS << " -I#{inc}"
 $LDFLAGS.prepend("-Wl,-rpath,#{rpath} -L#{lib} ")
-raise "OR-Tools not found" unless have_library("ortools")
+raise "OR-Tools not found" unless have_library("ortools") && have_library("ortools_core") && have_library("ortools_flatzinc") && have_library("ortools_math_opt") && have_library("ortools_packing") && have_library("ortools_routing") && have_library("ortools_scheduling")
 
 create_makefile("or_tools/ext")

@@ -10,6 +10,8 @@ jobs:
           - ruby: "4.0"
             os: ubuntu-24.04
             valgrind: true
+          - ruby: "4.0"
+            os: ubuntu-24.04-arm
           - ruby: 3.4
             os: macos-26
           - ruby: 3.3

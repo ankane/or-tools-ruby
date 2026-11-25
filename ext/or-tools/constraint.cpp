@@ -14,6 +14,7 @@
 using operations_research::Domain;
 using operations_research::sat::BoolVar;
 using operations_research::sat::Constraint;
+using operations_research::sat::BoolOrConstraint;
 using operations_research::sat::CpModelBuilder;
 using operations_research::sat::CpSolverResponse;
 using operations_research::sat::CpSolverStatus;
@@ -22,6 +23,7 @@ using operations_research::sat::IntVar;
 using operations_research::sat::LinearExpr;
 using operations_research::sat::Model;
 using operations_research::sat::NewFeasibleSolutionObserver;
+using operations_research::sat::NoOverlapConstraint;
 using operations_research::sat::SatParameters;
 using operations_research::sat::SolutionBooleanValue;
 using operations_research::sat::SolutionIntegerValue;
@@ -173,8 +175,6 @@ void init_constraint(Rice::Module& m) {
     .define_method("boolean_encoding_level=", &SatParameters::set_boolean_encoding_level)
     .define_method("catch_sigint_signal", &SatParameters::catch_sigint_signal)
     .define_method("catch_sigint_signal=", &SatParameters::set_catch_sigint_signal)
-    .define_method("check_drat_proof", &SatParameters::check_drat_proof)
-    .define_method("check_drat_proof=", &SatParameters::set_check_drat_proof)
     .define_method("check_lrat_proof", &SatParameters::check_lrat_proof)
     .define_method("check_lrat_proof=", &SatParameters::set_check_lrat_proof)
     .define_method("check_merged_lrat_proof", &SatParameters::check_merged_lrat_proof)
@@ -319,8 +319,6 @@ void init_constraint(Rice::Module& m) {
     .define_method("inprocessing_dtime_ratio=", &SatParameters::set_inprocessing_dtime_ratio)
     .define_method("inprocessing_minimization_dtime", &SatParameters::inprocessing_minimization_dtime)
     .define_method("inprocessing_minimization_dtime=", &SatParameters::set_inprocessing_minimization_dtime)
-    .define_method("inprocessing_minimization_use_all_orderings", &SatParameters::inprocessing_minimization_use_all_orderings)
-    .define_method("inprocessing_minimization_use_all_orderings=", &SatParameters::set_inprocessing_minimization_use_all_orderings)
     .define_method("inprocessing_minimization_use_conflict_analysis", &SatParameters::inprocessing_minimization_use_conflict_analysis)
     .define_method("inprocessing_minimization_use_conflict_analysis=", &SatParameters::set_inprocessing_minimization_use_conflict_analysis)
     .define_method("inprocessing_probing_dtime", &SatParameters::inprocessing_probing_dtime)
@@ -383,8 +381,6 @@ void init_constraint(Rice::Module& m) {
     .define_method("max_domain_size_for_linear2_expansion=", &SatParameters::set_max_domain_size_for_linear2_expansion)
     .define_method("max_domain_size_when_encoding_eq_neq_constraints", &SatParameters::max_domain_size_when_encoding_eq_neq_constraints)
     .define_method("max_domain_size_when_encoding_eq_neq_constraints=", &SatParameters::set_max_domain_size_when_encoding_eq_neq_constraints)
-    .define_method("max_drat_time_in_seconds", &SatParameters::max_drat_time_in_seconds)
-    .define_method("max_drat_time_in_seconds=", &SatParameters::set_max_drat_time_in_seconds)
     .define_method("max_integer_rounding_scaling", &SatParameters::max_integer_rounding_scaling)
     .define_method("max_integer_rounding_scaling=", &SatParameters::set_max_integer_rounding_scaling)
     .define_method("max_lin_max_size_for_expansion", &SatParameters::max_lin_max_size_for_expansion)
@@ -475,8 +471,6 @@ void init_constraint(Rice::Module& m) {
     .define_method("optimize_with_lb_tree_search=", &SatParameters::set_optimize_with_lb_tree_search)
     .define_method("optimize_with_max_hs", &SatParameters::optimize_with_max_hs)
     .define_method("optimize_with_max_hs=", &SatParameters::set_optimize_with_max_hs)
-    .define_method("output_drat_proof", &SatParameters::output_drat_proof)
-    .define_method("output_drat_proof=", &SatParameters::set_output_drat_proof)
     .define_method("output_lrat_proof", &SatParameters::output_lrat_proof)
     .define_method("output_lrat_proof=", &SatParameters::set_output_lrat_proof)
     .define_method("pb_cleanup_increment", &SatParameters::pb_cleanup_increment)
@@ -944,6 +938,9 @@ void init_constraint(Rice::Module& m) {
         }
         return proto_string;
       });
+
+  Rice::define_class_under<BoolOrConstraint, Constraint>(m, "BoolOrConstraint");
+  Rice::define_class_under<NoOverlapConstraint, Constraint>(m, "NoOverlapConstraint");
 
   Rice::define_class_under<CpSolverResponse>(m, "CpSolverResponse")
     .define_method("best_objective_bound", &CpSolverResponse::best_objective_bound)
