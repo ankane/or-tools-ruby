@@ -1,3 +1,8 @@
+## 0.19.0 (unreleased)
+
+- Updated OR-Tools to 10.0 rc1
+- Dropped support for C++17
+
 ## 0.18.2 (2026-10-27)
 
 - Added `add_at_most_one` and `add_exactly_one` methods to `CpModel`
